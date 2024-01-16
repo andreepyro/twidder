@@ -55,20 +55,34 @@ border: 5px solid black;
 
 
 #container {
-    border: 1px solid blue;
+    background-color: blue;
+    width: 600px;
+    height: 400px;
+    margin-top: 10px;
 }
 #container-info {
-    display: inline-block;
-    width:120px;
-    height:120px;
-    border: 1px solid red;
+    /* display: inline-block; */
+    width: 340px;
+    height: 400px;
+    background-color: red;
 }
 #container-ui {
-    vertical-align:top;
-    display: inline-block;
-    width:160px;
-    height:160px;
-    border: 1px solid green;
+    /* vertical-align:top;
+    display: inline-block; */
+    width:250px;
+    height:400px;
+    background-color: green;
+    margin-left: 10px;
+}
+#container-login {
+    width:250px;
+    height:120px;
+    background-color: orange;
+}
+#container-signup {
+    width:250px;
+    height:280px;
+    background-color: yellow;
 }
 
 
