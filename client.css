@@ -1,8 +1,20 @@
+body {
+    background-image: url("src/background4.jpeg");
+    background-size:     cover;
+    background-repeat:   no-repeat;
+    background-position: center center;
+}
+
+p {
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+}
+
 #container {
-    background-color: blue;
     width: 600px;
     height: 400px;
     margin-top: 10px;
+    margin: auto;
 }
 #container-info {
     display: inline-block;
@@ -16,7 +28,6 @@
     float: right;
     width:250px;
     height:400px;
-    background-color: green;
 }
 #container-login {
     width:250px;
@@ -34,12 +45,12 @@ label {
     display: inline-block;
     width: 76px;
     text-align: right;
-  }​
+}​
 
-  #submit {
+#submit {
     color: #fff;
     width: 135px;
     height: 60px;
     text-align: right;
     background: #0c0 url(image) 0 0 no-repeat; 
-   }
+}
