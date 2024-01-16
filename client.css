@@ -30,5 +30,16 @@
     background-color: yellow;
 }
 
+label {
+    display: inline-block;
+    width: 76px;
+    text-align: right;
+  }​
 
-
+  #submit {
+    color: #fff;
+    width: 135px;
+    height: 60px;
+    text-align: right;
+    background: #0c0 url(image) 0 0 no-repeat; 
+   }
