@@ -37,7 +37,7 @@
           </div>
           <div id="container-signup">
             Sign Up
-            <form>
+            <form id="form-sign-up" onsubmit="return signUp()">
               <div>
                 <label>First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10"/>
@@ -76,7 +76,7 @@
                 <input id="input-sign-up-password-repeat" required="required" type="password" size="10"/>
               </div>
               <div>
-                <input type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" />
+                <input type="submit" value="SignUp"/>
               </div>
             </form>
           </div>

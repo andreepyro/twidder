@@ -12,41 +12,18 @@ function showView(viewName) {
 }
 
 function signUp() {
-    if (isSignUpFormValid) {
-        // TODO
+    if (isSignUpFormValid()) {
+        alert("valid")
+    } else {
+        alert("invalid")
     }
-
 }
 
 function login() {
-    alert("inside login")
-    }
+    alert("login")
+}
 
 function isSignUpFormValid() {
-    // check for blank fields
-    if (document.getElementById("").value == "") {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
+    // TODO implement
     return true
 }
