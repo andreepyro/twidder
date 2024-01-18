@@ -22,7 +22,7 @@
         </div>
         <div id="container-ui">
           <div id="container-login" onsubmit="login();">
-            <form id="form-sign-up" onsubmit="return signUp()">
+            <form id="form-login" onsubmit="return login()">
               <p>
                 Login
               </p>
@@ -39,9 +39,9 @@
           </div>
           <div id="container-signup">
             <p>
-              Signup
+              Sign Up
             </p>
-            <form>
+            <form id="form-sign-up" onsubmit="return signUp()">
               <div>
                 <label>First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10"/>
@@ -69,7 +69,7 @@
               </div>
               <div>
                 <label>Email</label>
-                <input id="input-sign-up-email" required="required" type="text" size="10"/>
+                <input id="input-sign-up-email" required="required" type="email" size="10"/>
               </div>
               <div>
                 <label>Password </label>
@@ -80,7 +80,7 @@
                 <input id="input-sign-up-password-repeat" required="required" type="password" size="10"/>
               </div>
               <div>
-                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();"> Signup</button>
+                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" > Sign Up</button>
               </div>
             </form>
           </div>
