@@ -16,55 +16,55 @@
         <div id="container-ui">
           <div id="container-login">
             Login
-            <div class="block-email">
+            <div>
               <label>Email</label>
               <input type="text" size="10" />
-            <div class="block-pwd">
+            <div>
               <label>Password</label>
               <input type="text" size="10" />
             </div>
           </div>
           <div id="container-signup">
             Sign Up
-            <div class="block-fname">
+            <div>
               <label>First name</label>
-              <input type="text" size="10"/>
+              <input id="input-sign-up-first-name" type="text" size="10"/>
             </div>
-            <div class="block-family-name">
+            <div>
               <label>Family name</label>
-              <input type="text" size="10"/>
+              <input id="input-sign-up-last-name" type="text" size="10"/>
             </div>
-            <div class="block-gender">
+            <div>
               <label> Gender</label>
-              <select>
-                <option value="0"> Select Gender</option>
+              <select id="input-sign-up-gender">
+                <option value="0"> ---</option>
                 <option value="1"> Female </option>
                 <option value="2"> Male </option>
                 <option value="3"> Other </option>
               </select>
             </div>
-            <div class="block-city">
+            <div>
               <label>City</label>
-              <input type="text" size="10"/>
+              <input id="input-sign-up-city" type="text" size="10"/>
             </div>
-            <div class="block-country">
+            <div>
               <label>Country</label>
-              <input type="text" size="10"/>
+              <input id="input-sign-up-country" type="text" size="10"/>
             </div>
-            <div class="block-Email2">
+            <div>
               <label>Email</label>
-              <input type="text" size="10"/>
+              <input id="input-sign-up-email" type="text" size="10"/>
             </div>
-            <div class="block-pwd2">
+            <div>
               <label>Password </label>
-              <input type="text" size="10"/>
-              <div class="block-repeat">
-                <label>Repeat pwd</label>
-                <input type="text" size="10"/>
-              </div>
+              <input id="input-sign-up-password" type="text" size="10"/>
             </div>
-            <div class="block-submit">
-              <input type="submit" name="submit" value="SignUp" id="submit" />
+            <div>
+              <label>Repeat pwd</label>
+              <input id="input-sign-up-password-repeat" type="text" size="10"/>
+            </div>
+            <div>
+              <input type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" />
             </div>
         </div>
       </div>
