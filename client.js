@@ -45,8 +45,9 @@ function isSignUpFormValid() {
     if (document.getElementById("").value == 0) {
         return false
     }
-    if (document.getElementById("").value == 0) {
+    if (document.getElementById("").value == 0){
         return false
     }
+
     return true
 }
