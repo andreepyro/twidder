@@ -22,26 +22,28 @@
         </div>
         <div id="container-ui">
           <div id="container-login">
+            <form>
             Login
             <div>
               <label>Email</label>
-              <input type="text" size="10" />
+              <input id="input-login-email" type="text" size="10" required="required" placeholder="example@email.com" pattern="/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;/">
             </div>
             <div>
                 <label>Password</label>
-                <input type="text" size="10" />
+                <input id="input-login-password" type="password" required="required" size="10" />
             </div>
+            </form>
           </div>
           <div id="container-signup">
             Sign Up
             <form>
               <div>
                 <label>First name</label>
-                <input id="input-sign-up-first-name" type="text" size="10"/>
+                <input id="input-sign-up-first-name" type="text" required="required" size="10"/>
               </div>
               <div>
                 <label>Family name</label>
-                <input id="input-sign-up-last-name" type="text" size="10"/>
+                <input id="input-sign-up-last-name" type="text" required="required" size="10"/>
               </div>
               <div>
                 <label>Gender</label>
@@ -54,23 +56,23 @@
               </div>
               <div>
                 <label>City</label>
-                <input id="input-sign-up-city" type="text" size="10"/>
+                <input id="input-sign-up-city" required="required" type="text" size="10"/>
               </div>
               <div>
                 <label>Country</label>
-                <input id="input-sign-up-country" type="text" size="10"/>
+                <input id="input-sign-up-country" required="required" type="text" size="10"/>
               </div>
               <div>
                 <label>Email</label>
-                <input id="input-sign-up-email" type="text" size="10"/>
+                <input id="input-sign-up-email" required="required" type="text" size="10"/>
               </div>
               <div>
                 <label>Password </label>
-                <input id="input-sign-up-password" type="text" size="10"/>
+                <input id="input-sign-up-password" required="required" type="password" size="10"/>
               </div>
               <div>
                 <label>Repeat pwd</label>
-                <input id="input-sign-up-password-repeat" type="text" size="10"/>
+                <input id="input-sign-up-password-repeat" required="required" type="password" size="10"/>
               </div>
               <div>
                 <input type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" />
