@@ -21,7 +21,7 @@
           </p>
         </div>
         <div id="container-ui">
-          <div id="container-login">
+          <div id="container-login" onsubmit="login();">
             <form>
             Login
             <div>
@@ -32,6 +32,7 @@
                 <label>Password</label>
                 <input id="input-login-password" type="password" required="required" size="10" />
             </div>
+            <input type="submit" value="login" id="login"/>
             </form>
           </div>
           <div id="container-signup">

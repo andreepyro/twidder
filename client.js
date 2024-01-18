@@ -15,7 +15,12 @@ function signUp() {
     if (isSignUpFormValid) {
         // TODO
     }
+
 }
+
+function login() {
+    alert("inside login")
+    }
 
 function isSignUpFormValid() {
     // check for blank fields
