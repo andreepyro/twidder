@@ -15,13 +15,13 @@
 
       <div id="container">
         <div id="container-info">
-          <img src="src/logo.png" alt="twidder logo" width="170" height="170">
-          <p>
+          <img class="image-center" src="src/logo.png" alt="twidder logo" width="170" height="170">
+          <p class="text-center">
             Twidder: Where cat videos reign supreme, and your existential musings get 280 characters of fame – because life is too short for serious social networking!
           </p>
         </div>
         <div id="container-ui">
-          <div id="container-login" onsubmit="login();">
+          <div id="container-login">
             <form id="form-login" onsubmit="return login()">
               <p>
                 Login
@@ -34,7 +34,7 @@
                 <label>Password</label>
                 <input id="input-login-password" type="password" required="required" size="10" />
             </div>
-              <button type="submit" value="login" id="login"> Login </button>
+              <button type="submit" value="login" id="login">Login </button>
             </form>
           </div>
           <div id="container-signup">
@@ -53,10 +53,10 @@
               <div>
                 <label>Gender</label>
                 <select id="input-sign-up-gender">
-                  <option value="0"> ---</option>
-                  <option value="1"> Female </option>
-                  <option value="2"> Male </option>
-                  <option value="3"> Other </option>
+                  <option value="0">---</option>
+                  <option value="1">Female </option>
+                  <option value="2">Male </option>
+                  <option value="3">Other </option>
                 </select>
               </div>
               <div>
@@ -80,7 +80,7 @@
                 <input id="input-sign-up-password-repeat" required="required" type="password" size="10"/>
               </div>
               <div>
-                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" > Sign Up</button>
+                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" >Sign Up</button>
               </div>
             </form>
           </div>
