@@ -12,14 +12,16 @@ function showView(viewName) {
 }
 
 function signUp() {
-    if (isSignUpFormValid) {
-        // TODO
+    if (isSignUpFormValid()) {
+        alert("valid")
+    } else {
+        alert("invalid")
     }
 
 }
 
 function login() {
-    alert("inside login")
+    alert("login")
     }
 
 function isSignUpFormValid() {
