@@ -6,6 +6,7 @@
     <script src="serverstub.js"></script>
     <title>Twidder</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
     <!-- <script id="welcome-view" type=”text/view”>
@@ -44,7 +45,7 @@
             <p>
               Sign Up
             </p>
-            <form id="form-sign-up" onsubmit="return signUp()">
+            <form id="form-signup" onsubmit="return signUp()">
               <div>
                 <label>First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10">
@@ -89,5 +90,43 @@
           </div>
         </div>
       </div>
+
+      <div id="sidebar">
+        <img src="src/logo.png" alt="twidder logo" width="64" height="64">
+        <a class="active" href="#home">Home</a>
+        <a href="#news">Browse</a>
+        <a href="#contact">Account</a>
+      </div>
+      
+      <!-- CONTENT AFTER LOGIN -->
+
+      <!-- <div id="page">
+        <div id="page-content">
+          <div id="profile-info">
+            <img src="src/user-solid.svg" alt="John" width="128" height="128">
+            <h1>Peter Parker</h1>
+            <p class="profile-info-gender">Octopus</p>
+            <p>Linköping, Sweden</p>
+            <p>email@student.liu.se</p>
+          </div>
+          <div id="change-password">
+            <form id="form-change-password" onsubmit="return changePassword()">
+              <div>
+                <label>Old password</label>
+                <input id="input-change-password-old" type="password" required="required" size="10">
+              </div>
+              <div>
+                  <label>New password</label>
+                  <input id="input-change-password-new" type="password" required="required" size="10">
+              </div>
+              <div>
+                  <label>Repeat new password</label>
+                  <input id="input-change-password-new2" type="password" required="required" size="10">
+              </div>
+              <button type="submit" id="login">Change password</button>
+            </form>
+          </div>
+        </div>
+      </div> -->
   </body>
 </html>
