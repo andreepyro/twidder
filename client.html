@@ -77,14 +77,14 @@
               </div>
               <div>
                 <label for="password">Password </label>
-                <input id="input-sign-up-password" required="required" type="password" size="10">
+                <input id="input-sign-up-password" required="required" minlength="8" type="password" size="10">
               </div>
               <div>
                 <label for="repeat_pwd">Repeat pwd</label>
-                <input id="input-sign-up-password-repeat" required="required" type="password" size="10">
+                <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10">
               </div>
               <div>
-                <button type="submit" name="submit" value="SignUp" id="submit" >Sign Up</button>
+                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" >Sign Up</button>
               </div>
             </form>
           </div>

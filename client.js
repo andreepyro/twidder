@@ -26,8 +26,11 @@ function login() {
 
 function isSignUpFormValid() {
     // check for blank fields
-    let password = document.getElementById("input-sign-up-password").innerHTML = html;
-    let repeat_pwd = document.getElementById("input-sign-up-password-repeat").innerHTML = html;
+    let password = document.getElementById("input-sign-up-password").value;
+    let repeat_pwd = document.getElementById("input-sign-up-password-repeat").value;
+
+    //console.log(password)
+    //console.log(repeat_pwd)
 
     if (password != repeat_pwd){
         return false
