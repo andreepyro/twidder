@@ -77,11 +77,11 @@
               </div>
               <div>
                 <label for="password">Password </label>
-                <input id="input-sign-up-password" required="required" minlength="8" type="password" size="10">
+                <input id="input-sign-up-password" required="required" minlength="8" type="password" size="10" onKeyUp="checkSamePasswords();">
               </div>
               <div>
                 <label for="repeat_pwd">Repeat pwd</label>
-                <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10">
+                <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10" onKeyUp="checkSamePasswords();">
               </div>
               <div>
                 <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" >Sign Up</button>
