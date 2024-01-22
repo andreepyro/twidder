@@ -16,7 +16,6 @@
     <span id="content"> -->
 
 
-
       <div id="container">
         <div id="container-info">
           <img class="image-center" src="src/logo.png" alt="twidder logo" width="170" height="170">
@@ -31,12 +30,12 @@
                 Login
               </p>
             <div>
-              <label for="email">Email</label>
+              <label for="input-login-email">Email</label>
               <input id="input-login-email" type="email" size="10" class="mainLoginInput" required="required" placeholder="example@email.com">
             </div>
             <div>
-                <label for="password">Password</label>
-                <input id="input-login-password" type="password" required="required" size="10">
+                <label for="input-login-password">Password</label>
+                <input id="input-login-password" type="password" required="required" size="10" minlength="8">
             </div>
               <button type="submit" value="login" id="login">Login </button>
             </form>
@@ -47,15 +46,15 @@
             </p>
             <form id="form-signup" action="#" onsubmit="saveUser(this); return false;">
               <div>
-                <label for="first_name">First name</label>
+                <label for="input-sign-up-first-name">First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10">
               </div>
               <div>
-                <label for="family_name">Family name</label>
+                <label for="input-sign-up-last-name">Family name</label>
                 <input id="input-sign-up-last-name" type="text" required="required" size="10">
               </div>
               <div>
-                <label for="gender">Gender</label>
+                <label for="input-sign-up-gender">Gender</label>
                 <select id="input-sign-up-gender">
                   <option value="0">---</option>
                   <option value="1">Female </option>
@@ -64,24 +63,24 @@
                 </select>
               </div>
               <div>
-                <label for="city">City</label>
+                <label for="input-sign-up-city">City</label>
                 <input id="input-sign-up-city" required="required" type="text" size="10">
               </div>
               <div>
-                <label for="country">Country</label>
+                <label for="input-sign-up-country">Country</label>
                 <input id="input-sign-up-country" required="required" type="text" size="10">
               </div>
               <div>
-                <label for="email">Email</label>
+                <label for="input-sign-up-email">Email</label>
                 <input id="input-sign-up-email" required="required" type="email" size="10">
               </div>
               <div>
-                <label for="password">Password </label>
-                <input id="input-sign-up-password" required="required" minlength="8" type="password" size="10">
+                <label for="input-sign-up-password">Password </label>
+                <input id="input-sign-up-password" required="required" minlength="8" type="password" size="10" onKeyUp="checkSamePasswords();">
               </div>
               <div>
-                <label for="repeat_pwd">Repeat pwd</label>
-                <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10">
+                <label for="input-sign-up-password-repeat">Repeat pwd</label>
+                <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10" onKeyUp="checkSamePasswords();">
               </div>
               <div>
                 <button type="submit" name="submit" value="SignUp" id="submit"  >Sign Up</button>

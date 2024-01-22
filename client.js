@@ -13,11 +13,10 @@ function showView(viewName) {
 
 function signUp() {
     if (isSignUpFormValid()) {
-        alert("valid")
+        // TODO
     } else {
-        alert("invalid")
+        alert("passwords doesn't match!")
     }
-
 }
 
 function saveUser(formData){
@@ -50,19 +49,27 @@ function saveUser(formData){
 
 function login() {
     alert("login")
-    }
+}
 
 function isSignUpFormValid() {
-    // check for blank fields
-    let password = document.getElementById("input-sign-up-password").value;
-    let repeat_pwd = document.getElementById("input-sign-up-password-repeat").value;
+    let password1 = document.getElementById("input-sign-up-password");
+    let password2 = document.getElementById("input-sign-up-password-repeat");
 
-    //console.log(password)
-    //console.log(repeat_pwd)
-
-    if (password != repeat_pwd){
+    if (password1.value != password2.value){
         return false
     }
 
     return true
+}
+
+function checkSamePasswords() {
+    let password1 = document.getElementById("input-sign-up-password");
+    let password2 = document.getElementById("input-sign-up-password-repeat");
+    if (password1.value == password2.value) {
+        password1.style.color = "green";
+        password2.style.color = "green";
+    } else {
+        password1.style.color = "red";
+        password2.style.color = "red";
+    }
 }
