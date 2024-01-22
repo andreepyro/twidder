@@ -26,28 +26,10 @@ function login() {
 
 function isSignUpFormValid() {
     // check for blank fields
-    if (document.getElementById("").value == "") {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0) {
-        return false
-    }
-    if (document.getElementById("").value == 0){
+    let password = document.getElementById("input-sign-up-password").innerHTML = html;
+    let repeat_pwd = document.getElementById("input-sign-up-password-repeat").innerHTML = html;
+
+    if (password != repeat_pwd){
         return false
     }
 

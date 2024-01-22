@@ -31,11 +31,11 @@
                 Login
               </p>
             <div>
-              <label>Email</label>
+              <label for="email">Email</label>
               <input id="input-login-email" type="email" size="10" class="mainLoginInput" required="required" placeholder="example@email.com">
             </div>
             <div>
-                <label>Password</label>
+                <label for="password">Password</label>
                 <input id="input-login-password" type="password" required="required" size="10">
             </div>
               <button type="submit" value="login" id="login">Login </button>
@@ -47,15 +47,15 @@
             </p>
             <form id="form-signup" onsubmit="return signUp()">
               <div>
-                <label>First name</label>
+                <label for="first_name">First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10">
               </div>
               <div>
-                <label>Family name</label>
+                <label for="family_name">Family name</label>
                 <input id="input-sign-up-last-name" type="text" required="required" size="10">
               </div>
               <div>
-                <label>Gender</label>
+                <label for="gender">Gender</label>
                 <select id="input-sign-up-gender">
                   <option value="0">---</option>
                   <option value="1">Female </option>
@@ -64,43 +64,44 @@
                 </select>
               </div>
               <div>
-                <label>City</label>
+                <label for="city">City</label>
                 <input id="input-sign-up-city" required="required" type="text" size="10">
               </div>
               <div>
-                <label>Country</label>
+                <label for="country">Country</label>
                 <input id="input-sign-up-country" required="required" type="text" size="10">
               </div>
               <div>
-                <label>Email</label>
+                <label for="email">Email</label>
                 <input id="input-sign-up-email" required="required" type="email" size="10">
               </div>
               <div>
-                <label>Password </label>
+                <label for="password">Password </label>
                 <input id="input-sign-up-password" required="required" type="password" size="10">
               </div>
               <div>
-                <label>Repeat pwd</label>
+                <label for="repeat_pwd">Repeat pwd</label>
                 <input id="input-sign-up-password-repeat" required="required" type="password" size="10">
               </div>
               <div>
-                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" >Sign Up</button>
+                <button type="submit" name="submit" value="SignUp" id="submit" >Sign Up</button>
               </div>
             </form>
           </div>
         </div>
       </div>
-
-      <div id="sidebar">
+      
+      <!-- CONTENT AFTER LOGIN -->
+      
+    
+      <!-- <div id="sidebar">
         <img src="src/logo.png" alt="twidder logo" width="64" height="64">
         <a class="active" href="#home">Home</a>
         <a href="#news">Browse</a>
         <a href="#contact">Account</a>
       </div>
-      
-      <!-- CONTENT AFTER LOGIN -->
 
-      <!-- <div id="page">
+       <div id="page">
         <div id="page-content">
           <div id="profile-info">
             <img src="src/user-solid.svg" alt="John" width="128" height="128">
