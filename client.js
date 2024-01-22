@@ -20,6 +20,34 @@ function signUp() {
 
 }
 
+function saveUser(formData){
+    let first_name = formData["input-sign-up-first-name"].value; 
+    let family_name = formData["input-sign-up-last-name"].value; 
+    let gender = formData["input-sign-up-gender"].value; 
+    let city = formData["input-sign-up-city"].value; 
+    let country = formData["input-sign-up-country"].value;
+    let email = formData["input-sign-up-email"].value; 
+    let password = formData["input-sign-up-password"].value; 
+
+    var user ={
+        email: email, 
+        password: password,
+        firstname: first_name, 
+        familyname: family_name, 
+        gender: gender, 
+        city: city, 
+        country: country,  
+    };
+
+    if (!serverstub.signUp(user)["success"]){
+        //console.log(serverstub.signUp(user)["message"])
+        return serverstub.signUp(user)["message"]  
+    } else {
+        //console.log(serverstub.signUp(user)["success"])
+        return serverstub.signUp(user)["success"]
+    }
+}
+
 function login() {
     alert("login")
     }

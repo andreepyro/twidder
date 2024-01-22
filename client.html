@@ -45,7 +45,7 @@
             <p>
               Sign Up
             </p>
-            <form id="form-signup" onsubmit="return signUp()">
+            <form id="form-signup" action="#" onsubmit="saveUser(this); return false;">
               <div>
                 <label for="first_name">First name</label>
                 <input id="input-sign-up-first-name" type="text" required="required" size="10">
@@ -84,7 +84,7 @@
                 <input id="input-sign-up-password-repeat" required="required" minlength="8" type="password" size="10">
               </div>
               <div>
-                <button type="submit" name="submit" value="SignUp" id="submit" onclick="signUp();" >Sign Up</button>
+                <button type="submit" name="submit" value="SignUp" id="submit"  >Sign Up</button>
               </div>
             </form>
           </div>
