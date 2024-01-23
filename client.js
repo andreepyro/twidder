@@ -187,10 +187,10 @@ function checkSamePasswords(htmlPassword, htmlPassword2) {
     let password1 = document.getElementById(htmlPassword);
     let password2 = document.getElementById(htmlPassword2);
     if (password1.value == password2.value) {
-        password1.style.color = "green";
-        password2.style.color = "green";
+        password1.setCustomValidity("");
+        password2.setCustomValidity("");
     } else {
-        password1.style.color = "red";
-        password2.style.color = "red";
+        password1.setCustomValidity("Passwords doesn't match!");
+        password2.setCustomValidity("Passwords doesn't match!");
     }
 }
