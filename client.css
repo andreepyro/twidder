@@ -92,6 +92,10 @@ input:focus:valid {
     border: 2px solid green;
 }
 
+input:not(:focus) {
+    border: 2px solid rgba(255,255,255,0);
+}
+
 #form-login button {
     background-color: lightyellow; /* Green */
     border: 5px solid lightsalmon;
@@ -225,6 +229,7 @@ input:focus:valid {
         border-top-right-radius: 0px;
     }
     #page {
+        height: auto;
         margin-left: 0;
         padding-top: 60px;
     }
@@ -269,50 +274,6 @@ input:focus:valid {
     }
 }
 
-/* PROFILE INFORMATION */
-#profile-info {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 300px;
-    margin: auto;
-    margin-bottom: 15px;
-    text-align: center;
-    font-family: arial;
-    padding: 14px;
-}
-
-#profile-info-gender {
-    color: grey;
-    font-size: 18px;
-}
-
-#change-password {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    max-width: 300px;
-    margin: auto;
-    text-align: center;
-    font-family: arial;
-    padding: 14px;
-}
-
-/* CHANGE PASSWORD PAGE */
-#form-change-password {
-    margin: auto;
-    text-align: center;
-}
-
-#form-change-password label {
-    display: inline-block;
-    width: 160px;
-    text-align: right;
-    font-family: Tahoma, sans-serif;
-}
-
-#form-change-password button {
-    background-color: lightyellow; /* Green */
-    border: 5px solid lightsalmon;
-    color: black;
-}
-
 
 /* BROWSE PAGE */
 #browse-page {
@@ -351,6 +312,101 @@ input:focus:invalid {
 
 input:focus:valid {
     border: 0px solid green;
+}
+
+@media screen and (max-width: 700px) {
+    
+}
+
+@media screen and (max-width: 400px) {
+    
+}
+
+
+/* ACCOUNT PAGE */
+
+#account-content {
+    display: flex;
+    width: 100%;
+}
+
+#account-tab {
+    margin: auto;
+    display: flex;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#account-info {
+    max-width: 300px;
+    text-align: center;
+    font-family: arial;
+    padding: 14px;
+}
+
+#account-gender {
+    color: grey;
+    font-size: 18px;
+}
+
+#change-password {
+    max-width: 500px;
+    text-align: center;
+    font-family: arial;
+    padding: 14px;
+}
+
+#form-change-password {
+    margin: auto;
+    text-align: center;
+}
+
+#form-change-password div {
+    margin: 5px;
+}
+
+#form-change-password input {
+    height: 24px;
+    border-radius: 25px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    text-align: left;
+    padding-left: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#form-change-password input:invalid {
+    border: 1px solid red;
+}
+
+#form-change-password input:valid {
+    border: 1px solid green;
+}
+
+#form-change-password input:not(:focus) {
+    border: 1px solid rgba(255,255,255,0);
+}
+
+#form-change-password label {
+    display: inline-block;
+    width: 160px;
+    text-align: right;
+    font-family: Tahoma, sans-serif;
+}
+
+#form-change-password button {
+    width: 120px;
+    height: 24px;
+    background-color: white;
+    border: 0px solid gray;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+}
+
+@media screen and (max-width: 800px) {
+    #account-tab {
+        display: block;
+    }
 }
 
 @media screen and (max-width: 700px) {
