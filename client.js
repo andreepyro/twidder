@@ -21,11 +21,6 @@ function showView(viewName) {
     // show user content
     let userData = getUserData();
     if (userData != null) {
-        let htmlInfoUsername = document.getElementById("info-username");
-        if (htmlInfoUsername != null) {
-            htmlInfoUsername.innerHTML = userData.firstname + " " + userData.familyname;
-        }
-
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
             htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;

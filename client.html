@@ -103,14 +103,18 @@
         <a class="active" href="#" onclick="showView('browse-view'); return false;">Browse</a>
         <a href="#" onclick="showView('account-view'); return false;">Account</a>
         <div class="footer">
-          <p id="info-username">name placeholder</p>
-          <button onclick="logout();">sign out</button>
+          <a href="#" onclick="logout(); return false;">Sign out</a>
         </div>
       </div>
   
       <div id="page">
-        <div id="page-content">
-          <h1>BROWSE PAGE CONTENT</h1>
+        <div id="browse-page">
+          <form id="form-search-user" action="#" onsubmit="searchUser(this);return false;">
+            <div id="search-bar">
+              <input id="input-user-email" type="email" size="10" class="mainLoginInput" required="required" placeholder="example@email.com">
+              <button type="submit" name="save" value="Save">Search</button>
+            </div>
+          </form>
         </div>
       </div>
     </script>
