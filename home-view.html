@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link href="client.css" type="text/css" rel="stylesheet">
-    <script src="client.js"></script>
-    <script src="serverstub.js"></script>
+    <link href="./css/shared.css" type="text/css" rel="stylesheet">
+    <link href="./css/welcome-view.css" type="text/css" rel="stylesheet">
+    <link href="./css/home-view.css" type="text/css" rel="stylesheet">
+    <link href="./css/browse-view.css" type="text/css" rel="stylesheet">
+    <link href="./css/account-view.css" type="text/css" rel="stylesheet">
+    <script src="./js/client.js"></script>
+    <script src="./js/serverstub.js"></script>
     <title>Twidder</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +20,7 @@
             <a href="#" onclick="showView('browse-view'); return false;">Browse</a>
             <a href="#" onclick="showView('account-view'); return false;">Account</a>
             <div class="footer">
-              <p id="info-username">name placeholder</p>
-              <button onclick="logout();">sign out</button>
+              <a href="#" onclick="logout(); return false;">Sign out</a>
             </div>
           </div>
       

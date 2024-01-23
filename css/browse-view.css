@@ -1,0 +1,45 @@
+#browse-page {
+    width: 100%;
+    height: 100%;
+}
+
+#search-bar {
+    margin: 10px;
+    display: flex;
+}
+
+#search-bar input {
+    width: 100%;
+    height: 30px;
+    border-radius: 25px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    text-align: left;
+    padding-left: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#search-bar button {
+    width: 120px;
+    background-color: white;
+    border: 0px solid gray;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+input:focus:invalid {
+    border: 0px solid red;
+}
+
+input:focus:valid {
+    border: 0px solid green;
+}
+
+@media screen and (max-width: 700px) {
+    
+}
+
+@media screen and (max-width: 400px) {
+    
+}
