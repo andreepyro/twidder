@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="client.css" type="text/css" rel="stylesheet">
+    <script src="client.js"></script>
+    <script src="serverstub.js"></script>
+    <title>Twidder</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <span id="content">
+        <div id="sidebar">
+            <img src="src/logo.png" alt="twidder logo" width="64" height="64">
+            <a class="active" href="#" onclick="showView('home-view'); return false;">Home</a>
+            <a href="#" onclick="showView('browse-view'); return false;">Browse</a>
+            <a href="#" onclick="showView('account-view'); return false;">Account</a>
+            <div class="footer">
+              <p id="info-username">name placeholder</p>
+              <button onclick="logout();">sign out</button>
+            </div>
+          </div>
+      
+          <div id="page">
+            <div id="page-content">
+              <h1>HOME PAGE CONTENT</h1>
+            </div>
+          </div>
+    </span>
+  </body>
+</html>
