@@ -23,33 +23,23 @@ function showView(viewName) {
     let userData = getUserData();
     let token = localStorage.getItem("token");
     if (userData != null && token!=null) {
+
         let htmlWall = document.getElementById("wall");
-        
-        let newPostBoxHtml = document.getElementById("input-post-bar");
-        let userMessage = newPostBoxHtml.value;
-    
-        // let result = serverstub.postMessage(token, userMessage, userData.email)
-        // if (!result["success"]) {
-        //     alert(result["message"]);
-        //     return;
-        // }
-    
-    
         if (htmlWall != null) {
             let result = serverstub.getUserMessagesByToken(token);
             if (result["success"]){
-                let listOfMessages = result["data"]
-                for (var i=0; 1< listOfMessages.length;i++) {
-                    newPostBoxHtml.value = "";
+                let messages = result["data"]
+                for (var i = 0; i < messages.length; i++) {
                     const newPostHtml = document.createElement("div");
-                    const node = document.createTextNode(listOfMessages[i]["content"]);
+                    const node = document.createTextNode(messages[i]["content"]);
                     newPostHtml.appendChild(node);
                     newPostHtml.classList.add("post");
-                    htmlWall.insertBefore(newPostHtml, htmlWall.firstChild);
+                    htmlWall.appendChild(newPostHtml);
                   }  
 
             }   
         }
+
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
             htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;
