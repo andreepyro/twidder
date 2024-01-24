@@ -79,7 +79,29 @@
       </div>
     </script>
     <script id="home-view" type=”text/view”>
-      <div id="sidebar">
+      <div id="container-home">
+        <div id="container-profile">
+            <text> Profile</text>
+            <div id="home-p-info">
+              <img src="user.png" alt="Hanna" width="70" height="70">
+              <h1 id="account-username">Hanna Asp</h1>
+              <p id="account-gender" class="profile-info-gender">Octopus</p>
+              <p id="account-location">Linköping, Sweden</p>
+              <p id="account-email">email@student.liu.se</p>
+            </div>
+        </div>
+        <div id="container-content">
+          <text>WALL</text>
+          <div id="post-bar">
+          <input id="input-post-bar" type="text" placeholder="Write something interesting..." required=required">
+          <button type="submit" name="save" value="Save">Post</button>
+      </div>
+      <div id="wall">        
+  <post id=1>Hi, this is the first message in the description list </post>  
+
+      </div>
+     
+     <!-- <div id="sidebar">
         <img src="src/logo.png" alt="twidder logo" width="64" height="64">
         <a class="active" href="#" onclick="showView('home-view'); return false;">Home</a>
         <a href="#" onclick="showView('browse-view'); return false;">Browse</a>
@@ -94,7 +116,7 @@
         <div id="page-content">
           <h1>HOME PAGE CONTENT</h1>
         </div>
-      </div>
+      </div> -->
     </script>
     <script id="browse-view" type=”text/view”>
       <div id="sidebar">
