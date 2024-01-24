@@ -15,6 +15,7 @@
     border-radius: 50%;  /* Rounded corner percentage*/
     background-color: rgba(240, 175, 137, 0.845);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin-left: 10px; /* needs to be switched too */
 }
 #container-ui {
     vertical-align:top;
@@ -62,6 +63,7 @@
 }
 
 #form-login input {
+    outline: none;
     height: 18px;
     border-radius: 25px;
     border-top-left-radius: 0px;
@@ -128,6 +130,7 @@
 }
 
 #form-signup input {
+    outline: none;
     height: 18px;
     border-radius: 25px;
     border-top-left-radius: 0px;

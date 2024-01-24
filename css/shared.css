@@ -77,11 +77,6 @@ button {
     100% {}
 }
 
-@keyframes appear {
-    0%   {opacity: 0;}
-    100% {}
-}
-
 .page {
     margin-left: 200px;
     height: 100vh;
@@ -192,4 +187,55 @@ button {
 
 #tab-account {
     display: none;
+}
+
+/* JUMP TO START BUTTON */
+#jump-to-start {
+    position: fixed;
+    bottom: -60px;
+    right: 20px;
+    border: none;
+    border-color: #2196F3;
+    color: dodgerblue;
+    padding: 15px;
+    border-radius: 25px;
+    transition: 0.3s;
+    z-index: 100;
+}
+  
+#jump-to-start:hover {
+    background: #2196F3;
+    color: white;
+}
+
+/* POPUP MESSAGE */
+#pop-message {
+    visibility: hidden;
+    left: 50%;
+    bottom: 30px;
+    min-width: 250px;
+    margin-left: -125px;
+    padding: 16px;
+    position: fixed;
+    border-radius: 3px;
+    color: #ffffff;
+    background-color: #f44336;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+  
+#pop-message.show {
+    visibility: visible;
+    animation: fadein 0.50s, fadeout 0.50s 4.05s;
+}
+  
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+  
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
 }

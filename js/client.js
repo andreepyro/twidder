@@ -4,7 +4,7 @@
 //     // the code required to display a view
 // };
 
-window.onload = function(){
+window.onload = function() {
     let token = localStorage.getItem("token");
     if (token != null && getUserData(token) != null) {
         showView("user-view");
@@ -40,10 +40,29 @@ function showView(viewName) {
             }   
         }
 
+        let htmlHomeUsername = document.getElementById("home-username");
+        if (htmlHomeUsername != null) {
+            htmlHomeUsername.innerHTML = userData.firstname + " " + userData.familyname;
+        }
+
+        let htmlHomeGender = document.getElementById("home-gender");
+        if (htmlHomeGender != null) {
+            htmlHomeGender.innerHTML = userData.gender;
+        }
+
+        let htmlHomeLocation = document.getElementById("home-location");
+        if (htmlHomeLocation != null) {
+            htmlHomeLocation.innerHTML = userData.city + ", " + userData.country;
+        }
+
+        let htmlHomeEmail = document.getElementById("home-email");
+        if (htmlHomeEmail != null) {
+            htmlHomeEmail.innerHTML = userData.email;
+        }
+
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
             htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;
-            
         }
 
         let htmlAccountGender = document.getElementById("account-gender");
@@ -100,8 +119,10 @@ function showTab(tabName) {
             accountTabButton.classList.add("active");
             break;
         default:
-            alert("tab doesn't exist!");
+            showMessage("tab doesn't exist!");
     }
+
+    jumpToStart();
 }
 
 // LOGIN
@@ -121,7 +142,7 @@ function login(email, password) {
         showView("user-view");
         return true;
     } else {
-        alert(result["message"]);
+        showMessage(result["message"]);
         return false;
     }
 }
@@ -135,7 +156,7 @@ function logout() {
     let result = serverstub.signOut(token);
 
     if (!result["success"]) {
-        alert(result["message"]);
+        showMessage(result["message"]);
     }
 
     showView("welcome-view");
@@ -154,7 +175,7 @@ function registerForm(form) {
     let password2 = form["input-sign-up-password-repeat"].value;
 
     if (password != password2) {
-        alert("Passwords doesn't match!");
+        showMessage("Passwords doesn't match!");
         return
     }
 
@@ -173,7 +194,7 @@ function registerForm(form) {
     if (result["success"]) {
         login(email, password);
     } else {
-        alert(result["message"]);
+        showMessage(result["message"]);
     }
 }
 
@@ -201,25 +222,157 @@ function changedPasswordForm(form) {
     let passwordNew2 = form["input-change-password-new-repeat"].value;
 
     if (passwordNew == passwordOld) {
-        alert("New password can't be the same!");
+        showMessage("New password can't be the same!");
         return
     }
 
     if (passwordNew != passwordNew2) {
-        alert("Passwords doesn't match!");
+        showMessage("Passwords doesn't match!");
         return
     }
 
     let token = localStorage.getItem("token");
     if (token === null) {
-        alert("You need to be signed in!");
+        showMessage("You need to be signed in!");
         return
     }
 
     let result = serverstub.changePassword(token, passwordOld, passwordNew);
-    alert(result["message"]);
+    showMessage(result["message"]);
     if (result["success"]) {
         showView("user-view");
+    }
+}
+
+// ADD POST
+
+function addPost() {
+    let token = localStorage.getItem("token");
+    let userData = getUserData();
+
+    if (token == null || userData == null) {
+        return;
+    }
+
+    let wallHtml = document.getElementById("wall");
+    let newPostBoxHtml = document.getElementById("input-post-bar");
+    let userMessage = newPostBoxHtml.value;
+
+    let result = serverstub.postMessage(token, userMessage, userData.email)
+    if (!result["success"]) {
+        showMessage(result["message"]);
+        return;
+    }   
+
+    newPostBoxHtml.value = "";
+    const newPostHtml = document.createElement("div");
+    const node = document.createTextNode(userMessage);
+    newPostHtml.appendChild(node);
+    newPostHtml.classList.add("post");
+    newPostHtml.style.animation = "appear 1s";
+    wallHtml.insertBefore(newPostHtml, wallHtml.firstChild);
+
+    setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
+}
+
+function addPostOnWall() {
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showMessage("You need to be signed in!");
+        return;
+    }
+
+    let userData = getUserData();
+    if (userData == null) {
+        showMessage("Couldn't load user data!");
+        return;
+    }
+
+    let userEmailHtml = document.getElementById("browse-user-email");
+    let wallHtml = document.getElementById("browse-wall");
+    let newPostBoxHtml = document.getElementById("input-browse-new-post");
+    let userEmail = userEmailHtml.innerHTML;
+    let userMessage = newPostBoxHtml.value;
+
+    let result = serverstub.postMessage(token, userMessage, userEmail)
+    if (!result["success"]) {
+        showMessage(result["message"]);
+        return;
+    }   
+
+    newPostBoxHtml.value = "";
+    let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
+    const newPostHtml = document.createElement("div");
+    newPostHtml.innerHTML = postTemplateHtml;
+    newPostHtml.children[0].innerHTML = userData.email;
+    const textNode = document.createTextNode(userMessage);
+    newPostHtml.children[1].appendChild(textNode);
+    newPostHtml.classList.add("browse-post");
+    newPostHtml.style.animation = "appear 1s";
+    wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
+
+    setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
+}
+
+// SEARCH USER
+function searchUser() {
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showMessage("You need to be signed in!");
+        return;
+    }
+
+    let searchInputHtml = document.getElementById("input-user-email");
+    let userEmail = searchInputHtml.value;
+
+    let userDataResult = serverstub.getUserDataByEmail(token, userEmail);
+    if (!userDataResult["success"]) {
+        showMessage(userDataResult["message"]);
+        return;
+    }
+
+    let userData = userDataResult["data"];
+
+    let searchButtonHtml = document.getElementById("browse-search-button");
+    searchButtonHtml.innerHTML = "Reload";
+
+    let containerUserPage = document.getElementById("container-user-page");
+    containerUserPage.style.display = "block";
+
+    let userNameHtml = document.getElementById("browse-user-name");
+    userNameHtml.innerHTML = userData.firstname + " " + userData.familyname;
+
+    let userGenderHtml = document.getElementById("browse-user-gender");
+    userGenderHtml.innerHTML = userData.gender;
+
+    let userLocationHtml = document.getElementById("browse-user-location");
+    userLocationHtml.innerHTML = userData.city + ", " + userData.country;
+
+    let userEmailHtml = document.getElementById("browse-user-email");
+    userEmailHtml.innerHTML = userData.email;
+
+    let htmlWall = document.getElementById("browse-wall");
+    let userPostsResult = serverstub.getUserMessagesByEmail(token, userEmail);
+    if (!userPostsResult["success"]){
+        showMessage(userPostsResult["message"]);
+    }
+    let userMessages = userPostsResult["data"]
+
+    let oldPosts = document.getElementsByClassName("browse-post");
+    for (var i = oldPosts.length - 1; i >= 0; i--) {
+        oldPosts[i].remove();
+    }
+
+
+    let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
+    for (let i = 0; i < userMessages.length; i++) {
+        const newPostHtml = document.createElement("div");
+        newPostHtml.innerHTML = postTemplateHtml;
+        newPostHtml.children[0].innerHTML = userMessages[i]["writer"];
+        const textNode = document.createTextNode(userMessages[i]["content"]);
+        newPostHtml.children[1].appendChild(textNode);
+        newPostHtml.classList.add("browse-post");
+        htmlWall.appendChild(newPostHtml);
     }
 }
 
@@ -237,29 +390,41 @@ function checkSamePasswords(htmlPassword, htmlPassword2) {
     }
 }
 
-function addPost() {
-    let token = localStorage.getItem("token");
-    let userData = getUserData();
+function searchButtonUpdate() {
+    let searchButtonHtml = document.getElementById("browse-search-button");
+    searchButtonHtml.innerHTML = "Search";
+}
 
-    if (token == null || userData == null) {
-        return;
+var lastYPos = window.scrollY;
+window.onscroll = function() {
+  let searchFormHtml = document.getElementById("form-search-user");
+  let currentYPos = window.scrollY;
+  if (lastYPos > currentYPos) {
+    searchFormHtml.style.top = "10px";
+  } else {
+    searchFormHtml.style.top = "-50px";
+  }
+  lastYPos = currentYPos;
+
+  let jumpToStartHtml = document.getElementById("jump-to-start");
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    jumpToStartHtml.style.bottom = "20px";
+  } else {
+    jumpToStartHtml.style.bottom = "-60px";
+  }
+}
+
+function jumpToStart() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+
+// POPUP MESSAGE
+
+function showMessage(message) {
+    let messageHtml = document.getElementById("pop-message");
+    if (!messageHtml.classList.contains('show')) {
+        messageHtml.className = "show";
+        setTimeout(function(){ messageHtml.className = messageHtml.className.replace("show", ""); }, 4500);
     }
-
-    let wallHtml = document.getElementById("wall");
-    let newPostBoxHtml = document.getElementById("input-post-bar");
-    let userMessage = newPostBoxHtml.value;
-
-    let result = serverstub.postMessage(token, userMessage, userData.email)
-    if (!result["success"]) {
-        alert(result["message"]);
-        return;
-    }   
-
-    newPostBoxHtml.value = "";
-    const newPostHtml = document.createElement("div");
-    const node = document.createTextNode(userMessage);
-    newPostHtml.appendChild(node);
-    newPostHtml.classList.add("post");
-    newPostHtml.style.animation = "appear 1s";
-    wallHtml.insertBefore(newPostHtml, wallHtml.firstChild);
 }

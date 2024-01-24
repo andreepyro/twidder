@@ -57,14 +57,17 @@
 
 #form-change-password input:invalid {
     border: 1px solid red;
+    outline: none;
 }
 
 #form-change-password input:valid {
     border: 1px solid green;
+    outline: none;
 }
 
 #form-change-password input:not(:focus) {
     border: 1px solid #e7e7e7;
+    outline: none;
 }
 
 #form-change-password label {
