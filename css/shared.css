@@ -15,23 +15,6 @@ button {
     cursor: pointer;
 }
 
-input {
-    outline:none;
-    border-radius: 25px;
-    border: 0; 
-}
-
-input:focus:invalid {
-    border: 2px solid red;
-}
-
-input:focus:valid {
-    border: 2px solid green;
-}
-
-input:not(:focus) {
-    border: 2px solid rgba(255,255,255,0);
-}
 
 .image-center {
     width: 50%;
