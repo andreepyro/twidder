@@ -108,12 +108,15 @@
           </div>
             <div id="container-content">
               <text>WALL</text>
-              <div id="post-bar">
-              <input id="input-post-bar" type="text" placeholder="Write something interesting..." required=required">
-              <button type="submit" name="save" value="Save">Post</button>
-            </div>
-            <div id="wall">        
-              <post id=1>Hi, this is the first message in the description list </post>  
+              <form id="form-new-post" action="#" onsubmit="addPost(this);return false;">
+                <div id="post-bar">
+                  <input id="input-post-bar" type="text" placeholder="Write something interesting..." required=required">
+                  <button type="submit" name="save" value="Save">Post</button>
+                </div>
+              </form>
+            <div id="wall">
+              <div class="post">content</div>
+              <div class="post">content</div>
             </div>
           </div>
       </div>

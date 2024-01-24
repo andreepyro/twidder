@@ -216,3 +216,30 @@ function checkSamePasswords(htmlPassword, htmlPassword2) {
         password2.setCustomValidity("Passwords doesn't match!");
     }
 }
+
+function addPost() {
+    let token = localStorage.getItem("token");
+    let userData = getUserData();
+
+    if (token == null || userData == null) {
+        return;
+    }
+
+    let wallHtml = document.getElementById("wall");
+    let newPostBoxHtml = document.getElementById("input-post-bar");
+    let userMessage = newPostBoxHtml.value;
+
+    // let result = serverstub.postMessage(token, userMessage, userData.email)
+    // if (!result["success"]) {
+    //     alert(result["message"]);
+    //     return;
+    // }
+
+    newPostBoxHtml.value = "";
+    const newPostHtml = document.createElement("div");
+    const node = document.createTextNode(userMessage);
+    newPostHtml.appendChild(node);
+    newPostHtml.classList.add("post");
+    newPostHtml.style.animation = "appear 1s";
+    wallHtml.insertBefore(newPostHtml, wallHtml.firstChild);
+}

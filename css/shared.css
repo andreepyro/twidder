@@ -180,3 +180,16 @@ button {
         border-bottom-left-radius: 25px;
     }
 }
+
+/* TABS */
+#tab-home {
+    display: flex;
+}
+
+#tab-browse {
+    display: none;
+}
+
+#tab-account {
+    display: none;
+}
