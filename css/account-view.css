@@ -17,6 +17,10 @@
     padding: 14px;
 }
 
+#account-info img {
+    margin-top: 15px;
+}
+
 #account-gender {
     color: grey;
     font-size: 18px;
