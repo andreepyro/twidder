@@ -83,86 +83,81 @@
         </div>
       </div>
     </script>
-    <script id="home-view" type=”text/view”>
-      <div id="sidebar">
+    <script id="user-view" type=”text/view”>
+    <div id="sidebar">
         <img src="src/logo.png" alt="twidder logo" width="64" height="64">
-        <a class="active" href="#" onclick="showView('home-view'); return false;">Home</a>
-        <a href="#" onclick="showView('browse-view'); return false;">Browse</a>
-        <a href="#" onclick="showView('account-view'); return false;">Account</a>
+        <a id="sidebar-tab-home" class="active" href="#" onclick="showTab('home'); return false;">Home</a>
+        <a id="sidebar-tab-browse" href="#" onclick="showTab('browse'); return false;">Browse</a>
+        <a id="sidebar-tab-account" href="#" onclick="showTab('account'); return false;">Account</a>
         <div class="footer">
           <a href="#" onclick="logout(); return false;">Sign out</a>
         </div>
-      </div>
-  
-      <div id="page">
-        <div id="page-content">
-          <h1>HOME PAGE CONTENT</h1>
-        </div>
-      </div>
-    </script>
-    <script id="browse-view" type=”text/view”>
-      <div id="sidebar">
-        <img src="src/logo.png" alt="twidder logo" width="64" height="64">
-        <a href="#" onclick="showView('home-view'); return false;">Home</a>
-        <a class="active" href="#" onclick="showView('browse-view'); return false;">Browse</a>
-        <a href="#" onclick="showView('account-view'); return false;">Account</a>
-        <div class="footer">
-          <a href="#" onclick="logout(); return false;">Sign out</a>
-        </div>
-      </div>
-  
-      <div id="page">
-        <div id="browse-page">
-          <form id="form-search-user" action="#" onsubmit="searchUser(this);return false;">
-            <div id="search-bar">
-              <input id="input-user-email" type="email" size="10" class="mainLoginInput" required="required" placeholder="example@email.com">
-              <button type="submit" name="save" value="Save">Search</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </script>
-    <script id="account-view" type=”text/view”>
-      <div id="sidebar">
-          <img src="src/logo.png" alt="twidder logo" width="64" height="64">
-          <a href="#" onclick="showView('home-view'); return false;">Home</a>
-          <a href="#" onclick="showView('browse-view'); return false;">Browse</a>
-          <a class="active" href="#" onclick="showView('account-view'); return false;">Account</a>
-          <div class="footer">
-            <a href="#" onclick="logout(); return false;">Sign out</a>
-          </div>
-      </div>
-    
-      <div id="page">
-          <div id="account-content">
-              <div id="account-tab">
-                  <div id="account-info">
-                      <img src="src/user-solid.svg" alt="John" width="128" height="128">
-                      <h1 id="account-username">Peter Parker</h1>
-                      <p id="account-gender">Octopus</p>
-                      <p id="account-location">Linköping, Sweden</p>
-                      <p id="account-email">email@student.liu.se</p>
-                  </div>
-                  <div id="change-password">
-                      <form id="form-change-password"  action="#" onsubmit="changedPasswordForm(this);return false;">
-                          <div>
-                              <label for="input-change-password-old">Old password</label>
-                              <input id="input-change-password-old" type="password" required="required" size="10" minlength="8">
-                          </div>
-                          <div>
-                              <label for="input-change-password-new">New password</label>
-                              <input id="input-change-password-new" type="password" required="required" size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
-                          </div>
-                          <div>
-                              <label for="input-change-password-new-repeat">Repeat new password</label>
-                              <input id="input-change-password-new-repeat" type="password" required="required" size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
-                          </div>
-                          <button type="submit" name="save" value="Save">Change password</button>
-                      </form>
-                  </div>
+    </div>
+
+    <div id="tab-home" class="page">
+      <div id="container-home">
+          <div id="container-profile">
+              <text> Profile</text>
+              <div id="home-p-info">
+                <img src="src/user.png" alt="Hanna" width="70" height="70">
+                <h1 id="account-username">Hanna Asp</h1>
+                <p id="account-gender" class="profile-info-gender">Octopus</p>
+                <p id="account-location">Linköping, Sweden</p>
+                <p id="account-email">email@student.liu.se</p>
               </div>
           </div>
+            <div id="container-content">
+              <text>WALL</text>
+              <div id="post-bar">
+              <input id="input-post-bar" type="text" placeholder="Write something interesting..." required=required">
+              <button type="submit" name="save" value="Save">Post</button>
+            </div>
+            <div id="wall">        
+              <post id=1>Hi, this is the first message in the description list </post>  
+            </div>
+          </div>
       </div>
+    </div>
+    <div id="tab-browse" class="page">
+      <div id="browse-page">
+        <form id="form-search-user" action="#" onsubmit="searchUser(this);return false;">
+          <div id="search-bar">
+            <input id="input-user-email" type="email" size="10" required="required" placeholder="example@email.com">
+            <button type="submit" name="save" value="Save">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="tab-account" class="page">
+      <div id="account-content">
+        <div id="account-tab">
+            <div id="account-info">
+                <img src="src/user-solid.svg" alt="John" width="128" height="128">
+                <h1 id="account-username">Peter Parker</h1>
+                <p id="account-gender">Octopus</p>
+                <p id="account-location">Linköping, Sweden</p>
+                <p id="account-email">email@student.liu.se</p>
+            </div>
+            <div id="change-password">
+                <form id="form-change-password"  action="#" onsubmit="changedPasswordForm(this);return false;">
+                    <div>
+                        <label for="input-change-password-old">Old password</label>
+                        <input id="input-change-password-old" type="password" required="required" size="10" minlength="8">
+                    </div>
+                    <div>
+                        <label for="input-change-password-new">New password</label>
+                        <input id="input-change-password-new" type="password" required="required" size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
+                    </div>
+                    <div>
+                        <label for="input-change-password-new-repeat">Repeat new password</label>
+                        <input id="input-change-password-new-repeat" type="password" required="required" size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
+                    </div>
+                    <button type="submit" name="save" value="Save">Change password</button>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
     </script>
     <span id="content">
     

@@ -7,7 +7,7 @@
 window.onload = function(){
     let token = localStorage.getItem("token");
     if (token != null && getUserData(token) != null) {
-        showView("home-view");
+        showView("user-view");
     } else {
         showView("welcome-view");
     }
@@ -41,24 +41,46 @@ function showView(viewName) {
             htmlAccountEmail.innerHTML = userData.email;
         }
     }
+}
 
-    // apply dynamic changes
-    // TODO REMOVE ???
-    switch(viewName) {
-        case "welcome-view":
-            // code block
+function showTab(tabName) {
+    let homeTabButton = document.getElementById("sidebar-tab-home");
+    let browseTabButton = document.getElementById("sidebar-tab-browse");
+    let accountTabButton = document.getElementById("sidebar-tab-account");
+
+    if (homeTabButton.classList.contains('active')) {
+        homeTabButton.classList.remove("active");
+    }
+    if (browseTabButton.classList.contains('active')) {
+        browseTabButton.classList.remove("active");
+    }
+    if (accountTabButton.classList.contains('active')) {
+        accountTabButton.classList.remove("active");
+    }
+
+    let homeTab = document.getElementById("tab-home");
+    let browseTab = document.getElementById("tab-browse");
+    let accountTab = document.getElementById("tab-account");
+
+    homeTab.style.display = "none";
+    browseTab.style.display = "none";
+    accountTab.style.display = "none";
+
+    switch(tabName) {
+        case "home":
+            homeTabButton.classList.add("active");
+            homeTab.style.display = "flex";
             break;
-        case "home-view":
-            // code block
+        case "browse":
+            browseTab.style.display = "flex";
+            browseTabButton.classList.add("active");
             break;
-        case "browse-view":
-            // code block
-            break;
-        case "account-view":
-            // code block
+        case "account":
+            accountTab.style.display = "flex";
+            accountTabButton.classList.add("active");
             break;
         default:
-            alert("view doesn't exist!");
+            alert("tab doesn't exist!");
     }
 }
 
@@ -76,7 +98,7 @@ function login(email, password) {
     if (result["success"]) {
         let token = result["data"];
         localStorage.setItem("token", token);
-        showView("home-view");
+        showView("user-view");
         return true;
     } else {
         alert(result["message"]);
@@ -177,7 +199,7 @@ function changedPasswordForm(form) {
     let result = serverstub.changePassword(token, passwordOld, passwordNew);
     alert(result["message"]);
     if (result["success"]) {
-        showView("home-view");
+        showView("user-view");
     }
 }
 

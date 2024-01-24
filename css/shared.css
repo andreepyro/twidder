@@ -52,6 +52,9 @@ button {
     border-radius: 25px;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+    transition: 0.3s;
+    animation-name: appear-from-left;
+	animation-duration: 0.4s;
 }
 
 #sidebar a.active {
@@ -64,7 +67,22 @@ button {
     color: white;
 }
 
-#page {
+#sidebar .footer a {
+    animation-name: none;
+}
+
+@keyframes appear-from-left {
+    0%   {margin-left: -250px; margin-right: 250px;}
+    50%   {margin-left: -250px; margin-right: 250px;}
+    100% {}
+}
+
+@keyframes appear {
+    0%   {opacity: 0;}
+    100% {}
+}
+
+.page {
     margin-left: 200px;
     height: 100vh;
     display: flex;
@@ -115,8 +133,9 @@ button {
         border-radius: 25px;
         border-top-left-radius: 0px;
         border-top-right-radius: 0px;
+        animation-name: none;
     }
-    #page {
+    .page {
         height: auto;
         margin-left: 0;
         padding-top: 60px;
@@ -150,7 +169,7 @@ button {
         margin: 5px;
         border-radius: 25px;
     }
-    #page {
+    .page {
         padding-top: 220px;
     }
     #sidebar .footer a {
