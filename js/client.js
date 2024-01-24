@@ -17,13 +17,43 @@ function showView(viewName) {
     // load view
     let html = document.getElementById(viewName).innerHTML;
     document.getElementById("content").innerHTML = html;
+  
 
     // show user content
     let userData = getUserData();
-    if (userData != null) {
+    let token = localStorage.getItem("token");
+    if (userData != null && token!=null) {
+        let htmlWall = document.getElementById("wall");
+        
+        let newPostBoxHtml = document.getElementById("input-post-bar");
+        let userMessage = newPostBoxHtml.value;
+    
+        // let result = serverstub.postMessage(token, userMessage, userData.email)
+        // if (!result["success"]) {
+        //     alert(result["message"]);
+        //     return;
+        // }
+    
+    
+        if (htmlWall != null) {
+            let result = serverstub.getUserMessagesByToken(token);
+            if (result["success"]){
+                let listOfMessages = result["data"]
+                for (var i=0; 1< listOfMessages.length;i++) {
+                    newPostBoxHtml.value = "";
+                    const newPostHtml = document.createElement("div");
+                    const node = document.createTextNode(listOfMessages[i]["content"]);
+                    newPostHtml.appendChild(node);
+                    newPostHtml.classList.add("post");
+                    htmlWall.insertBefore(newPostHtml, htmlWall.firstChild);
+                  }  
+
+            }   
+        }
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
             htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;
+            
         }
 
         let htmlAccountGender = document.getElementById("account-gender");
@@ -229,11 +259,11 @@ function addPost() {
     let newPostBoxHtml = document.getElementById("input-post-bar");
     let userMessage = newPostBoxHtml.value;
 
-    // let result = serverstub.postMessage(token, userMessage, userData.email)
-    // if (!result["success"]) {
-    //     alert(result["message"]);
-    //     return;
-    // }
+    let result = serverstub.postMessage(token, userMessage, userData.email)
+    if (!result["success"]) {
+        alert(result["message"]);
+        return;
+    }   
 
     newPostBoxHtml.value = "";
     const newPostHtml = document.createElement("div");
