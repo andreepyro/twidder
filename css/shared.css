@@ -133,7 +133,7 @@ button {
     .page {
         height: auto;
         margin-left: 0;
-        padding-top: 60px;
+        padding-top: 55px;
     }
     #sidebar img {
         display: none
@@ -159,20 +159,15 @@ button {
 
 @media screen and (max-width: 400px) {
     #sidebar a {
-        text-align: center;
-        float: none;
-        margin: 5px;
-        border-radius: 25px;
+        margin: 0px;
+        border-radius: 0px;
+        box-shadow: 0 0 0 0;
     }
     .page {
-        padding-top: 220px;
+        padding-top: 50px;
     }
     #sidebar .footer a {
         float: right;
-        border-top-left-radius: 25px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 25px;
     }
 }
 
