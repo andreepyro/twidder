@@ -42,8 +42,12 @@
     margin-right: 28px;
     background-color: white;
     border: 0px solid gray;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     border-radius: 25px;
+    transition: 0.2s;
+}
+
+#form-login button:hover {
+    background-color: orange;
 }
 
 #form-login label {
@@ -70,7 +74,6 @@
     border-bottom-left-radius: 0px;
     text-align: left;
     padding-left: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
 #form-login input:invalid {
@@ -121,8 +124,12 @@
     margin-right: 28px;
     background-color: white;
     border: 0px solid gray;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     border-radius: 25px;
+    transition: 0.2s;
+}
+
+#form-signup button:hover {
+    background-color: orange;
 }
 
 #form-signup div {
@@ -137,7 +144,6 @@
     border-bottom-left-radius: 0px;
     text-align: left;
     padding-left: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
 #form-signup select {
