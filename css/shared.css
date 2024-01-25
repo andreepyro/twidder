@@ -119,6 +119,7 @@ button {
     #sidebar {
         width: 100%;
         height: auto;
+        z-index: 100;
     }
     #sidebar a {
         float: left;
@@ -138,10 +139,10 @@ button {
         display: none
     }
     #sidebar .footer {
-        width: auto;
+        width: fit-content;
         height: 50px;
-        position: relative;
-        bottom: 0;
+        right: 0px;
+        bottom: unset;
     }
     #sidebar .footer a {
         float: right;

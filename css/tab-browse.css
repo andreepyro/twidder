@@ -5,10 +5,10 @@
 
 #form-search-user {
     position: fixed;
-    width: calc(100% - 250px);
+    width: calc(100% - 200px);
     top: 10px;
     transition: 0.3s;
-    z-index: 100;
+    z-index: 50;
 }
 
 #search-bar {
@@ -63,11 +63,16 @@
 }
 
 @media screen and (max-width: 700px) {
-    
+    #form-search-user {
+        margin-top: 50px;
+        width: 100%;
+    }
 }
 
 @media screen and (max-width: 400px) {
-    
+    #form-search-user {
+        margin-top: 220px;
+    }
 }
 
 #browse-user-background {
