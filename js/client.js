@@ -400,9 +400,9 @@ window.onscroll = function() {
   let searchFormHtml = document.getElementById("form-search-user");
   let currentYPos = window.scrollY;
   if (lastYPos > currentYPos) {
-    searchFormHtml.style.top = "10px";
+    searchFormHtml.style.top = "0px";
   } else {
-    searchFormHtml.style.top = "-50px";
+    searchFormHtml.style.top = "-60px";
   }
   lastYPos = currentYPos;
 

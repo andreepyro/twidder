@@ -1,13 +1,12 @@
 #browse-page {
     width: 100%;
     height: 100%;
-    background-color: orange;
 }
 
 #form-search-user {
-    position: sticky;
+    position: fixed;
+    width: calc(100% - 250px);
     top: 10px;
-    width: inherit;
     transition: 0.3s;
     z-index: 100;
 }
@@ -71,12 +70,17 @@
     
 }
 
+#browse-user-background {
+    width: 100%;
+    height: 160px;
+    background-color: orange;
+}
+
 #container-user-page {
     display: none;
     width: 100%;
     height: fit-content;
     margin: auto;
-    margin-top: 120px;
     background-color: white;
     padding-bottom: 10px;
     transition: 0.2s;
