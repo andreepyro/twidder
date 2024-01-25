@@ -6,7 +6,7 @@
 #form-search-user {
     position: fixed;
     width: calc(100% - 200px);
-    top: 10px;
+    top: 5px;
     transition: 0.3s;
     z-index: 50;
 }
@@ -64,14 +64,14 @@
 
 @media screen and (max-width: 700px) {
     #form-search-user {
-        margin-top: 50px;
+        margin-top: 55px;
         width: 100%;
     }
 }
 
 @media screen and (max-width: 400px) {
     #form-search-user {
-        margin-top: 220px;
+        margin-top: 50px;
     }
 }
 
@@ -217,6 +217,14 @@
     }
 }
 
-@media screen and (max-width: 400px) {
-    /* TODO MAKE POSTS SMALLER */
+@media screen and (max-width: 430px) {
+    #form-browse-new-post {
+        width: 300px;
+    }
+    #form-browse-new-post textarea {
+        width: 294px;
+    }
+    .browse-post {
+        width: 300px;
+    }
 }
