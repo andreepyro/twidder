@@ -51,7 +51,9 @@ function showView(viewName) {
     }
 
     // load correct tab
-    showTab("home");
+    if (window.location.pathname == "/browse") showTab("browse");
+    else if (window.location.pathname == "/account") showTab("account");
+    else showTab("home");
 }
 
 function showTab(tabName) {
