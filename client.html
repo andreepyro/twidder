@@ -114,9 +114,16 @@
                 <div id="post-bar">
                   <input id="input-post-bar" type="text" placeholder="Write something interesting..." required>
                   <button type="submit" name="save" value="Save">Post</button>
+                  <div style="position: relative;">
+                    <div id="user-email"></div>
+                    <img alt="refresh" src="src/refresh-button.png" onclick="showWall(this);return false;">
+                   </div>  
                 </div>
               </form>
-            <div id="wall"></div>
+              <div id="post-template">
+                <div class="author"></div>
+                <div class="content"></div>
+              </div>
           </div>
       </div>
     </div>

@@ -24,15 +24,25 @@ function showView(viewName) {
     let token = localStorage.getItem("token");
     if (userData != null && token!=null) {
 
-        let htmlWall = document.getElementById("wall");
+        //let htmlWall = document.getElementById("wall");
+        let oldPosts = document.getElementsByClassName("post");
+        for (var i = oldPosts.length - 1; i >= 0; i--) {
+            oldPosts[i].remove();
+        }
+
+        let htmlWall = document.getElementById("form-new-post");
+        let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
+
         if (htmlWall != null) {
             let result = serverstub.getUserMessagesByToken(token);
             if (result["success"]){
                 let messages = result["data"]
                 for (var i = 0; i < messages.length; i++) {
                     const newPostHtml = document.createElement("div");
-                    const node = document.createTextNode(messages[i]["content"]);
-                    newPostHtml.appendChild(node);
+                    newPostHtml.innerHTML = postTemplateHtml;
+                    newPostHtml.children[0].innerHTML = messages[i]["writer"];
+                    const textNode = document.createTextNode(messages[i]["content"]);
+                    newPostHtml.appendChild(textNode);
                     newPostHtml.classList.add("post");
                     htmlWall.appendChild(newPostHtml);
                   }  
@@ -79,6 +89,24 @@ function showView(viewName) {
         if (htmlAccountEmail != null) {
             htmlAccountEmail.innerHTML = userData.email;
         }
+    }
+}
+
+function addMessages(){
+    let htmlWall = document.getElementById("post");
+    if (htmlWall != null) {
+        let result = serverstub.getUserMessagesByToken(token);
+        if (result["success"]){
+            let messages = result["data"]
+            for (var i = 0; i < messages.length; i++) {
+                const newPostHtml = document.createElement("div");
+                const node = document.createTextNode(messages[i]["content"]);
+                newPostHtml.appendChild(node);
+                newPostHtml.classList.add("post");
+                htmlWall.appendChild(newPostHtml);
+              }  
+
+        }   
     }
 }
 
@@ -313,6 +341,41 @@ function addPostOnWall() {
 
     setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
 }
+
+//show wall
+function showWall(){
+    let token = localStorage.getItem("token");
+    let wallHtml = document.getElementById("form-new-post");
+    let postTemplateHtml = document.getElementById("post-template").innerHTML;
+    if (token == null) {
+        showMessage("You need to be signed in!");
+        return;
+    }
+
+    let userMessagesByToken = serverstub.getUserMessagesByToken(token);
+    if (!userMessagesByToken["success"]){
+        showMessage(userMessagesByEmail["message"]);
+        return; 
+    } 
+    //removes previous posts on wall
+    let currentMessages = userMessagesByToken["data"];
+    let oldPosts = document.getElementsByClassName("post");
+    for (var i = oldPosts.length - 1; i >= 0; i--) {
+            oldPosts[i].remove();
+        }
+    //Adds the same content again
+    for (let i = 0; i < currentMessages.length; i++) {
+        const newPostHtml = document.createElement("div");
+        newPostHtml.innerHTML = postTemplateHtml;
+        newPostHtml.children[0].innerHTML = currentMessages[i]["writer"];
+        const textNode = document.createTextNode(currentMessages[i]["content"]);
+        newPostHtml.children[1].appendChild(textNode);
+        newPostHtml.classList.add("post");
+        wallHtml.appendChild(newPostHtml);
+    }
+
+}
+
 
 // SEARCH USER
 function searchUser() {
