@@ -18,57 +18,13 @@ function showView(viewName) {
     let html = document.getElementById(viewName).innerHTML;
     document.getElementById("content").innerHTML = html;
   
-
     // show user content
     let userData = getUserData();
     let token = localStorage.getItem("token");
     if (userData != null && token!=null) {
-
-        //let htmlWall = document.getElementById("wall");
-        let oldPosts = document.getElementsByClassName("post");
-        for (var i = oldPosts.length - 1; i >= 0; i--) {
-            oldPosts[i].remove();
-        }
-
-        let htmlWall = document.getElementById("form-new-post");
-        let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
-
-        if (htmlWall != null) {
-            let result = serverstub.getUserMessagesByToken(token);
-            if (result["success"]){
-                let messages = result["data"]
-                for (var i = 0; i < messages.length; i++) {
-                    const newPostHtml = document.createElement("div");
-                    newPostHtml.innerHTML = postTemplateHtml;
-                    newPostHtml.children[0].innerHTML = messages[i]["writer"];
-                    const textNode = document.createTextNode(messages[i]["content"]);
-                    newPostHtml.appendChild(textNode);
-                    newPostHtml.classList.add("post");
-                    htmlWall.appendChild(newPostHtml);
-                  }  
-
-            }   
-        }
-
-        let htmlHomeUsername = document.getElementById("home-username");
-        if (htmlHomeUsername != null) {
-            htmlHomeUsername.innerHTML = userData.firstname + " " + userData.familyname;
-        }
-
-        let htmlHomeGender = document.getElementById("home-gender");
-        if (htmlHomeGender != null) {
-            htmlHomeGender.innerHTML = userData.gender;
-        }
-
-        let htmlHomeLocation = document.getElementById("home-location");
-        if (htmlHomeLocation != null) {
-            htmlHomeLocation.innerHTML = userData.city + ", " + userData.country;
-        }
-
-        let htmlHomeEmail = document.getElementById("home-email");
-        if (htmlHomeEmail != null) {
-            htmlHomeEmail.innerHTML = userData.email;
-        }
+        reloadHomeTab();
+        
+        // Account Tab
 
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
@@ -276,14 +232,19 @@ function changedPasswordForm(form) {
 
 function addPost() {
     let token = localStorage.getItem("token");
-    let userData = getUserData();
-
-    if (token == null || userData == null) {
+    if (token == null) {
+        showMessage("You need to be signed in!");
         return;
     }
 
-    let wallHtml = document.getElementById("wall");
-    let newPostBoxHtml = document.getElementById("input-post-bar");
+    let userData = getUserData();
+    if (userData == null) {
+        showMessage("Couldn't load user data!");
+        return;
+    }
+
+    let wallHtml = document.getElementById("home-wall");
+    let newPostBoxHtml = document.getElementById("input-home-new-post");
     let userMessage = newPostBoxHtml.value;
 
     let result = serverstub.postMessage(token, userMessage, userData.email)
@@ -293,12 +254,15 @@ function addPost() {
     }   
 
     newPostBoxHtml.value = "";
+    let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
-    const node = document.createTextNode(userMessage);
-    newPostHtml.appendChild(node);
-    newPostHtml.classList.add("post");
-    newPostHtml.style.animation = "appear 1s";
-    wallHtml.insertBefore(newPostHtml, wallHtml.firstChild);
+    newPostHtml.innerHTML = postTemplateHtml;
+    newPostHtml.children[0].innerHTML = userData.email;
+    const textNode = document.createTextNode(userMessage);
+    newPostHtml.children[1].appendChild(textNode);
+    newPostHtml.classList.add("home-post");
+    newPostHtml.style.animation = "home-post-appear 1s";
+    wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
 }
@@ -336,7 +300,7 @@ function addPostOnWall() {
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[1].appendChild(textNode);
     newPostHtml.classList.add("browse-post");
-    newPostHtml.style.animation = "appear 1s";
+    newPostHtml.style.animation = "browse-post-appear 1s";
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
@@ -356,13 +320,15 @@ function showWall(){
     if (!userMessagesByToken["success"]){
         showMessage(userMessagesByEmail["message"]);
         return; 
-    } 
+    }
+
     //removes previous posts on wall
     let currentMessages = userMessagesByToken["data"];
     let oldPosts = document.getElementsByClassName("post");
     for (var i = oldPosts.length - 1; i >= 0; i--) {
-            oldPosts[i].remove();
-        }
+        oldPosts[i].remove();
+    }
+
     //Adds the same content again
     for (let i = 0; i < currentMessages.length; i++) {
         const newPostHtml = document.createElement("div");
@@ -373,7 +339,56 @@ function showWall(){
         newPostHtml.classList.add("post");
         wallHtml.appendChild(newPostHtml);
     }
+}
 
+// HOME TAB
+function reloadHomeTab() {
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showMessage("You need to be signed in!");
+        return;
+    }
+
+    let userData = getUserData();
+    if (userData == null) {
+        showMessage("Couldn't load user data!");
+        return;
+    }
+
+    let userNameHtml = document.getElementById("home-user-name");
+    userNameHtml.innerHTML = userData.firstname + " " + userData.familyname;
+
+    let userGenderHtml = document.getElementById("home-user-gender");
+    userGenderHtml.innerHTML = userData.gender;
+
+    let userLocationHtml = document.getElementById("home-user-location");
+    userLocationHtml.innerHTML = userData.city + ", " + userData.country;
+
+    let userEmailHtml = document.getElementById("home-user-email");
+    userEmailHtml.innerHTML = userData.email;
+
+    let htmlWall = document.getElementById("home-wall");
+    let userPostsResult = serverstub.getUserMessagesByEmail(token, userData.email);
+    if (!userPostsResult["success"]){
+        showMessage(userPostsResult["message"]);
+    }
+    let userMessages = userPostsResult["data"]
+
+    let oldPosts = document.getElementsByClassName("home-post");
+    for (var i = oldPosts.length - 1; i >= 0; i--) {
+        oldPosts[i].remove();
+    }
+
+    let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
+    for (let i = 0; i < userMessages.length; i++) {
+        const newPostHtml = document.createElement("div");
+        newPostHtml.innerHTML = postTemplateHtml;
+        newPostHtml.children[0].innerHTML = userMessages[i]["writer"];
+        const textNode = document.createTextNode(userMessages[i]["content"]);
+        newPostHtml.children[1].appendChild(textNode);
+        newPostHtml.classList.add("home-post");
+        htmlWall.appendChild(newPostHtml);
+    }
 }
 
 
@@ -486,6 +501,7 @@ function jumpToStart() {
 
 function showMessage(message) {
     let messageHtml = document.getElementById("pop-message");
+    messageHtml.innerHTML = message;
     if (!messageHtml.classList.contains('show')) {
         messageHtml.className = "show";
         setTimeout(function(){ messageHtml.className = messageHtml.className.replace("show", ""); }, 4500);

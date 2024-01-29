@@ -97,34 +97,30 @@
     <button id="jump-to-start" onclick="jumpToStart()">Top</button>
 
     <div id="tab-home" class="page">
-      <div id="container-home">
-          <div id="container-profile">
-              <p>Profile</p>
-              <div id="home-p-info">
-                <img alt="user profile picture" src="src/user.png" width="70" height="70">
-                <h1 id="home-username">Hanna Asp</h1>
-                <p id="home-gender" class="profile-info-gender">Octopus</p>
-                <p id="home-location">Linköping, Sweden</p>
-                <p id="home-email">email@student.liu.se</p>
-              </div>
+      <div id="home-page">
+        <div id="home-user-background"></div>
+        <img id="home-reload-button" alt="reload button" src="src/reload.svg" width="32" height="32" onclick="reloadHomeTab(this);return false;">
+        <div id="home-user-page">
+          <div id="home-user-page-user-info">
+            <img alt="user profile picture" src="src/user.png" width="128" height="128">
+            <div id="home-user-name">Name</div>
+            <div id="home-user-gender">Gender</div>
+            <div id="home-user-email">Email</div>
+            <div id="home-user-location">Location</div>
           </div>
-            <div id="container-content">
-              <p>WALL</p>
-              <form id="form-new-post" action="#" onsubmit="addPost(this);return false;">
-                <div id="post-bar">
-                  <input id="input-post-bar" type="text" placeholder="Write something interesting..." required>
+          <div id="container-home-wall">
+            <div id="home-wall">
+              <form id="form-home-new-post" action="#" onsubmit="addPost(this);return false;">
+                  <textarea id="input-home-new-post" placeholder="Write something interesting..." required></textarea>
                   <button type="submit" name="save" value="Save">Post</button>
-                  <div style="position: relative;">
-                    <div id="user-email"></div>
-                    <img alt="refresh" src="src/refresh-button.png" onclick="showWall(this);return false;">
-                   </div>  
-                </div>
               </form>
-              <div id="post-template">
+              <div id="home-post-template">
                 <div class="author"></div>
                 <div class="content"></div>
               </div>
+            </div>
           </div>
+        </div>
       </div>
     </div>
     <div id="tab-browse" class="page">
