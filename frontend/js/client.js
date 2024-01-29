@@ -1,17 +1,21 @@
 // VIEWS
 
-// displayView = function(){
-//     // the code required to display a view
-// };
-
 window.onload = function() {
+    loadApp();
+};
+
+window.addEventListener('popstate', function(e) {
+    loadApp();
+});
+
+function loadApp() {
     let token = localStorage.getItem("token");
     if (token != null && getUserData(token) != null) {
         showView("user-view");
     } else {
         showView("welcome-view");
     }
-};
+}
 
 function showView(viewName) {
     // load view
@@ -25,7 +29,6 @@ function showView(viewName) {
         reloadHomeTab();
         
         // Account Tab
-
         let htmlAccountUsername = document.getElementById("account-username");
         if (htmlAccountUsername != null) {
             htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;
@@ -46,24 +49,9 @@ function showView(viewName) {
             htmlAccountEmail.innerHTML = userData.email;
         }
     }
-}
 
-function addMessages(){
-    let htmlWall = document.getElementById("post");
-    if (htmlWall != null) {
-        let result = serverstub.getUserMessagesByToken(token);
-        if (result["success"]){
-            let messages = result["data"]
-            for (var i = 0; i < messages.length; i++) {
-                const newPostHtml = document.createElement("div");
-                const node = document.createTextNode(messages[i]["content"]);
-                newPostHtml.appendChild(node);
-                newPostHtml.classList.add("post");
-                htmlWall.appendChild(newPostHtml);
-              }  
-
-        }   
-    }
+    // load correct tab
+    showTab("home");
 }
 
 function showTab(tabName) {
@@ -89,18 +77,26 @@ function showTab(tabName) {
     browseTab.style.display = "none";
     accountTab.style.display = "none";
 
+    let modifyHistory = window.location.pathname.split("/")[1] != tabName;
+
     switch(tabName) {
         case "home":
             homeTabButton.classList.add("active");
             homeTab.style.display = "flex";
+            document.title = "Twidder | Home";
+            if (modifyHistory) history.pushState("home", '', "home");
             break;
         case "browse":
             browseTab.style.display = "flex";
             browseTabButton.classList.add("active");
+            document.title = "Twidder | Browse";
+            if (modifyHistory) history.pushState("browse", '', "browse");
             break;
         case "account":
             accountTab.style.display = "flex";
             accountTabButton.classList.add("active");
+            document.title = "Twidder | Account";
+            if (modifyHistory) history.pushState("account", '', "account");
             break;
         default:
             showMessage("tab doesn't exist!");
@@ -123,7 +119,7 @@ function login(email, password) {
     if (result["success"]) {
         let token = result["data"];
         localStorage.setItem("token", token);
-        showView("user-view");
+        loadApp();
         return true;
     } else {
         showMessage(result["message"]);
@@ -143,7 +139,7 @@ function logout() {
         showMessage(result["message"]);
     }
 
-    showView("welcome-view");
+    loadApp();
 }
 
 // REGISTER
@@ -224,13 +220,13 @@ function changedPasswordForm(form) {
     let result = serverstub.changePassword(token, passwordOld, passwordNew);
     showMessage(result["message"]);
     if (result["success"]) {
-        showView("user-view");
+        showTab("home");
     }
 }
 
 // ADD POST
 
-function addPost() {
+function addPostHome() {
     let token = localStorage.getItem("token");
     if (token == null) {
         showMessage("You need to be signed in!");
@@ -267,7 +263,7 @@ function addPost() {
     setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
 }
 
-function addPostOnWall() {
+function addPostBrowse() {
     let token = localStorage.getItem("token");
     if (token == null) {
         showMessage("You need to be signed in!");
@@ -304,41 +300,6 @@ function addPostOnWall() {
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
-}
-
-//show wall
-function showWall(){
-    let token = localStorage.getItem("token");
-    let wallHtml = document.getElementById("form-new-post");
-    let postTemplateHtml = document.getElementById("post-template").innerHTML;
-    if (token == null) {
-        showMessage("You need to be signed in!");
-        return;
-    }
-
-    let userMessagesByToken = serverstub.getUserMessagesByToken(token);
-    if (!userMessagesByToken["success"]){
-        showMessage(userMessagesByEmail["message"]);
-        return; 
-    }
-
-    //removes previous posts on wall
-    let currentMessages = userMessagesByToken["data"];
-    let oldPosts = document.getElementsByClassName("post");
-    for (var i = oldPosts.length - 1; i >= 0; i--) {
-        oldPosts[i].remove();
-    }
-
-    //Adds the same content again
-    for (let i = 0; i < currentMessages.length; i++) {
-        const newPostHtml = document.createElement("div");
-        newPostHtml.innerHTML = postTemplateHtml;
-        newPostHtml.children[0].innerHTML = currentMessages[i]["writer"];
-        const textNode = document.createTextNode(currentMessages[i]["content"]);
-        newPostHtml.children[1].appendChild(textNode);
-        newPostHtml.classList.add("post");
-        wallHtml.appendChild(newPostHtml);
-    }
 }
 
 // HOME TAB
@@ -390,7 +351,6 @@ function reloadHomeTab() {
         htmlWall.appendChild(newPostHtml);
     }
 }
-
 
 // SEARCH USER
 function searchUser() {
@@ -454,7 +414,7 @@ function searchUser() {
     }
 }
 
-// INTERACTIVE CSS
+// INTERACTIVE CSS ELEMENTS
 
 function checkSamePasswords(htmlPassword, htmlPassword2) {
     let password1 = document.getElementById(htmlPassword);
@@ -475,29 +435,29 @@ function searchButtonUpdate() {
 
 var lastYPos = window.scrollY;
 window.onscroll = function() {
-  let searchFormHtml = document.getElementById("form-search-user");
-  let currentYPos = window.scrollY;
-  if (lastYPos > currentYPos) {
-    searchFormHtml.style.top = "0px";
-  } else {
-    searchFormHtml.style.top = "-60px";
-  }
-  lastYPos = currentYPos;
+    // show search bar
+    let searchFormHtml = document.getElementById("form-search-user");
+    let currentYPos = window.scrollY;
+        if (lastYPos > currentYPos) {
+        searchFormHtml.style.top = "0px";
+    } else {
+        searchFormHtml.style.top = "-60px";
+    }
+    lastYPos = currentYPos;
 
-  let jumpToStartHtml = document.getElementById("jump-to-start");
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    jumpToStartHtml.style.bottom = "20px";
-  } else {
-    jumpToStartHtml.style.bottom = "-60px";
-  }
+    // show jump button
+    let jumpToStartHtml = document.getElementById("jump-to-start");
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        jumpToStartHtml.style.bottom = "20px";
+    } else {
+        jumpToStartHtml.style.bottom = "-60px";
+    }
 }
 
 function jumpToStart() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
 }
-
-// POPUP MESSAGE
 
 function showMessage(message) {
     let messageHtml = document.getElementById("pop-message");
