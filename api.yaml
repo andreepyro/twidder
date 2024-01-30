@@ -126,19 +126,12 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
-  /users/{userEmail}/posts:
+  /posts:
     post:
       tags:
         - posts
       summary: Create a new post on user's wall
       operationId: createPost
-      parameters:
-        - in: path
-          name: userEmail
-          schema:
-            type: string
-          required: true
-          description: User email address
       requestBody:
         content:
           application/json:
@@ -161,15 +154,16 @@ paths:
     get:
       tags:
         - posts
-      summary: List all user's posts
+      summary: List posts
       operationId: getPosts
       parameters:
-        - in: path
-          name: userEmail
+        - in: query
+          name: email
           schema:
             type: string
-          required: true
-          description: User email address
+            format: email
+          required: false
+          description: User email address to filter posts by author
       responses:
         '200':
           $ref: '#/components/responses/UserPosts'
@@ -200,7 +194,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPost'
+              $ref: '#/components/schemas/EditPost'
         required: true
       responses:
         '200':
@@ -298,6 +292,16 @@ components:
         - created
         - content
     NewPost:
+      type: object
+      properties:
+        user:
+          type: string
+        content:
+          type: string
+      required:
+        - user
+        - content
+    EditPost:
       type: object
       properties:
         content:
