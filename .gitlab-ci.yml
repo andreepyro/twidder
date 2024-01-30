@@ -1,5 +1,5 @@
 before_script:
-    - apt install python3.10
+    - apk add --no-cache python3 py3-pip
     - python3 -m pip install -r requirements.txt
 
 run tests:
