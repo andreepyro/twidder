@@ -1,4 +1,5 @@
 before_script:
+    - apt install python3.10
     - python3 -m pip install -r requirements.txt
 
 run tests:
