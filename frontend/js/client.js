@@ -466,6 +466,9 @@ function showMessage(message) {
     messageHtml.innerHTML = message;
     if (!messageHtml.classList.contains('show')) {
         messageHtml.className = "show";
-        setTimeout(function(){ messageHtml.className = messageHtml.className.replace("show", ""); }, 4500);
+        setTimeout(function() {
+            messageHtml.innerHTML = "";
+            messageHtml.className = messageHtml.className.replace("show", "");
+        }, 4500);
     }
 }

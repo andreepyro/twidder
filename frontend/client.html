@@ -34,7 +34,7 @@
                   <label for="input-login-password">Password</label>
                   <input id="input-login-password" type="password" required size="10" minlength="8">
               </div>
-              <button type="submit" name="save" value="Save">Login</button>
+              <button id="button-login" type="submit" name="save" value="Save">Login</button>
             </form>
           </div>
           <div id="container-signup">
@@ -77,7 +77,7 @@
                 <label for="input-sign-up-password-repeat">Repeat pwd</label>
                 <input id="input-sign-up-password-repeat" required minlength="8" type="password" size="10" onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');">
               </div>
-              <button type="submit" name="save" value="Save">Sign up</button>
+              <button id="button-register" type="submit" name="save" value="Save">Sign up</button>
             </form>
           </div>
         </div>
@@ -91,7 +91,7 @@
         <a id="sidebar-tab-browse" href="#" onclick="showTab('browse'); return false;">Browse</a>
         <a id="sidebar-tab-account" href="#" onclick="showTab('account'); return false;">Account</a>
         <div class="footer">
-          <a href="#" onclick="logout(); return false;">Sign out</a>
+          <a id="button-logout" href="#" onclick="logout(); return false;">Sign out</a>
         </div>
     </div>
     <button id="jump-to-start" onclick="jumpToStart()">Top</button>
@@ -112,7 +112,7 @@
             <div id="home-wall">
               <form id="form-home-new-post" action="#" onsubmit="addPostHome(this);return false;">
                   <textarea id="input-home-new-post" placeholder="Write something interesting..." required></textarea>
-                  <button type="submit" name="save" value="Save">Post</button>
+                  <button id="button-home-new-post" type="submit" name="save" value="Save">Post</button>
               </form>
               <div id="home-post-template">
                 <div class="author"></div>
