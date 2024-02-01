@@ -26,6 +26,8 @@ def authorization(fun):
         return fun(user, *args, **kwargs)
 
     return wrapper
+
+
 def required_parameters(*params):
     def decorator(fun):
         def wrapper(*args, **kwargs):
@@ -62,7 +64,7 @@ def sign_in():
 
 @app.route('/sign_up', methods=["POST"])
 @required_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
-def sign_up(): 
+def sign_up():
     body = request.get_json()
     email = body["email"]
     password = body["password"]
@@ -72,21 +74,23 @@ def sign_up():
     city = body["city"]
     country = body["country"]
 
-    if len(password) < 8: 
-        return jsonify({"message":"To few characters in password"}), http.HTTPStatus.FORBIDDEN
-    if email=="" or password == "" or first_name =="" or family_name=="" or gender=="" or city =="" or country=="" or image=="":
+    if len(password) < 8:
+        return jsonify({"message": "To few characters in password"}), http.HTTPStatus.FORBIDDEN
+
+    if email == "" or password == "" or first_name == "" or family_name == "" or gender == "" or city == "" or country == "":
         return jsonify({"message": "Field is empty"}), http.HTTPStatus.FORBIDDEN
-    if gender not in ["Female","Male","Other"]:
-         return jsonify({"message": "Forbidden gender"}), http.HTTPStatus.FORBIDDEN 
+
+    if gender not in ["Female", "Male", "Other"]:
+        return jsonify({"message": "Forbidden gender"}), http.HTTPStatus.FORBIDDEN
     try:
         validate_email(email, check_deliverability=False)
-    except EmailNotValidError as e:
+    except EmailNotValidError:
         return jsonify({"message": "invalid email"}), http.HTTPStatus.FORBIDDEN
 
-    if not database_handler.create_user(email,password, first_name, family_name,gender,city,country, None):
+    if not database_handler.create_user(email, password, first_name, family_name, gender, city, country, None):
         return jsonify({"message": "Couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    
-    return jsonify({"message": "Successfull sign up"}), http.HTTPStatus.OK
+
+    return jsonify({"message": "Successfully sign up"}), http.HTTPStatus.OK
 
 
 @authorization
