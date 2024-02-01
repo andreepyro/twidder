@@ -1,10 +1,36 @@
-from flask import Flask, send_file, jsonify, request
-import database_helper 
-import bcrypt
-import uuid
-import json
 import base64
+import http
+import json
+import uuid
+
+import bcrypt
+from flask import Flask, send_file, jsonify, request
+
+import database_handler
+
 app = Flask(__name__, static_folder="../frontend", static_url_path='')
+
+
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+    body = request.get_json()
+    if "username" not in body:
+        return jsonify({"message": "username is missing"}), http.HTTPStatus.BAD_REQUEST
+    if "password" not in body:
+        return jsonify({"message": "password is missing"}), http.HTTPStatus.BAD_REQUEST
+    username = body["username"]
+    password = body["password"]
+    user = database_handler.retrieve_user(username)
+    hashed_password = _hash_password(password)
+    if user is not None and hashed_password == user["password"]:
+        token = _create_token(username)
+        if database_handler.create_token(token):
+            resp = Flask.Response(None, status=http.HTTPStatus.OK)
+            resp.headers["Authorization"] = token
+            return resp
+        return jsonify({"message": "token failed to be created"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
+
 
 @app.route('/')
 @app.route('/home')
@@ -13,81 +39,44 @@ app = Flask(__name__, static_folder="../frontend", static_url_path='')
 def hello_world():
     return send_file("../frontend/client.html")
 
-if __name__ == '__main__':
-    app.run(host="localhost", port=8080, debug=True)
 
-#Lesson 2 examples 
-@app.route('/sign_in',methods= ['POST'])
-def sign_in():
-    body = request.get_json() 
-    if "username" not in body: 
-        return jsonify({"message": "username is missing"}), 400
-    if "password" not in body: 
-        return jsonify({"message": "password is missing"}), 400
-    username = body["username"]
-    password = body["password"]
-    user = database_helper.retrieve_user(username)
-    #password = str(hash(password))
-    password = _hash_password(password)["hashed_password"]
-    if user is not None and password==user["password"]:
-        token = _create_token(username)
-        add_token = database_helper.create_token(token)
-        if add_token: 
-            resp = Flask.Response(add_token, status=200)
-            resp.headers["Authorization"] = token
-            return resp
-        return jsonify({"Token failed to be created"}), 200
-    return jsonify({"Combination of username and password is unsuccessful"}), 401
-    
+@app.teardown_request
+def after_request(exception):
+    database_handler.disconnect_db()
+
+
 def _hash_password(password: str):
-    b_password = str.encode(password)
+    b_password = bytes(password, "utf-8")
     salt = bcrypt.gensalt()
-    hash_password = bcrypt.hashpw(
-    password=b_password,
-    salt=salt
-)
-    print(f"Actual Password: {b_password.decode('utf-8')}")
-    print(f"Hashed Password: {hash_password.decode('utf-8')}")
-    return {"plaintext": b_password.decode('utf-8'), 
-            "hashed_password": hash_password.decode('utf-8')}
+    hashed_password = bcrypt.hashpw(b_password, salt)
+    return hashed_password.decode('utf-8')
+
 
 def _encode_token(token_plain: dict) -> str:
-   token_str = json.dumps(token_plain)
-   token_b = bytes(token_str, "utf-8")
-   token_b64b = base64.b64encode(token_b)
-   return token_b64b.decode("utf-8")
+    token_str = json.dumps(token_plain)
+    token_b = bytes(token_str, "utf-8")
+    token_b64b = base64.b64encode(token_b)
+    return token_b64b.decode("utf-8")
+
 
 def _decode_token(token: str) -> dict:
-   token_str = base64.b64decode(token)
-   return json.loads(token_str)
+    token_str = base64.b64decode(token)
+    return json.loads(token_str)
+
 
 def _create_token(user_email: str) -> str:
-   return _encode_token({
-       "user": user_email,
-       "session_id": uuid.uuid4(),
-   })
+    token_plain = {
+        "user": user_email,
+        "session_id": uuid.uuid4(),
+    }
+    return _encode_token(token_plain)
+
 
 def _verify_token(user_email: str, token: str) -> bool:
-   return database_helper.get_token(token) and _decode_token(token)["user"] == user_email
+    return database_handler.retrieve_token(token) and _decode_token(token)["user"] == user_email
 
-@app.route("/getcontact/<name>", methods = ['GET'])
-def get_contact(name):
-    if len(name) >= 4:
-        contact = database_helper.retrieve_contact(name)
-        return jsonify(contact), 200
-    else:
-        return "Too short name", 400 #return data in json format for instance jsonify({"message" : "Too short name"})
 
-@app.route("/save_contact/", methods = ['POST'])
-def save_contact():
-    json_dic = request.get_json() #returns dictionary, not text. 
-    if "name" in json_dic and "number" in json_dic:
-        if len(json_dic["name"])>4:
-            resp = database_helper.create_contact(json_dic["name"],json_dic["number"])
-            if resp is False: 
-                return jsonify({"message": "creating contact"})   
-        else: 
-            return jsonify({"message": "name to short"})
-    else: 
-            return jsonify({"message": "data missing"})
-
+if __name__ == '__main__':
+    with app.app_context():
+        database_handler.initialize_database()
+    app.run(host="localhost", port=8080, debug=True)
