@@ -13,7 +13,7 @@ def get_db():
     return db
 
 
-def disconnect():
+def disconnect_db():
     db = getattr(g, "db", None)
     if db is not None:
         db.close()
@@ -29,7 +29,7 @@ def initialize_database():
 
 # ------------------------------------------------USER-------------------------------------------------------------------------------
 def retrieve_user(email):
-    cursor = get_db().execute("Select (email, password, firstname, familyname, gender, city, country, image) from user where (email==?)", [email])
+    cursor = get_db().execute("select email, password, firstname, familyname, gender, city, country, image from user where email==?", [email])
     rows = cursor.fetchall()
     if len(rows) == 0:
         return None
@@ -48,7 +48,7 @@ def retrieve_user(email):
 
 def create_user(email, password, firstname, familyname, gender, city, country, image):
     try:
-        get_db().execute("insert into user(email, password, firstname, familyname, gender, city, country, image) values(?,?,?,?,?,?,?,?)",
+        get_db().execute("insert into user (email, password, firstname, familyname, gender, city, country, image) values (?, ?, ?, ?, ?, ?, ?, ?)",
                          [email, password, firstname, familyname, gender, city, country, image])
         get_db().commit()
         return True
@@ -78,7 +78,7 @@ def delete_user(email):
 # ------------------------------------------------POST -------------------------------------------------------------------------------
 def create_post(author, user, content, created, edited):
     try:
-        get_db().execute("insert into post(author, user, content, created, edited) values(?,?,?,?,?)", [author, user, content, created, edited])
+        get_db().execute("insert into post (author, user, content, created, edited) values (?, ?, ?, ?, ?)", [author, user, content, created, edited])
         get_db().commit()
         return True
     except Exception:
@@ -86,7 +86,7 @@ def create_post(author, user, content, created, edited):
 
 
 def retrieve_posts(user):
-    cursor = get_db().execute("Select (id, author, user, content, created, edited)  from post where (user==?)", [user])
+    cursor = get_db().execute("select id, author, user, content, created, edited from post where user==?", [user])
     rows = cursor.fetchall()
     return [{'id': row[0],
              'author': row[1],
@@ -99,7 +99,7 @@ def retrieve_posts(user):
 
 def update_post(post_id, author, user, content, created, edited):
     try:
-        get_db().execute("Update post set author=?, user=?, content=?, created=?, edited=? where (id==?)", [author, user, content, created, edited, post_id])
+        get_db().execute("update post set author=?, user=?, content=?, created=?, edited=? where id==?", [author, user, content, created, edited, post_id])
         get_db().commit()
         return True
     except Exception:
@@ -118,7 +118,7 @@ def delete_post(post_id):
 # ------------------------------------------------TOKEN -------------------------------------------------------------------------------
 def create_token(token):
     try:
-        get_db().execute("insert into token(token) values(?)", [token])
+        get_db().execute("insert into token (token) values (?)", [token])
         get_db().commit()
         return True
     except Exception:
@@ -135,6 +135,6 @@ def delete_token(token):
 
 
 def retrieve_token(token):
-    cursor = get_db().execute("Select (token) from token where (token==?)", [token])
+    cursor = get_db().execute("select token from token where token==?", [token])
     row = cursor.fetchall()
     return len(row) > 0

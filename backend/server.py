@@ -4,7 +4,7 @@ import json
 import uuid
 
 import bcrypt
-from flask import Flask, send_file, jsonify, request
+from flask import Flask, Response, send_file, jsonify, request
 
 import database_handler
 
@@ -22,10 +22,11 @@ def sign_in():
     password = body["password"]
     user = database_handler.retrieve_user(username)
     hashed_password = _hash_password(password)
-    if user is not None and hashed_password == user["password"]:
+    if user is not None and _check_password(password, hashed_password):
+        # TODO get all previous user tokens and invalidate them (we will probably need to change DB schema)
         token = _create_token(username)
         if database_handler.create_token(token):
-            resp = Flask.Response(None, status=http.HTTPStatus.OK)
+            resp = Response(None, status=http.HTTPStatus.OK)
             resp.headers["Authorization"] = token
             return resp
         return jsonify({"message": "token failed to be created"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
@@ -45,11 +46,17 @@ def after_request(exception):
     database_handler.disconnect_db()
 
 
-def _hash_password(password: str):
-    b_password = bytes(password, "utf-8")
+def _hash_password(password: str) -> str:
+    password_b = bytes(password, "utf-8")
     salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(b_password, salt)
+    hashed_password = bcrypt.hashpw(password_b, salt)
     return hashed_password.decode('utf-8')
+
+
+def _check_password(password: str, hashed_password: str) -> bool:
+    password_b = bytes(password, "utf-8")
+    hashed_password_b = bytes(hashed_password, "utf-8")
+    return bcrypt.checkpw(password_b, hashed_password_b)
 
 
 def _encode_token(token_plain: dict) -> str:
@@ -67,7 +74,7 @@ def _decode_token(token: str) -> dict:
 def _create_token(user_email: str) -> str:
     token_plain = {
         "user": user_email,
-        "session_id": uuid.uuid4(),
+        "session_id": str(uuid.uuid4()),
     }
     return _encode_token(token_plain)
 
