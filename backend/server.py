@@ -12,6 +12,20 @@ import database_handler
 app = Flask(__name__, static_folder="../frontend", static_url_path='')
 
 
+def authorization(fun):
+    def wrapper(*args, **kwargs):
+        if "Authorization" not in request.headers:
+            return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
+        token = request.headers["Authorization"]
+        token_data = database_handler.retrieve_token(token)
+        if token_data is None:
+            return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
+        if bool(token_data["valid"]) is False:
+            return jsonify({"message": "session expired"}), http.HTTPStatus.UNAUTHORIZED
+        user = token_data["email"]
+        return fun(user, *args, **kwargs)
+
+    return wrapper
 def required_parameters(*params):
     def decorator(fun):
         def wrapper(*args, **kwargs):
@@ -24,24 +38,12 @@ def required_parameters(*params):
         return wrapper
 
     return decorator
-@app.route('/sign_out', methods=['DELETE'])
 
-def sign_out():
-    body = request.get_json()
-    if "username" not in body: 
-        return jsonify({"message": "username is missing"}), http.HTTPStatus.BAD_REQUEST
-    user_name = body["username"]
-    if not database_handler.delete_user_tokens(user_name): 
-        return jsonify({"message": "Couldn't delete user token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    return jsonify({"message": "Signed out"}), http.HTTPStatus.OK
-    
-@app.route('/sign_in', methods=['POST'])
+
+@app.route('/sign_in', methods=["POST"])
+@required_parameters("username", "password")
 def sign_in():
     body = request.get_json()
-    if "username" not in body:
-        return jsonify({"message": "username is missing"}), http.HTTPStatus.BAD_REQUEST
-    if "password" not in body:
-        return jsonify({"message": "password is missing"}), http.HTTPStatus.BAD_REQUEST
     username = body["username"]
     password = body["password"]
     user = database_handler.retrieve_user(username)
@@ -56,6 +58,7 @@ def sign_in():
         resp.headers["Authorization"] = token
         return resp
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
+
 
 @app.route('/sign_up', methods=["POST"])
 @required_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
@@ -84,6 +87,14 @@ def sign_up():
         return jsonify({"message": "Couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     
     return jsonify({"message": "Successfull sign up"}), http.HTTPStatus.OK
+
+
+@authorization
+@app.route('/sign_out', methods=["DELETE"])
+def sign_out(user_email):
+    if not _revoke_tokens(user_email):
+        return jsonify({"message": "couldn't revoke user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return None, http.HTTPStatus.OK
 
 
 @app.route('/')

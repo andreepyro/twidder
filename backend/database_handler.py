@@ -152,6 +152,18 @@ def delete_token(token):
         return False
 
 
+def retrieve_token(token):
+    cursor = get_db().execute("select email, token, valid from token where token==?", [token])
+    rows = cursor.fetchall()
+    if len(rows) == 0:
+        return None
+
+    return {
+        "email": rows[0][0],
+        "token": rows[0][1],
+        "valid": rows[0][2],
+    }
+
 def retrieve_user_tokens(email):
     cursor = get_db().execute("select email, token, valid from token where email==?", [email])
     rows = cursor.fetchall()
