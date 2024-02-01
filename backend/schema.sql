@@ -21,5 +21,7 @@ create table if not exists post (
 );
 
 create table if not exists token (
-  token text primary key
+    email text NOT NULL,
+    valid boolean NOT NULL,
+    token text primary key
 );

@@ -23,13 +23,14 @@ def sign_in():
     user = database_handler.retrieve_user(username)
     hashed_password = _hash_password(password)
     if user is not None and _check_password(password, hashed_password):
-        # TODO get all previous user tokens and invalidate them (we will probably need to change DB schema)
+        if not _revoke_tokens(username):
+            return jsonify({"message": "couldn't revoke old user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
         token = _create_token(username)
-        if database_handler.create_token(token):
-            resp = Response(None, status=http.HTTPStatus.OK)
-            resp.headers["Authorization"] = token
-            return resp
-        return jsonify({"message": "token failed to be created"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+        if not database_handler.create_token(username, token, True):
+            return jsonify({"message": "couldn't create a new token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+        resp = Response(None, status=http.HTTPStatus.OK)
+        resp.headers["Authorization"] = token
+        return resp
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
 
 
@@ -77,6 +78,14 @@ def _create_token(user_email: str) -> str:
         "session_id": str(uuid.uuid4()),
     }
     return _encode_token(token_plain)
+
+
+def _revoke_tokens(user_email: str) -> bool:
+    tokens = database_handler.retrieve_user_tokens(user_email)
+    for token in tokens:
+        if not database_handler.update_token(token["token"], user_email, False):
+            return False
+    return True
 
 
 def _verify_token(user_email: str, token: str) -> bool:

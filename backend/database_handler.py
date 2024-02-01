@@ -68,7 +68,7 @@ def update_user(old_email, email, password, firstname, familyname, gender, city,
 
 def delete_user(email):
     try:
-        get_db().execute("delete from table user where email==?", [email])
+        get_db().execute("delete from user where email==?", [email])
         get_db().commit()
         return True
     except Exception:
@@ -108,7 +108,7 @@ def update_post(post_id, author, user, content, created, edited):
 
 def delete_post(post_id):
     try:
-        get_db().execute("delete from table post where id==?", [post_id])
+        get_db().execute("delete from post where id==?", [post_id])
         get_db().commit()
         return True
     except Exception:
@@ -116,9 +116,27 @@ def delete_post(post_id):
 
 
 # ------------------------------------------------TOKEN -------------------------------------------------------------------------------
-def create_token(token):
+def create_token(email, token, valid):
     try:
-        get_db().execute("insert into token (token) values (?)", [token])
+        get_db().execute("insert into token (email, token, valid) values (?, ?, ?)", [email, token, valid])
+        get_db().commit()
+        return True
+    except Exception:
+        return False
+
+
+def update_token(token, email, valid):
+    try:
+        get_db().execute("update token set email=?, valid=? where token==?", [email, valid, token])
+        get_db().commit()
+        return True
+    except Exception:
+        return False
+
+
+def delete_user_tokens(email):
+    try:
+        get_db().execute("delete from token where email==?", [email])
         get_db().commit()
         return True
     except Exception:
@@ -127,14 +145,18 @@ def create_token(token):
 
 def delete_token(token):
     try:
-        get_db().execute("delete from table token where token==?", [token])
+        get_db().execute("delete from token where token==?", [token])
         get_db().commit()
         return True
     except Exception:
         return False
 
 
-def retrieve_token(token):
-    cursor = get_db().execute("select token from token where token==?", [token])
-    row = cursor.fetchall()
-    return len(row) > 0
+def retrieve_user_tokens(email):
+    cursor = get_db().execute("select email, token, valid from token where email==?", [email])
+    rows = cursor.fetchall()
+    return [{
+        "email": row[0],
+        "token": row[1],
+        "valid": row[2],
+    } for row in rows]
