@@ -4,6 +4,7 @@ import json
 import uuid
 
 import bcrypt
+from email_validator import validate_email, EmailNotValidError
 from flask import Flask, Response, send_file, jsonify, request
 
 import database_handler
@@ -11,6 +12,29 @@ import database_handler
 app = Flask(__name__, static_folder="../frontend", static_url_path='')
 
 
+def required_parameters(*params):
+    def decorator(fun):
+        def wrapper(*args, **kwargs):
+            body = request.get_json()
+            for p in params:
+                if p not in body:
+                    return jsonify({"message": f"parameter '{p}' is not present"}), http.HTTPStatus.BAD_REQUEST
+            return fun(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+@app.route('/sign_out', methods=['DELETE'])
+
+def sign_out():
+    body = request.get_json()
+    if "username" not in body: 
+        return jsonify({"message": "username is missing"}), http.HTTPStatus.BAD_REQUEST
+    user_name = body["username"]
+    if not database_handler.delete_user_tokens(user_name): 
+        return jsonify({"message": "Couldn't delete user token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"message": "Signed out"}), http.HTTPStatus.OK
+    
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
     body = request.get_json()
@@ -32,6 +56,34 @@ def sign_in():
         resp.headers["Authorization"] = token
         return resp
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
+
+@app.route('/sign_up', methods=["POST"])
+@required_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
+def sign_up(): 
+    body = request.get_json()
+    email = body["email"]
+    password = body["password"]
+    first_name = body["firstname"]
+    family_name = body["familyname"]
+    gender = body["gender"]
+    city = body["city"]
+    country = body["country"]
+
+    if len(password) < 8: 
+        return jsonify({"message":"To few characters in password"}), http.HTTPStatus.FORBIDDEN
+    if email=="" or password == "" or first_name =="" or family_name=="" or gender=="" or city =="" or country=="" or image=="":
+        return jsonify({"message": "Field is empty"}), http.HTTPStatus.FORBIDDEN
+    if gender not in ["Female","Male","Other"]:
+         return jsonify({"message": "Forbidden gender"}), http.HTTPStatus.FORBIDDEN 
+    try:
+        validate_email(email, check_deliverability=False)
+    except EmailNotValidError as e:
+        return jsonify({"message": "invalid email"}), http.HTTPStatus.FORBIDDEN
+
+    if not database_handler.create_user(email,password, first_name, family_name,gender,city,country, None):
+        return jsonify({"message": "Couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    
+    return jsonify({"message": "Successfull sign up"}), http.HTTPStatus.OK
 
 
 @app.route('/')
