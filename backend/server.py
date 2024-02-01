@@ -12,7 +12,7 @@ import database_handler
 app = Flask(__name__, static_folder="../frontend", static_url_path='')
 
 
-def authorization(fun):
+def authorize_user(fun):
     def wrapper(*args, **kwargs):
         if "Authorization" not in request.headers:
             return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
@@ -22,13 +22,15 @@ def authorization(fun):
             return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
         if bool(token_data["valid"]) is False:
             return jsonify({"message": "session expired"}), http.HTTPStatus.UNAUTHORIZED
-        user = token_data["email"]
-        return fun(user, *args, **kwargs)
+        user_email = token_data["email"]
+        return fun(user_email, *args, **kwargs)
 
+    # renaming wrapper to function name, so flask doesn't throw exception
+    wrapper.__name__ = fun.__name__
     return wrapper
 
 
-def required_parameters(*params):
+def require_parameters(*params):
     def decorator(fun):
         def wrapper(*args, **kwargs):
             body = request.get_json()
@@ -37,13 +39,15 @@ def required_parameters(*params):
                     return jsonify({"message": f"parameter '{p}' is not present"}), http.HTTPStatus.BAD_REQUEST
             return fun(*args, **kwargs)
 
+        # renaming wrapper to function name, so flask doesn't throw exception
+        wrapper.__name__ = fun.__name__
         return wrapper
 
     return decorator
 
 
 @app.route('/sign_in', methods=["POST"])
-@required_parameters("username", "password")
+@require_parameters("username", "password")
 def sign_in():
     body = request.get_json()
     username = body["username"]
@@ -63,7 +67,7 @@ def sign_in():
 
 
 @app.route('/sign_up', methods=["POST"])
-@required_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
+@require_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
 def sign_up():
     body = request.get_json()
     email = body["email"]
@@ -93,19 +97,57 @@ def sign_up():
     return jsonify({"message": "Successfully sign up"}), http.HTTPStatus.OK
 
 
-@authorization
 @app.route('/sign_out', methods=["DELETE"])
+@authorize_user
 def sign_out(user_email):
     if not _revoke_tokens(user_email):
         return jsonify({"message": "couldn't revoke user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    return None, http.HTTPStatus.OK
+    return "", http.HTTPStatus.OK
+
+
+@app.route('/change_password', methods=["POST"])
+@authorize_user
+@require_parameters("old_password", "new_password")
+def change_password(user_email):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
+
+
+@app.route('/get_user_data_by_token', methods=["GET"])
+@authorize_user
+def get_user_data_by_token(user_email):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
+
+
+@app.route('/get_user_data_by_email/<target_user>', methods=["GET"])
+@authorize_user
+def get_user_data_by_email(user_email, target_user):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
+
+
+@app.route('/get_user_messages_by_token', methods=["GET"])
+@authorize_user
+def get_user_messages_by_token(user_email):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
+
+
+@app.route('/get_user_messages_by_email/<target_user>', methods=["GET"])
+@authorize_user
+def get_user_messages_by_email(user_email, target_user):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
+
+
+@app.route('/post_message', methods=["POST"])
+@authorize_user
+@require_parameters("message", "email")
+def post_message(user_email):
+    return "", http.HTTPStatus.NOT_IMPLEMENTED
 
 
 @app.route('/')
 @app.route('/home')
 @app.route('/browse')
 @app.route('/account')
-def hello_world():
+def get_page():
     return send_file("../frontend/client.html")
 
 

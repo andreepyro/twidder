@@ -9,12 +9,3 @@ The project was created as a part of the Web Programming (TDDD97) course at [Lin
 ```bash
 python3 ./backend/server.py
 ```
-
-## Generate API
-
-```
-docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate \
-    -i "/local/api.yaml" \
-    -g python \
-    -o /local/out/go
-```
