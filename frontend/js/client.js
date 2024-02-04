@@ -472,3 +472,17 @@ function showMessage(message) {
         }, 4500);
     }
 }
+
+function showRegisterContainer() {
+    document.getElementById("register-container").style.display = "block";
+}
+
+function hideRegisterContainer() {
+    document.getElementById("register-container").style.display = "none";
+}
+
+window.onclick = function (event) {
+    if (event.target === document.getElementById("register-container")) {
+        hideRegisterContainer();
+    }
+}

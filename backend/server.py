@@ -204,4 +204,4 @@ def _verify_token(user_email: str, token: str) -> bool:
 if __name__ == '__main__':
     with app.app_context():
         database_handler.initialize_database()
-    app.run(host="localhost", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)

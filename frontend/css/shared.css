@@ -209,7 +209,7 @@ button {
     left: 50%;
     bottom: 30px;
     min-width: 250px;
-    margin-left: -125px;
+    margin-left: -141px;
     padding: 16px;
     position: fixed;
     border-radius: 3px;
@@ -233,4 +233,17 @@ button {
 @keyframes fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
+}
+
+.close-button {
+    position: absolute;
+    right: 35px;
+    top: 15px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #f1f1f1;
+}
+
+.close-button:hover {
+    cursor: pointer;
 }
