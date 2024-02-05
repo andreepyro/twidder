@@ -6,7 +6,7 @@ import uuid
 import bcrypt
 from email_validator import validate_email, EmailNotValidError
 from flask import Flask, Response, send_file, jsonify, request
-
+import datetime
 import database_handler
 
 app = Flask(__name__, static_folder="../frontend", static_url_path='')
@@ -109,38 +109,118 @@ def sign_out(user_email):
 @authorize_user
 @require_parameters("old_password", "new_password")
 def change_password(user_email):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+    body = request.get_json()
+    old = body["old_password"]
+    new = body["new_password"]
+    MIN = 8
+    if not len(new) < MIN: 
+        return jsonify({"message": "to few characters in password"}), http.HTTPStatus.FORBIDDEN
+    if old == new: 
+        return jsonify({"message": "new password should be different to previous"}), http.HTTPStatus.FORBIDDEN
+    user = database_handler.retrieve_user(user_email)
+    if user is None: 
+        return jsonify({"message": "user does not exist in the database"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    
+    if old != user["password"]: 
+        return jsonify({"message": "old password does not match user password"}), http.HTTPStatus.FORBIDDEN
+    
+    update = database_handler.update_user(user_email, user_email, new, user["firstname"], user["familyname"], user["gender"], user["city"], user["country"], user["image"])
+    if update is False: 
+        return jsonify({"message": "update failed, try again"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return "", http.HTTPStatus.OK
 
 
 @app.route('/get_user_data_by_token', methods=["GET"])
 @authorize_user
 def get_user_data_by_token(user_email):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+    user = database_handler.retrieve_user(user_email)
+    if user is None: 
+        return jsonify({"message": "user could not be retrieved"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({
+        "first_name": user["firstname"], 
+        "family_name": user["familyname"],
+        "gender": user["gender"],
+        "city": user["city"],
+        "country": user["country"],
+        "email": user["email"],
+    }), http.HTTPStatus.OK
 
 
 @app.route('/get_user_data_by_email/<target_user>', methods=["GET"])
 @authorize_user
-def get_user_data_by_email(user_email, target_user):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+def get_user_data_by_email(_user_email, target_user):
+    user = database_handler.retrieve_user(target_user)
+    if user is None: 
+        return jsonify({"message": "user not found"}), http.HTTPStatus.NOT_FOUND
+    return jsonify({
+        "first_name": user["firstname"], 
+        "family_name": user["familyname"],
+        "gender": user["gender"],
+        "city": user["city"],
+        "country": user["country"],
+        "email": user["email"],
+    }), http.HTTPStatus.OK
+ 
 
 
 @app.route('/get_user_messages_by_token', methods=["GET"])
 @authorize_user
 def get_user_messages_by_token(user_email):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+    user_messages = database_handler.retrieve_posts(user_email)
+    return jsonify({
+            "posts": [
+                {
+                    "id": post["id"],
+                    "author": post["author"], 
+                    "user": post["user"], 
+                    "content": post["content"], 
+                    "created": post["created"], 
+                    "edited": post["edited"]
+                    
+                } for post in user_messages
+            ]
+    }), http.HTTPStatus.OK
+ 
+
 
 
 @app.route('/get_user_messages_by_email/<target_user>', methods=["GET"])
 @authorize_user
 def get_user_messages_by_email(user_email, target_user):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+    user_messages = database_handler.retrieve_posts(target_user)
+    return jsonify({
+            "posts": [
+                {
+                    "id": post["id"],
+                    "author": post["author"], 
+                    "user": post["user"], 
+                    "content": post["content"], 
+                    "created": post["created"], 
+                    "edited": post["edited"]
+                    
+                } for post in user_messages
+            ]
+    }), http.HTTPStatus.OK
+ 
+
 
 
 @app.route('/post_message', methods=["POST"])
 @authorize_user
 @require_parameters("message", "email")
 def post_message(user_email):
-    return "", http.HTTPStatus.NOT_IMPLEMENTED
+    body = request.get_json()
+    target = body["email"]
+    if database_handler.retrieve_user(target) is None: 
+        return jsonify({"message": "target user does not exist"}), http.HTTPStatus.FORBIDDEN
+    
+    create = database_handler.create_post(
+        author=user_email, user = body["email"], content = body["message"], created= datetime.datetime.now(), edited= datetime.datetime.now()
+    )
+
+    if create is False: 
+        return jsonify({"message": "could not create post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    return "", http.HTTPStatus.OK
 
 
 @app.route('/')
