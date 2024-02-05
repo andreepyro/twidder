@@ -17,6 +17,7 @@ MIN_PASSWORD_LENGTH = 8
 
 
 def authorize_user(fun):
+    """Decorator for user authorization. Makes sure only authorized users are let through. Adds user email to function parameters."""
     def wrapper(*args, **kwargs):
         if "Authorization" not in request.headers:
             # return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED  # TODO use after lab2
@@ -37,18 +38,24 @@ def authorize_user(fun):
     return wrapper
 
 
-def require_parameters(*params):
+def post_parameters(*params):
+    """Decorator for POST requests. Makes sure all specified fields are provided and are of correct type."""
     def decorator(fun):
         def wrapper(*args, **kwargs):
             body = request.get_json()
-            for p in params:
-                if p not in body:
-                    return jsonify({"success": False, "message": f"parameter '{p}' is not present"}), http.HTTPStatus.OK
+            new_params = []
+            for (p_name, p_type) in params:
+                if p_name not in body:
+                    return jsonify({"success": False, "message": f"parameter '{p_name}' is not present"}), http.HTTPStatus.OK
                     # return jsonify({"message": f"parameter '{p}' is not present"}), http.HTTPStatus.BAD_REQUEST  # TODO use after lab2
-                if body[p] is None:
-                    return jsonify({"success": False, "message": f"parameter '{p}' must not be null"}), http.HTTPStatus.OK
+                if body[p_name] is None:
+                    return jsonify({"success": False, "message": f"parameter '{p_name}' must not be null"}), http.HTTPStatus.OK
                     # return jsonify({"message": f"parameter '{p}' must not be null"}), http.HTTPStatus.BAD_REQUEST  # TODO use after lab2
-            return fun(*args, **kwargs)
+                if not isinstance(body[p_name], p_type):
+                    return jsonify({"success": False, "message": f"parameter '{p_name}' must not be '{p_type}'"}), http.HTTPStatus.OK
+                    # return jsonify({"message": f"parameter '{p}' must not be '{p_type}'"}), http.HTTPStatus.BAD_REQUEST  # TODO use after lab2
+                new_params.append(body[p_name])
+            return fun(*args, *new_params, **kwargs)
 
         # renaming wrapper to function name, so flask doesn't throw exception
         wrapper.__name__ = fun.__name__
@@ -76,19 +83,16 @@ def lab2_tests(fun):
 
 
 @app.route('/sign_in', methods=["POST"])
-@require_parameters("email", "password")
+@post_parameters(("email", str), ("password", str))
 @lab2_tests
-def sign_in():
-    body = request.get_json()
-    username = body["email"]
-    password = body["password"]
-    user = database_handler.retrieve_user(username)
+def sign_in(email: str, password: str):
+    user = database_handler.retrieve_user(email)
 
     if user is not None and _check_password(password, user["password"]):
-        if not _revoke_tokens(username):
+        if not _revoke_tokens(email):
             return jsonify({"message": "couldn't revoke old user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-        token = _create_token(username)
-        if not database_handler.create_token(username, token, True):
+        token = _create_token(email)
+        if not database_handler.create_token(email, token, True):
             return jsonify({"message": "couldn't create a new token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
         resp = Response("")
         resp.headers["Authorization"] = token
@@ -97,22 +101,13 @@ def sign_in():
 
 
 @app.route('/sign_up', methods=["POST"])
-@require_parameters("email", "password", "firstname", "familyname", "gender", "city", "country")
+@post_parameters(("email", str), ("password", str), ("firstname", str), ("familyname", str), ("gender", str), ("city", str), ("country", str))
 @lab2_tests
-def sign_up():
-    body = request.get_json()
-    email = body["email"]
-    password = body["password"]
-    first_name = body["firstname"]
-    family_name = body["familyname"]
-    gender = body["gender"]
-    city = body["city"]
-    country = body["country"]
-
+def sign_up(email: str, password: str, firstname: str, familyname: str, gender: str, city: str, country: str):
     if len(password) < MIN_PASSWORD_LENGTH:
-        return jsonify({"message": "too few characters in password"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": f"password must have at least '{MIN_PASSWORD_LENGTH}' characters"}), http.HTTPStatus.FORBIDDEN
 
-    if email == "" or password == "" or first_name == "" or family_name == "" or gender == "" or city == "" or country == "":
+    if email == "" or password == "" or firstname == "" or familyname == "" or gender == "" or city == "" or country == "":
         return jsonify({"message": "field is empty"}), http.HTTPStatus.FORBIDDEN
 
     if gender not in ["Female", "Male", "Other"]:
@@ -126,16 +121,16 @@ def sign_up():
         return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.FORBIDDEN
 
     hashed_password = _hash_password(password)
-    if not database_handler.create_user(email, hashed_password, first_name, family_name, gender, city, country, None):
-        return jsonify({"message": "Couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    if not database_handler.create_user(email, hashed_password, firstname, familyname, gender, city, country, None):
+        return jsonify({"message": "couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
-    return jsonify({"message": "Successfully sign up", "success": True}), http.HTTPStatus.OK
+    return jsonify({"message": "successfully signed up", "success": True}), http.HTTPStatus.OK
 
 
 @app.route('/sign_out', methods=["DELETE"])
 @authorize_user
 @lab2_tests
-def sign_out(user_email):
+def sign_out(user_email: str):
     if not _revoke_tokens(user_email):
         return jsonify({"message": "couldn't revoke user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     return "", http.HTTPStatus.OK
@@ -143,40 +138,50 @@ def sign_out(user_email):
 
 @app.route('/change_password', methods=["POST"])
 @authorize_user
-@require_parameters("old_password", "new_password")
+@post_parameters(("old_password", str), ("new_password", str))
 @lab2_tests
-def change_password(user_email):
+def change_password(user_email: str, old_password: str, new_password: str):
     body = request.get_json()
     old_password = body["old_password"]
     new_password = body["new_password"]
 
     if len(new_password) < MIN_PASSWORD_LENGTH:
-        return jsonify({"message": "too few characters in password"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": f"password must have at least '{MIN_PASSWORD_LENGTH}' characters"}), http.HTTPStatus.FORBIDDEN
+
     if old_password == new_password:
-        return jsonify({"message": "new password should be different to previous"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": "the new password and the old password can not be the same"}), http.HTTPStatus.FORBIDDEN
 
     user = database_handler.retrieve_user(user_email)
     if user is None:
-        return jsonify({"message": "user does not exist in the database"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+        return jsonify({"message": "user not found"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
     if not _check_password(old_password, user["password"]):
-        return jsonify({"message": "old password does not match user password"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": "wrong current password"}), http.HTTPStatus.FORBIDDEN
 
     hashed_password = _hash_password(new_password)
-    update = database_handler.update_user(user_email, user_email, hashed_password, user["firstname"], user["familyname"], user["gender"], user["city"],
-                                          user["country"], user["image"])
-    if update is False:
-        return jsonify({"message": "update failed, try again"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    if database_handler.update_user(
+            user_email,
+            user_email,
+            hashed_password,
+            user["firstname"],
+            user["familyname"],
+            user["gender"],
+            user["city"],
+            user["country"],
+            user["image"]
+    ) is False:
+        return jsonify({"message": "couldn't update the password"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+
     return "", http.HTTPStatus.OK
 
 
 @app.route('/get_user_data_by_token', methods=["GET"])
 @authorize_user
 @lab2_tests
-def get_user_data_by_token(user_email):
+def get_user_data_by_token(user_email: str):
     user = database_handler.retrieve_user(user_email)
     if user is None:
-        return jsonify({"message": "user could not be retrieved"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+        return jsonify({"message": "user not found"}), http.HTTPStatus.INTERNAL_SERVER_ERROR  # here we expect our user exists
     return jsonify({
         "first_name": user["firstname"],
         "family_name": user["familyname"],
@@ -190,7 +195,7 @@ def get_user_data_by_token(user_email):
 @app.route('/get_user_data_by_email/<target_user>', methods=["GET"])
 @authorize_user
 @lab2_tests
-def get_user_data_by_email(_user_email, target_user):
+def get_user_data_by_email(user_email: str, target_user: str):
     user = database_handler.retrieve_user(target_user)
     if user is None:
         return jsonify({"message": "user not found"}), http.HTTPStatus.NOT_FOUND
@@ -207,8 +212,8 @@ def get_user_data_by_email(_user_email, target_user):
 @app.route('/get_user_messages_by_token', methods=["GET"])
 @authorize_user
 @lab2_tests
-def get_user_messages_by_token(user_email):
-    user_messages = database_handler.retrieve_posts(user_email)
+def get_user_messages_by_token(user_email: str):
+    user_posts = database_handler.retrieve_posts(user_email)
     return jsonify({
         "posts": [
             {
@@ -219,7 +224,7 @@ def get_user_messages_by_token(user_email):
                 "created": post["created"],
                 "edited": post["edited"]
 
-            } for post in user_messages
+            } for post in user_posts
         ]
     }), http.HTTPStatus.OK
 
@@ -227,7 +232,7 @@ def get_user_messages_by_token(user_email):
 @app.route('/get_user_messages_by_email/<target_user>', methods=["GET"])
 @authorize_user
 @lab2_tests
-def get_user_messages_by_email(user_email, target_user):
+def get_user_messages_by_email(user_email: str, target_user: str):
     user = database_handler.retrieve_user(target_user)
     if user is None:
         return jsonify({"message": "user not found"}), http.HTTPStatus.NOT_FOUND
@@ -249,19 +254,15 @@ def get_user_messages_by_email(user_email, target_user):
 
 @app.route('/post_message', methods=["POST"])
 @authorize_user
-@require_parameters("message", "email")
+@post_parameters(("message", str), ("email", str))
 @lab2_tests
-def post_message(user_email):
-    body = request.get_json()
-    target = body["email"]
-    message = body["message"]
-
-    if database_handler.retrieve_user(target) is None:
-        return jsonify({"message": "target user does not exist"}), http.HTTPStatus.FORBIDDEN
+def post_message(user_email: str, message: str, email: str):
+    if database_handler.retrieve_user(email) is None:
+        return jsonify({"message": "user doesn't exist"}), http.HTTPStatus.FORBIDDEN
 
     curr_datetime = datetime.datetime.now()  # todo Add timezone ???
-    if database_handler.create_post(user_email, target, message, curr_datetime, curr_datetime) is False:
-        return jsonify({"message": "could not create post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    if database_handler.create_post(user_email, email, message, curr_datetime, curr_datetime) is False:
+        return jsonify({"message": "couldn't create a new post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
     return "", http.HTTPStatus.OK
 

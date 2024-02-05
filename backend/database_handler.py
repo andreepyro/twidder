@@ -28,7 +28,7 @@ def initialize_database():
 
 
 # ------------------------------------------------USER-------------------------------------------------------------------------------
-def retrieve_user(email):
+def retrieve_user(email: str) -> None | dict:
     cursor = get_db().execute("select email, password, firstname, familyname, gender, city, country, image from user where email==?", [email])
     rows = cursor.fetchall()
     if len(rows) == 0:
@@ -46,7 +46,7 @@ def retrieve_user(email):
     }
 
 
-def create_user(email, password, firstname, familyname, gender, city, country, image):
+def create_user(email: str, password: str, firstname: str, familyname: str, gender: str, city: str, country: str, image: bytes) -> bool:
     try:
         get_db().execute("insert into user (email, password, firstname, familyname, gender, city, country, image) values (?, ?, ?, ?, ?, ?, ?, ?)",
                          [email, password, firstname, familyname, gender, city, country, image])
@@ -56,7 +56,7 @@ def create_user(email, password, firstname, familyname, gender, city, country, i
         return False
 
 
-def update_user(old_email, email, password, firstname, familyname, gender, city, country, image):
+def update_user(old_email: str, email: str, password: str, firstname: str, familyname: str, gender: str, city: str, country: str, image: bytes) -> bool:
     try:
         get_db().execute("update user set email=?, password=?, firstname=?, familyname=?, gender=?, city=?, country=?, image=? where email==?",
                          [email, password, firstname, familyname, gender, city, country, image, old_email])
@@ -66,7 +66,7 @@ def update_user(old_email, email, password, firstname, familyname, gender, city,
         return False
 
 
-def delete_user(email):
+def delete_user(email: str) -> bool:
     try:
         get_db().execute("delete from user where email==?", [email])
         get_db().commit()
@@ -76,7 +76,7 @@ def delete_user(email):
 
 
 # ------------------------------------------------POST -------------------------------------------------------------------------------
-def create_post(author, user, content, created, edited):
+def create_post(author: str, user: str, content: str, created: str, edited: str) -> bool:
     try:
         get_db().execute("insert into post (author, user, content, created, edited) values (?, ?, ?, ?, ?)", [author, user, content, created, edited])
         get_db().commit()
@@ -85,7 +85,7 @@ def create_post(author, user, content, created, edited):
         return False
 
 
-def retrieve_posts(user):
+def retrieve_posts(user: str) -> list[dict]:
     cursor = get_db().execute("select id, author, user, content, created, edited from post where user==?", [user])
     rows = cursor.fetchall()
     return [{'id': row[0],
@@ -97,7 +97,7 @@ def retrieve_posts(user):
              } for row in rows]
 
 
-def update_post(post_id, author, user, content, created, edited):
+def update_post(post_id: str, author: str, user: str, content: str, created: str, edited: str) -> bool:
     try:
         get_db().execute("update post set author=?, user=?, content=?, created=?, edited=? where id==?", [author, user, content, created, edited, post_id])
         get_db().commit()
@@ -106,7 +106,7 @@ def update_post(post_id, author, user, content, created, edited):
         return False
 
 
-def delete_post(post_id):
+def delete_post(post_id: str) -> bool:
     try:
         get_db().execute("delete from post where id==?", [post_id])
         get_db().commit()
@@ -116,7 +116,7 @@ def delete_post(post_id):
 
 
 # ------------------------------------------------TOKEN -------------------------------------------------------------------------------
-def create_token(email, token, valid):
+def create_token(email: str, token: str, valid: str) -> bool:
     try:
         get_db().execute("insert into token (email, token, valid) values (?, ?, ?)", [email, token, valid])
         get_db().commit()
@@ -125,7 +125,7 @@ def create_token(email, token, valid):
         return False
 
 
-def update_token(token, email, valid):
+def update_token(token: str, email: str, valid: str) -> bool:
     try:
         get_db().execute("update token set email=?, valid=? where token==?", [email, valid, token])
         get_db().commit()
@@ -134,7 +134,7 @@ def update_token(token, email, valid):
         return False
 
 
-def delete_user_tokens(email):
+def delete_user_tokens(email: str) -> bool:
     try:
         get_db().execute("delete from token where email==?", [email])
         get_db().commit()
@@ -143,7 +143,7 @@ def delete_user_tokens(email):
         return False
 
 
-def delete_token(token):
+def delete_token(token: str) -> bool:
     try:
         get_db().execute("delete from token where token==?", [token])
         get_db().commit()
@@ -152,7 +152,7 @@ def delete_token(token):
         return False
 
 
-def retrieve_token(token):
+def retrieve_token(token: str) -> None | dict:
     cursor = get_db().execute("select email, token, valid from token where token==?", [token])
     rows = cursor.fetchall()
     if len(rows) == 0:
@@ -164,7 +164,8 @@ def retrieve_token(token):
         "valid": rows[0][2],
     }
 
-def retrieve_user_tokens(email):
+
+def retrieve_user_tokens(email: str) -> list[dict]:
     cursor = get_db().execute("select email, token, valid from token where email==?", [email])
     rows = cursor.fetchall()
     return [{
