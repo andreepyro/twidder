@@ -27,36 +27,31 @@ function showView(viewName) {
     let token = localStorage.getItem("token");
     if (userData != null && token!=null) {
         reloadHomeTab();
-        
-        // Account Tab
-        let htmlAccountUsername = document.getElementById("account-username");
-        if (htmlAccountUsername != null) {
-            htmlAccountUsername.innerHTML = userData.firstname + " " + userData.familyname;
-        }
 
-        let htmlAccountGender = document.getElementById("account-gender");
-        if (htmlAccountGender != null) {
-            htmlAccountGender.innerHTML = userData.gender;
-        }
-
-        let htmlAccountLocation = document.getElementById("account-location");
-        if (htmlAccountLocation != null) {
-            htmlAccountLocation.innerHTML = userData.city + ", " + userData.country;
-        }
-
-        let htmlAccountEmail = document.getElementById("account-email");
-        if (htmlAccountEmail != null) {
-            htmlAccountEmail.innerHTML = userData.email;
-        }
+        // Account tab
+        document.getElementById("input-account-first-name").value = userData.firstname;
+        document.getElementById("input-account-last-name").value = userData.familyname;
+        document.getElementById("input-account-city").value = userData.city;
+        document.getElementById("input-account-country").value = userData.country;
+        document.getElementById("input-account-gender").value = userData.gender;
+        document.getElementById("account-email").innerHTML = userData.email;
     }
 
     // register gender selection
-    checkValidGender(document.getElementById("input-sign-up-gender"));
+    let htmlSelect = document.getElementById("input-sign-up-gender");
+    if (htmlSelect != null) {
+        checkValidGender(htmlSelect);
+    }
 
     // load correct tab
-    if (window.location.pathname == "/browse") showTab("browse");
-    else if (window.location.pathname == "/account") showTab("account");
-    else showTab("home");
+    if (viewName === "welcome-view") {
+        history.pushState("welcome", '', "/");
+    }
+    if (viewName === "user-view") {
+        if (window.location.pathname == "/browse") showTab("browse");
+        else if (window.location.pathname == "/account") showTab("account");
+        else showTab("home");
+    }
 }
 
 function showTab(tabName) {
@@ -491,6 +486,15 @@ function showRegisterContainer() {
 function hideRegisterContainer() {
     document.getElementById("register-container").style.display = "none";
 }
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === "Escape") {
+        // close register form if visible
+        if (document.getElementById("register-container").style.display === "block") {
+            document.getElementById("register-container").style.display = "none";
+        }
+    }
+});
 
 window.onclick = function (event) {
     if (event.target === document.getElementById("register-container")) {

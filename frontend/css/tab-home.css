@@ -87,6 +87,8 @@
     border: 0px;
     outline: 0px;
     resize: none;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
 }
 
 #form-home-new-post button {

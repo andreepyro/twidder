@@ -175,7 +175,7 @@
     border: 1px solid green;
 }
 
-#form-register input:required:invalid:not(:placeholder-shown), #form-register select:invalid {
+#form-register input:required:invalid:not(:placeholder-shown) {
     border: 1px solid red;
 }
 

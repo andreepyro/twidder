@@ -4,122 +4,235 @@
     height: 100%;
 }
 
-#account-tab {
+#account-window {
     margin: auto;
-    display: flex;
-    border-radius: 25px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+}
+
+#account-container {
+    display: flex;
+    border-bottom: 1px solid lightgray;
+}
+
+#delete-account-container {
+    display: flex;
+    height: fit-content;
+    padding: 0px 16px;
+    align-items: center;
+}
+
+#delete-account-container p {
+    max-width: 256px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#button-delete-account {
+    float: right;
+    width: 256px;
+    height: 36px;
+    margin: 8px 8px 8px auto;
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 0px solid #e7e7e7;
+    color: red;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+#button-delete-account:hover {
+    color: white;
+    background-color: red;
 }
 
 #account-info {
+    display: flex;
     max-width: 300px;
     text-align: center;
-    font-family: arial;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
     padding: 14px;
 }
 
 #account-info img {
-    margin-top: 15px;
+    margin: auto;
 }
 
-#account-gender {
-    color: grey;
-    font-size: 18px;
-}
-
-#change-password {
-    display: flex;
-    align-items: center;
-    max-width: 500px;
+#account-email {
+    width: 202px;
+    height: 36px;
+    line-height:36px;
+    margin: 8px 8px;
+    padding: 0px 10px;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
     text-align: center;
-    font-family: arial;
-    padding: 14px;
-    border-left: 1px solid #e7e7e7;
+}
+
+#form-account-details {
+    padding: 8px;
 }
 
 #form-change-password {
-    margin: auto;
-    text-align: center;
+    width: 288px;
+    padding: 8px;
+    border-left: 1px solid lightgray;
 }
 
-#form-change-password div {
-    margin: 5px;
+#title-account-details, #form-change-password p {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#form-account-details div, #form-change-password div {
+    display: flex;
+}
+
+#form-account-details input {
+    width: 202px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
 }
 
 #form-change-password input {
-    height: 24px;
-    border-radius: 25px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    text-align: left;
-    padding-left: 10px;
-    transition: 0.2s;
-}
-
-#form-change-password input:invalid {
-    border: 1px solid red;
+    width: 236px;
+    height: 36px;
+    margin: 8px 16px;
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
     outline: none;
-}
-
-#form-change-password input:valid {
-    border: 1px solid green;
-    outline: none;
-}
-
-#form-change-password input:not(:focus) {
-    border: 1px solid #e7e7e7;
-    outline: none;
-}
-
-#form-change-password label {
-    display: inline-block;
-    width: 160px;
-    text-align: right;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
     font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details select {
+    width: 224px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details input:required:valid, #form-account-details select:valid, #form-change-password input:required:valid, #form-change-password select:valid {
+    border: 1px solid green;
+}
+
+#form-account-details input:required:invalid:not(:placeholder-shown), #form-change-password input:required:invalid:not(:placeholder-shown) {
+    border: 1px solid red;
+}
+
+#form-account-details input:focus, #form-account-details input:hover, #form-change-password input:focus, #form-change-password input:hover {
+    background-color: rgba(0, 0, 0, 0.100);
+}
+
+#form-account-details input::placeholder, #form-account-details select::placeholder, #form-change-password input::placeholder {
+    text-align: start;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details button {
+    width: 464px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0px;
+    border-radius: 10px;
+    border: 0px solid #e7e7e7;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
 }
 
 #form-change-password button {
-    width: 130px;
-    height: 30px;
-    margin: 5px;
-    background-color: white;
-    border: 1px solid #e7e7e7;
-    border-radius: 25px;
-    transition: 0.2s;
+    width: 256px;
+    height: 36px;
+    margin: 8px 16px;
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 0px solid #e7e7e7;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
 }
 
-#form-change-password button:hover {
-    background: #e7e7e7;
+#form-account-details button:hover, #form-change-password button:hover {
+    background-color: orange;
 }
 
-@media screen and (max-width: 800px) {
-    #account-tab {
+@media screen and (max-width: 1200px) {
+    #account-info {
+        margin: auto;
+    }
+
+    #account-container {
         display: block;
     }
-    #change-password {
-        border-top: 1px solid #e7e7e7;
-        border-left: 1px solid rgba(255,255,255,0);
+
+    #form-account-details {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #form-change-password {
+        margin: auto;
+        border-left: 0px solid lightgray;
+    }
+
+    #delete-account-container {
+        display: block;
+    }
+
+    #delete-account-container p {
+        margin-top: 16px;
+        max-width: unset;
+    }
+
+    #button-delete-account {
+        float: unset;
+        display: block;
+        margin: auto;
+        margin-bottom: 8px;
     }
 }
 
-@media screen and (max-width: 700px) {
-    
-}
-
-@media screen and (max-width: 400px) {
-    #form-change-password label {
-        display: inline;
-        text-align: center;
-        margin-top: 5px;
-    }
-    
-    #form-change-password input {
-        border-radius: 25px;
-    }
-
-    #form-change-password div {
+@media screen and (max-width: 520px) {
+    /*TODO*/
+    #form-account-details div {
         display: grid;
-        margin-left: 0px;
-        margin-right: 0px;
+        width: fit-content;
+        margin: auto;
+    }
+
+    #form-account-details button {
+        width: 226px;
+        margin: 8px auto auto;
+        display: block;
     }
 }

@@ -51,9 +51,8 @@
                 <input id="input-sign-up-email" required type="email" size="10" placeholder="e-mail">
                 </div>
                 <div>
-                    <input id="input-sign-up-password" required minlength="8" type="password" size="10" placeholder="Password">
-                    <input id="input-sign-up-password-repeat" required minlength="8" type="password" size="10"
-                           onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');" placeholder="Repeat password">
+                    <input id="input-sign-up-password" required minlength="8" type="password" size="10" onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');" placeholder="Password">
+                    <input id="input-sign-up-password-repeat" required minlength="8" type="password" size="10" onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');" placeholder="Repeat password">
                 </div>
                 <button id="button-register" type="submit" name="save" value="Save">Register</button>
             </form>
@@ -78,7 +77,7 @@
         <img id="home-reload-button" alt="reload button" src="src/reload.svg" width="32" height="32" onclick="reloadHomeTab(this);return false;">
         <div id="home-user-page">
           <div id="home-user-page-user-info">
-            <img alt="user profile picture" src="src/user.png" width="128" height="128">
+            <img alt="user profile picture" src="src/user-solid.svg" width="128" height="128">
             <div id="home-user-name">Name</div>
             <div id="home-user-gender">Gender</div>
             <div id="home-user-email">Email</div>
@@ -133,30 +132,44 @@
     </div>
     <div id="tab-account" class="page">
       <div id="account-content">
-        <div id="account-tab">
-            <div id="account-info">
-                <img alt="user profile picture" src="src/user-solid.svg" width="128" height="128">
-                <h1 id="account-username">Peter Parker</h1>
-                <p id="account-gender">Octopus</p>
-                <p id="account-location">Linköping, Sweden</p>
-                <p id="account-email">email@student.liu.se</p>
-            </div>
-            <div id="change-password">
-                <form id="form-change-password"  action="#" onsubmit="changedPasswordForm(this);return false;">
+        <div id="account-window">
+            <div id="account-container">
+                <div id="account-info">
+                    <img alt="user profile picture" src="src/user-solid.svg" width="128" height="128">
+                </div>
+                <form id="form-account-details" action="#" onsubmit="TODO(this);return false;">
+                    <p id="title-account-details">Account details</p>
                     <div>
-                        <label for="input-change-password-old">Old password</label>
-                        <input id="input-change-password-old" type="password" required size="10" minlength="8">
+                        <input id="input-account-first-name" type="text" required size="10" placeholder="First name">
+                        <input id="input-account-last-name" type="text" required size="10" placeholder="Last name">
                     </div>
                     <div>
-                        <label for="input-change-password-new">New password</label>
-                        <input id="input-change-password-new" type="password" required size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
+                        <input id="input-account-city" required type="text" size="10" placeholder="City">
+                        <input id="input-account-country" required type="text" size="10" placeholder="Country">
                     </div>
                     <div>
-                        <label for="input-change-password-new-repeat">Repeat new password</label>
-                        <input id="input-change-password-new-repeat" type="password" required size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');">
+                        <select id="input-account-gender" onpageshow="checkValidGender(this);" onChange="checkValidGender(this);">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <p id="account-email" >email@example.com</p>
                     </div>
+                    <button type="submit" name="save" value="Save">Save changes</button>
+                </form>
+                <form id="form-change-password" action="#" onsubmit="changedPasswordForm(this);return false;">
+                    <p>Change password</p>
+                    <input id="input-change-password-old" type="password" required size="10" minlength="8" placeholder="Old password">
+                    <input id="input-change-password-new" type="password" required size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');" placeholder="New password">
+                    <input id="input-change-password-new-repeat" type="password" required size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');" placeholder="Repeat new password">
                     <button type="submit" name="save" value="Save">Change password</button>
                 </form>
+            </div>
+            <div id="delete-account-container">
+                <div>
+                    <p>Delete user account?</p>
+                </div>
+                <button id="button-delete-account">Delete account</button>
             </div>
         </div>
       </div>
