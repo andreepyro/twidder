@@ -149,15 +149,17 @@ def change_password(user_email):
     body = request.get_json()
     old_password = body["old_password"]
     new_password = body["new_password"]
+
     if len(new_password) < MIN_PASSWORD_LENGTH:
         return jsonify({"message": "too few characters in password"}), http.HTTPStatus.FORBIDDEN
     if old_password == new_password:
         return jsonify({"message": "new password should be different to previous"}), http.HTTPStatus.FORBIDDEN
+
     user = database_handler.retrieve_user(user_email)
     if user is None:
         return jsonify({"message": "user does not exist in the database"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
-    if _check_password(old_password, user["password"]):
+    if not _check_password(old_password, user["password"]):
         return jsonify({"message": "old password does not match user password"}), http.HTTPStatus.FORBIDDEN
 
     hashed_password = _hash_password(new_password)
