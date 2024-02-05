@@ -50,6 +50,9 @@ function showView(viewName) {
         }
     }
 
+    // register gender selection
+    checkValidGender(document.getElementById("input-sign-up-gender"));
+
     // load correct tab
     if (window.location.pathname == "/browse") showTab("browse");
     else if (window.location.pathname == "/account") showTab("account");
@@ -427,6 +430,14 @@ function checkSamePasswords(htmlPassword, htmlPassword2) {
     } else {
         password1.setCustomValidity("Passwords doesn't match!");
         password2.setCustomValidity("Passwords doesn't match!");
+    }
+}
+
+function checkValidGender(htmlSelect) {
+    if (htmlSelect.value === "") {
+        htmlSelect.setCustomValidity("Please select your gender!");
+    } else {
+        htmlSelect.setCustomValidity("");
     }
 }
 

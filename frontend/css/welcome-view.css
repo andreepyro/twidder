@@ -32,6 +32,8 @@
     outline: none;
     background-color: rgba(0, 0, 0, 0.035);
     transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
 }
 
 #form-login input:focus, #form-login input:hover {
@@ -91,7 +93,7 @@
     color: orange;
     margin: 0px;
     font-family: Tahoma, sans-serif;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 #text-twidder-description {
@@ -129,6 +131,14 @@
     border-radius: 10px;
 }
 
+#form-register p {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
 #form-register div {
     display: flex;
 }
@@ -143,6 +153,8 @@
     outline: none;
     background-color: rgba(0, 0, 0, 0.035);
     transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
 }
 
 #form-register select {
@@ -155,6 +167,8 @@
     outline: none;
     background-color: rgba(0, 0, 0, 0.035);
     transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
 }
 
 #form-register input:required:valid, #form-register select:valid {
@@ -176,10 +190,10 @@
 }
 
 #form-register button {
-    width: 256px;
+    width: 464px;
     height: 36px;
-    margin: 8px 16px;
-    padding: 0px 10px;
+    margin: 8px 8px;
+    padding: 0px;
     border-radius: 10px;
     border: 0px solid #e7e7e7;
     outline-color: orange;

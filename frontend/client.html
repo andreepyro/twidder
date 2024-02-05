@@ -32,6 +32,7 @@
         <div id="register-container">
             <span onclick="hideRegisterContainer();" class="close-button" title="Close Modal">&times;</span>
             <form id="form-register" action="#" onsubmit="registerForm(this);return false;">
+                <p>Create a new account</p>
                 <div>
                     <input id="input-sign-up-first-name" type="text" required size="10" placeholder="First name">
                     <input id="input-sign-up-last-name" type="text" required size="10" placeholder="Last name">
@@ -41,10 +42,10 @@
                     <input id="input-sign-up-country" required type="text" size="10" placeholder="Country">
                 </div>
                 <div>
-                    <select id="input-sign-up-gender">
-                        <option value="0">Gender</option>
-                        <option value="Female">Female</option>
+                    <select id="input-sign-up-gender" onpageshow="checkValidGender(this);" onChange="checkValidGender(this);">
+                        <option value="" disabled selected>Select gender</option>
                         <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                         <option value="Other">Other</option>
                     </select>
                 <input id="input-sign-up-email" required type="email" size="10" placeholder="e-mail">
