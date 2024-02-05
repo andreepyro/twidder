@@ -8,4 +8,4 @@ run tests:
     stage: test
     script:
 #        - python -m pytest
-        - echo "Placeholder"
+        - python test/test_backend.py
