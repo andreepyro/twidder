@@ -12,6 +12,7 @@ import requests
 # hack to import app
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../backend")
 from server import app
+from database_handler import initialize_database
 
 
 class FlaskAppTests(unittest.TestCase):
@@ -636,6 +637,9 @@ def get_token_value(json_data, target_token):
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        initialize_database()
+
     server = Process(target=lambda: app.run(host="localhost", port=8080))
     server.start()
 
