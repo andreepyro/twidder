@@ -116,7 +116,7 @@ def delete_post(post_id: str) -> bool:
 
 
 # ------------------------------------------------TOKEN -------------------------------------------------------------------------------
-def create_token(email: str, token: str, valid: str) -> bool:
+def create_token(email: str, token: str, valid: bool) -> bool:
     try:
         get_db().execute("insert into token (email, token, valid) values (?, ?, ?)", [email, token, valid])
         get_db().commit()
@@ -125,7 +125,7 @@ def create_token(email: str, token: str, valid: str) -> bool:
         return False
 
 
-def update_token(token: str, email: str, valid: str) -> bool:
+def update_token(token: str, email: str, valid: bool) -> bool:
     try:
         get_db().execute("update token set email=?, valid=? where token==?", [email, valid, token])
         get_db().commit()
