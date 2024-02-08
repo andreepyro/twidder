@@ -2,8 +2,8 @@ import sqlite3
 
 from flask import g
 
-DATABASE_FILE = "./backend/database.db"
-DATABASE_SCHEMA = "./backend/schema.sql"
+DATABASE_FILE = "./database.db"
+DATABASE_SCHEMA = "./app/schema.sql"
 
 
 def get_db():

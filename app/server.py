@@ -10,7 +10,7 @@ from flask import Flask, Response, send_file, jsonify, request
 
 import database_handler
 
-app = Flask(__name__, static_folder="../frontend", static_url_path='')
+app = Flask(__name__)
 
 MIN_PASSWORD_LENGTH = 8
 
@@ -251,7 +251,7 @@ def post_message(user_email: str, message: str, email: str):
 @app.route('/browse')
 @app.route('/account')
 def get_page():
-    return send_file("../frontend/client.html")
+    return send_file("templates/index.html")
 
 
 @app.teardown_request
