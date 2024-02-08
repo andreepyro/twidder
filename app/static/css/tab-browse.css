@@ -21,9 +21,7 @@
 #search-bar input {
     width: 100%;
     height: 36px;
-    border-radius: 25px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-radius: 25px 0px 0px 25px;
     text-align: left;
     padding-left: 20px;
     padding-right: 0px;
@@ -189,15 +187,40 @@
 }
 
 .browse-post .content {
+    height: 104px;
     font-family: Tahoma, sans-serif;
     font-size: 15px; 
     color: gray;
 }
 
+.browse-post .button-edit, .browse-post .button-delete {
+    float: right;
+    padding: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.browse-post .button-edit:hover {
+    background-color: green;
+}
+
+.browse-post .button-delete:hover {
+    background-color: red;
+}
+
 @keyframes browse-post-appear {
     0%  {opacity: 0; height: 0px;}
-    50%  {opacity: 0; height: 100px;}
+    50%  {opacity: 0; height: 150px;}
     100%   {opacity: 1;}
+}
+
+@keyframes browse-post-appear-inner {
+    0%  {display: none;}
+    75%  {display: none; opacity: 0;}
+    100%  {display: unset; opacity: 1;}
 }
 
 @media screen and (max-width: 1275px) {
