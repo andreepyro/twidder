@@ -1,40 +1,59 @@
-// VIEWS
+// Constants
+const HOST = "http://localhost:8080";
 
+// Extending localStorage to object (credits: https://stackoverflow.com/a/3146971)
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function (key) {
+    let value = this.getItem(key);
+    return value && JSON.parse(value);
+}
+
+// App state management
 window.onload = function() {
-    loadApp();
+    // page load
+    loadApp().then();
 };
 
 window.addEventListener('popstate', function(e) {
-    loadApp();
+    // going back/forward using history API
+    loadApp().then(); // TODO don't load the whole app, but decide here (so we don't fetch user data all over again)
 });
 
-function loadApp() {
+async function loadApp() {
     let token = localStorage.getItem("token");
-    if (token != null && getUserData(token) != null) {
-        showView("user-view");
-    } else {
+    if (token == null) {
         showView("welcome-view");
     }
+
+    if (!await loadUserDataByToken(token)) {
+        localStorage.setItem("token", null);
+        localStorage.setItem("user", null);
+        showMessage("You have been logged out.");
+        showView("welcome-view");
+    }
+
+    showView("user-view");
 }
 
 function showView(viewName) {
     // load view
-    let html = document.getElementById(viewName).innerHTML;
-    document.getElementById("content").innerHTML = html;
+    document.getElementById("content").innerHTML = document.getElementById(viewName).innerHTML;
   
     // show user content
-    let userData = getUserData();
-    let token = localStorage.getItem("token");
-    if (userData != null && token!=null) {
+    let user = localStorage.getObject("user");
+    if (user != null) {
         reloadHomeTab();
 
         // Account tab
-        document.getElementById("input-account-first-name").value = userData.firstname;
-        document.getElementById("input-account-last-name").value = userData.familyname;
-        document.getElementById("input-account-city").value = userData.city;
-        document.getElementById("input-account-country").value = userData.country;
-        document.getElementById("input-account-gender").value = userData.gender;
-        document.getElementById("account-email").innerHTML = userData.email;
+        document.getElementById("input-account-first-name").value = user.first_name;
+        document.getElementById("input-account-last-name").value = user.family_name;
+        document.getElementById("input-account-city").value = user.city;
+        document.getElementById("input-account-country").value = user.country;
+        document.getElementById("input-account-gender").value = user.gender;
+        document.getElementById("account-email").innerHTML = user.email;
     }
 
     // register gender selection
@@ -48,8 +67,8 @@ function showView(viewName) {
         history.pushState("welcome", '', "/");
     }
     if (viewName === "user-view") {
-        if (window.location.pathname == "/browse") showTab("browse");
-        else if (window.location.pathname == "/account") showTab("account");
+        if (window.location.pathname === "/browse") showTab("browse");
+        else if (window.location.pathname === "/account") showTab("account");
         else showTab("home");
     }
 }
@@ -77,7 +96,7 @@ function showTab(tabName) {
     browseTab.style.display = "none";
     accountTab.style.display = "none";
 
-    let modifyHistory = window.location.pathname.split("/")[1] != tabName;
+    let modifyHistory = window.location.pathname.split("/")[1] !== tabName;
 
     switch(tabName) {
         case "home":
@@ -105,137 +124,120 @@ function showTab(tabName) {
     jumpToStart();
 }
 
-// LOGIN
+async function login(email, password) {
+    // create a new session
+    const response = await fetch(HOST + "/sign_in", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password,
+        }),
+    });
 
-function loginForm(form) {
-    let email = form["input-login-email"].value;
-    let password = form["input-login-password"].value;
-    return login(email, password);
+    if (response.status === 401) {
+        showMessage("Invalid username or password.");
+    } else if (response.status !== 200) {
+        showMessage("Error");
+        return;
+    }
+
+    // load & save data
+    let token = response.headers.get("Authorization");
+    if (!await loadUserDataByToken(token)) {
+        showMessage("Error");
+        return;
+    }
+    localStorage.setItem("token", token);
+
+    // reload app content
+    loadApp().then();
 }
 
-function login(email, password) {
-    let result = serverstub.signIn(email, password);
+async function loadUserDataByToken(token) {
+    let userDataRequest = fetch(HOST + "/get_user_data_by_token", {
+        method: "GET",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+    });
+    let userPostsRequest = fetch(HOST + "/get_user_messages_by_token", {
+        method: "GET",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+    });
 
-    if (result["success"]) {
-        let token = result["data"];
-        localStorage.setItem("token", token);
-        loadApp();
-        return true;
-    } else {
-        showMessage(result["message"]);
+    const userDataResponse = await userDataRequest;
+    const userPostsResponse = await userPostsRequest;
+
+    if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
         return false;
     }
+
+    let user = await userDataResponse.json();
+    let posts = await userPostsResponse.json();
+
+    localStorage.setObject("user", user);
+    localStorage.setObject("posts", posts.posts);
+
+    return true;
 }
 
-// LOGOUT
-
-function logout() {
+async function logout() {
     let token = localStorage.getItem("token");
+
+    // TODO IMPLEMENT ME
+
     localStorage.removeItem("token");
-
-    let result = serverstub.signOut(token);
-
-    if (!result["success"]) {
-        showMessage(result["message"]);
-    }
-
-    loadApp();
+    loadApp().then();
 }
 
-// REGISTER
-
-function registerForm(form) {
-    let firstName = form["input-sign-up-first-name"].value;
-    let familyName = form["input-sign-up-last-name"].value;
-    let gender = form["input-sign-up-gender"].value;
-    let city = form["input-sign-up-city"].value;
-    let country = form["input-sign-up-country"].value;
-    let email = form["input-sign-up-email"].value;
-    let password = form["input-sign-up-password"].value;
-    let password2 = form["input-sign-up-password-repeat"].value;
-
-    if (password != password2) {
-        showMessage("Passwords doesn't match!");
-        return
-    }
-
-    let user = {
-        email: email,
-        password: password,
-        firstname: firstName,
-        familyname: familyName,
-        gender: gender,
-        city: city,
-        country: country,
-    };
-
-    let result = serverstub.signUp(user);
-
-    if (result["success"]) {
-        login(email, password);
-    } else {
-        showMessage(result["message"]);
-    }
-}
-
-// USER DATA
-
-function getUserData() {
-    let token = localStorage.getItem("token");
-    if (token === null) {
-        return null;
-    }
-
-    let result = serverstub.getUserDataByToken(token);
-    if (!result["success"]) {
-        return null;
-    }
-
-    return result["data"];
-}
-
-// CHANGE PASSWORD
-
-function changedPasswordForm(form) {
+async function changedPasswordForm(form) {
     let passwordOld = form["input-change-password-old"].value;
     let passwordNew = form["input-change-password-new"].value;
     let passwordNew2 = form["input-change-password-new-repeat"].value;
 
-    if (passwordNew == passwordOld) {
+    if (passwordNew === passwordOld) {
         showMessage("New password can't be the same!");
         return
     }
 
-    if (passwordNew != passwordNew2) {
+    if (passwordNew !== passwordNew2) {
         showMessage("Passwords doesn't match!");
         return
     }
 
     let token = localStorage.getItem("token");
-    if (token === null) {
-        showMessage("You need to be signed in!");
-        return
+    if (token == null) {
+        showMessage("Error: couldn't load token");
+        return;
     }
 
-    let result = serverstub.changePassword(token, passwordOld, passwordNew);
-    showMessage(result["message"]);
-    if (result["success"]) {
-        showTab("home");
-    }
+    // TODO implement me
+
+    showTab("home"); // TODO only when successful
 }
 
 // ADD POST
 
-function addPostHome() {
+async function addPostHome() {
     let token = localStorage.getItem("token");
     if (token == null) {
-        showMessage("You need to be signed in!");
+        showMessage("Error: couldn't load token");
         return;
     }
 
-    let userData = getUserData();
-    if (userData == null) {
-        showMessage("Couldn't load user data!");
+    let user = localStorage.getObject("user");
+    if (user == null) {
+        showMessage("Error: couldn't load user data");
         return;
     }
 
@@ -243,36 +245,39 @@ function addPostHome() {
     let newPostBoxHtml = document.getElementById("input-home-new-post");
     let userMessage = newPostBoxHtml.value;
 
-    let result = serverstub.postMessage(token, userMessage, userData.email)
-    if (!result["success"]) {
-        showMessage(result["message"]);
-        return;
-    }   
+    // TODO implement me
 
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
     newPostHtml.innerHTML = postTemplateHtml;
-    newPostHtml.children[0].innerHTML = userData.email;
+    newPostHtml.children[0].innerHTML = "now";
+    newPostHtml.children[1].innerHTML = user.email;
     const textNode = document.createTextNode(userMessage);
-    newPostHtml.children[1].appendChild(textNode);
+    newPostHtml.children[2].appendChild(textNode);
     newPostHtml.classList.add("home-post");
-    newPostHtml.style.animation = "home-post-appear 1s";
+    newPostHtml.style.animation = "home-post-appear 1.5s";
+    newPostHtml.children[3].style.animation = "home-post-appear-inner 2.0s";
+    newPostHtml.children[4].style.animation = "home-post-appear-inner 2.0s";
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
-    setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
+    setTimeout(function () {
+        newPostHtml.style.animation = "";
+        newPostHtml.children[3].style.animation = "";
+        newPostHtml.children[4].style.animation = "";
+    }, 2000);
 }
 
-function addPostBrowse() {
+async function addPostBrowse() {
     let token = localStorage.getItem("token");
     if (token == null) {
-        showMessage("You need to be signed in!");
+        showMessage("Error: couldn't load token");
         return;
     }
 
-    let userData = getUserData();
-    if (userData == null) {
-        showMessage("Couldn't load user data!");
+    let user = localStorage.getObject("user");
+    if (user == null) {
+        showMessage("Error: couldn't load user data");
         return;
     }
 
@@ -282,92 +287,85 @@ function addPostBrowse() {
     let userEmail = userEmailHtml.innerHTML;
     let userMessage = newPostBoxHtml.value;
 
-    let result = serverstub.postMessage(token, userMessage, userEmail)
-    if (!result["success"]) {
-        showMessage(result["message"]);
-        return;
-    }   
+    // TODO implement me
 
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
     newPostHtml.innerHTML = postTemplateHtml;
-    newPostHtml.children[0].innerHTML = userData.email;
+    newPostHtml.children[0].innerHTML = user.email;
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[1].appendChild(textNode);
     newPostHtml.classList.add("browse-post");
     newPostHtml.style.animation = "browse-post-appear 1s";
+    newPostHtml.children[3].style.animation = "browse-post-appear-inner 2.0s";
+    newPostHtml.children[4].style.animation = "browse-post-appear-inner 2.0s";
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
-    setTimeout(function(){ newPostHtml.style.animation = ""; }, 1500);
+    setTimeout(function () {
+        newPostHtml.style.animation = "";
+        newPostHtml.children[3].style.animation = "";
+        newPostHtml.children[4].style.animation = "";
+    }, 2000);
 }
 
-// HOME TAB
 function reloadHomeTab() {
     let token = localStorage.getItem("token");
     if (token == null) {
-        showMessage("You need to be signed in!");
+        showMessage("Error: couldn't load token");
         return;
     }
 
-    let userData = getUserData();
-    if (userData == null) {
-        showMessage("Couldn't load user data!");
+    let user = localStorage.getObject("user");
+    if (user == null) {
+        showMessage("Error: couldn't load user data");
         return;
     }
 
-    let userNameHtml = document.getElementById("home-user-name");
-    userNameHtml.innerHTML = userData.firstname + " " + userData.familyname;
-
-    let userGenderHtml = document.getElementById("home-user-gender");
-    userGenderHtml.innerHTML = userData.gender;
-
-    let userLocationHtml = document.getElementById("home-user-location");
-    userLocationHtml.innerHTML = userData.city + ", " + userData.country;
-
-    let userEmailHtml = document.getElementById("home-user-email");
-    userEmailHtml.innerHTML = userData.email;
+    document.getElementById("home-user-name").innerHTML = user.first_name + " " + user.family_name;
+    document.getElementById("home-user-gender").innerHTML = user.gender;
+    document.getElementById("home-user-location").innerHTML = user.city + ", " + user.country;
+    document.getElementById("home-user-email").innerHTML = user.email;
 
     let htmlWall = document.getElementById("home-wall");
-    let userPostsResult = serverstub.getUserMessagesByEmail(token, userData.email);
-    if (!userPostsResult["success"]){
-        showMessage(userPostsResult["message"]);
+
+    let posts = localStorage.getObject("posts");
+    if (posts == null) {
+        showMessage("Error: couldn't load user posts");
+        return;
     }
-    let userMessages = userPostsResult["data"]
 
     let oldPosts = document.getElementsByClassName("home-post");
-    for (var i = oldPosts.length - 1; i >= 0; i--) {
+    for (let i = oldPosts.length - 1; i >= 0; i--) {
         oldPosts[i].remove();
     }
 
     let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
-    for (let i = 0; i < userMessages.length; i++) {
+    for (let i = 0; i < posts.length; i++) {
         const newPostHtml = document.createElement("div");
         newPostHtml.innerHTML = postTemplateHtml;
-        newPostHtml.children[0].innerHTML = userMessages[i]["writer"];
-        const textNode = document.createTextNode(userMessages[i]["content"]);
-        newPostHtml.children[1].appendChild(textNode);
+        newPostHtml.children[0].innerHTML = posts[i]["edited"]; // TODO for created != edited show edited icon
+        newPostHtml.children[1].innerHTML = posts[i]["author"];
+        const textNode = document.createTextNode(posts[i]["content"]);
+        newPostHtml.children[2].appendChild(textNode);
+        newPostHtml.children[3].setAttribute("id", posts[i]["id"]);
+        newPostHtml.children[4].setAttribute("id", posts[i]["id"]);
         newPostHtml.classList.add("home-post");
         htmlWall.appendChild(newPostHtml);
     }
 }
 
-// SEARCH USER
-function searchUser() {
+async function searchUser() {
     let token = localStorage.getItem("token");
     if (token == null) {
-        showMessage("You need to be signed in!");
+        showMessage("Error: couldn't load token");
         return;
     }
 
     let searchInputHtml = document.getElementById("input-user-email");
     let userEmail = searchInputHtml.value;
 
-    let userDataResult = serverstub.getUserDataByEmail(token, userEmail);
-    if (!userDataResult["success"]) {
-        showMessage(userDataResult["message"]);
-        return;
-    }
+    // TODO implement me
 
     let userData = userDataResult["data"];
 
@@ -390,10 +388,9 @@ function searchUser() {
     userEmailHtml.innerHTML = userData.email;
 
     let htmlWall = document.getElementById("browse-wall");
-    let userPostsResult = serverstub.getUserMessagesByEmail(token, userEmail);
-    if (!userPostsResult["success"]){
-        showMessage(userPostsResult["message"]);
-    }
+
+    // TODO implement me
+
     let userMessages = userPostsResult["data"]
 
     let oldPosts = document.getElementsByClassName("browse-post");
@@ -406,12 +403,34 @@ function searchUser() {
     for (let i = 0; i < userMessages.length; i++) {
         const newPostHtml = document.createElement("div");
         newPostHtml.innerHTML = postTemplateHtml;
-        newPostHtml.children[0].innerHTML = userMessages[i]["writer"];
+        newPostHtml.children[0].innerHTML = userMessages[i]["author"];
         const textNode = document.createTextNode(userMessages[i]["content"]);
         newPostHtml.children[1].appendChild(textNode);
+        newPostHtml.children[3].setAttribute("id", userMessages[i]["id"]);
+        newPostHtml.children[4].setAttribute("id", userMessages[i]["id"]);
         newPostHtml.classList.add("browse-post");
         htmlWall.appendChild(newPostHtml);
     }
+}
+
+async function editHomePost(button) {
+    let postID = button.getAttribute("id");
+    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
+}
+
+async function editBrowsePost(button) {
+    let postID = button.getAttribute("id");
+    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
+}
+
+async function deleteHomePost(button) {
+    let postID = button.getAttribute("id");
+    alert("DELETE POST: " + postID); // TODO IMPLEMENT ME
+}
+
+async function deleteBrowsePost(button) {
+    let postID = button.getAttribute("id");
+    alert("DELETE POST: " + postID); // TODO IMPLEMENT ME
 }
 
 // INTERACTIVE CSS ELEMENTS
@@ -419,7 +438,7 @@ function searchUser() {
 function checkSamePasswords(htmlPassword, htmlPassword2) {
     let password1 = document.getElementById(htmlPassword);
     let password2 = document.getElementById(htmlPassword2);
-    if (password1.value == password2.value) {
+    if (password1.value === password2.value) {
         password1.setCustomValidity("");
         password2.setCustomValidity("");
     } else {
@@ -499,5 +518,60 @@ document.addEventListener('keydown', function (e) {
 window.onclick = function (event) {
     if (event.target === document.getElementById("register-container")) {
         hideRegisterContainer();
+    }
+}
+
+async function formLogin(form) {
+    let email = form["input-login-email"].value;
+    let password = form["input-login-password"].value;
+    await login(email, password);
+}
+
+async function formRegister(form) {
+    let firstName = form["input-sign-up-first-name"].value;
+    let familyName = form["input-sign-up-last-name"].value;
+    let gender = form["input-sign-up-gender"].value;
+    let city = form["input-sign-up-city"].value;
+    let country = form["input-sign-up-country"].value;
+    let email = form["input-sign-up-email"].value;
+    let password = form["input-sign-up-password"].value;
+    let password2 = form["input-sign-up-password-repeat"].value;
+
+    if (password !== password2) {
+        showMessage("Passwords doesn't match!");
+        return
+    }
+
+    if (!["Male", "Female", "Other"].includes(gender)) {
+        showMessage("Invalid gender!")
+        return
+    }
+
+    const response = await fetch(HOST + "/sign_up", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password,
+            firstname: firstName,
+            familyname: familyName,
+            gender: gender,
+            city: city,
+            country: country,
+        }),
+    });
+
+    switch (response.status) {
+        case 200: // Ok
+            await login(email, password);
+            break;
+        case 404: // Forbidden
+            showMessage("Invalid data!"); // TODO decide on error message
+            break
+        default:
+            showMessage("Error");
     }
 }

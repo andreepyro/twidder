@@ -122,19 +122,54 @@
 
 .home-post .author {
     font-family: Tahoma, sans-serif;
-    font-size: 16px; 
+    font-size: 14px;
+    color: gray;
+}
+
+.home-post .time {
+    float: right;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    color: gray;
 }
 
 .home-post .content {
+    padding-top: 6px;
+    height: 104px;
     font-family: Tahoma, sans-serif;
-    font-size: 15px; 
-    color: gray;
+    font-size: 16px;
+}
+
+.home-post .button-edit, .home-post .button-delete {
+    float: right;
+    padding: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.home-post .button-edit:hover {
+    background-color: green;
+}
+
+.home-post .button-delete:hover {
+    background-color: red;
 }
 
 @keyframes home-post-appear {
     0%  {opacity: 0; height: 0px;}
-    50%  {opacity: 0; height: 100px;}
+    50%  {opacity: 0; height: 150px;}
     100%   {opacity: 1;}
+}
+
+@keyframes home-post-appear-inner {
+    0%  {display: none;}
+    75%  {display: none; opacity: 0;}
+    100%  {display: unset; opacity: 1;}
 }
 
 @media screen and (max-width: 1275px) {
