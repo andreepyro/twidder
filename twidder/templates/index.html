@@ -56,7 +56,6 @@
                 <button id="button-register" type="submit" name="save" value="Save">Register</button>
             </form>
         </div>
-        <div id="pop-message"></div>
     </script>
     <script id="user-view" type=”text/view”>
     <div id="sidebar">
@@ -124,6 +123,7 @@
                   <button type="submit" name="save" value="Save">Post</button>
               </form>
               <div id="browse-post-template">
+                <div class="time"></div>
                 <div class="author"></div>
                 <div class="content"></div>
                 <img onclick="deleteBrowsePost(this);" class="button-delete" src="./static/src/bin.svg" alt="delete post" width="24" height="24">
@@ -178,13 +178,12 @@
         </div>
       </div>
     </div>
-    <div id="pop-message"></div>
     </script>
     <div id="content">
         <img id="loading-logo" src="./static/src/logo.png" alt="twidder logo" width="170" height="170">
         <p id="loading-text-title">Twidder</p>
         <p id="loading-text-description">The page is loading...</p>
-        <div id="pop-message"></div>
     </div>
+    <div id="pop-message"></div>
   </body>
 </html>

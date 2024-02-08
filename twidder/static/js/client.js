@@ -26,15 +26,16 @@ async function loadApp() {
     let token = localStorage.getItem("token");
     if (token == null) {
         showView("welcome-view");
+        return;
     }
 
     if (!await loadUserDataByToken(token)) {
         localStorage.setItem("token", null);
         localStorage.setItem("user", null);
-        showMessage("You have been logged out.");
         showView("welcome-view");
-        return; }
-   
+        showMessage("You have been logged out.");
+        return;
+    }
 
     showView("user-view");
 }
@@ -42,19 +43,21 @@ async function loadApp() {
 function showView(viewName) {
     // load view
     document.getElementById("content").innerHTML = document.getElementById(viewName).innerHTML;
-  
-    // show user content
-    let user = localStorage.getObject("user");
-    if (user != null) {
-        reloadHomeTab();
 
-        // Account tab
-        document.getElementById("input-account-first-name").value = user.first_name;
-        document.getElementById("input-account-last-name").value = user.family_name;
-        document.getElementById("input-account-city").value = user.city;
-        document.getElementById("input-account-country").value = user.country;
-        document.getElementById("input-account-gender").value = user.gender;
-        document.getElementById("account-email").innerHTML = user.email;
+    if (viewName === "user-view") {
+        // show user content
+        let user = localStorage.getObject("user");
+        if (user != null) {
+            reloadHomeTab();
+
+            // Account tab
+            document.getElementById("input-account-first-name").value = user.first_name;
+            document.getElementById("input-account-last-name").value = user.family_name;
+            document.getElementById("input-account-city").value = user.city;
+            document.getElementById("input-account-country").value = user.country;
+            document.getElementById("input-account-gender").value = user.gender;
+            document.getElementById("account-email").innerHTML = user.email;
+        }
     }
 
     // register gender selection
@@ -66,8 +69,7 @@ function showView(viewName) {
     // load correct tab
     if (viewName === "welcome-view") {
         history.pushState("welcome", '', "/");
-    }
-    if (viewName === "user-view") {
+    } else if (viewName === "user-view") {
         if (window.location.pathname === "/browse") showTab("browse");
         else if (window.location.pathname === "/account") showTab("account");
         else showTab("home");
@@ -141,17 +143,14 @@ async function login(email, password) {
 
     if (response.status === 401) {
         showMessage("Invalid username or password.");
+        return;
     } else if (response.status !== 200) {
         showMessage("Error");
         return;
     }
 
-    // load & save data
+    // save token
     let token = response.headers.get("Authorization");
-    if (!await loadUserDataByToken(token)) {
-        showMessage("Error");
-        return;
-    }
     localStorage.setItem("token", token);
 
     // reload app content
@@ -181,7 +180,7 @@ async function loadUserDataByToken(token) {
 
     if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
         showMessage("Error")
-        return;
+        return false;
     }
 
     let user = await userDataResponse.json();
@@ -195,24 +194,20 @@ async function loadUserDataByToken(token) {
 
 async function logout() {
     let token = localStorage.getItem("token");
-    const logOut = fetch(HOST + "/sign_out", {
-        method: "DELETE",
-        cache: "no-cache",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        },
-    });
+    if (token != null) {
+        const response = await fetch(HOST + "/sign_out", {
+            method: "DELETE", cache: "no-cache", headers: {
+                "Content-Type": "application/json", "Authorization": token,
+            },
+        });
 
-    const logOutResponse = await logOut;
-    if (logOutResponse.status !== 200) {
-        return false;
+        if (response.status !== 200) {
+            showMessage("Error");
+            return false;
+        }
     }
 
-    data = await logOutResponse.json(); 
-    console.log(data)
-
-    localStorage.removeItem("token", token);
+    localStorage.removeItem("token");
     loadApp().then();
 }
 
@@ -237,7 +232,7 @@ async function changedPasswordForm(form) {
         return;
     }
 
-    let response = fetch(HOST + "/change_password", {
+    let response = await fetch(HOST + "/change_password", {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -250,18 +245,17 @@ async function changedPasswordForm(form) {
         }),
     });
 
-    if (response.status == 403) {
+    if (response.status === 403) {
         showMessage("Invalid password.");
         return;
-    } else if (response.status != 200) {
+    } else if (response.status !== 200) {
         showMessage("Error");
         return;
     }
-    alert("number 1")
+
+    showMessage("Password successfully changed!");
     showTab("home");
 }
-
-// ADD POST
 
 async function addPostHome() {
     let token = localStorage.getItem("token");
@@ -280,7 +274,6 @@ async function addPostHome() {
     let newPostBoxHtml = document.getElementById("input-home-new-post");
     let userMessage = newPostBoxHtml.value;
 
-    // TODO implement me
     const response = await fetch(HOST + "/post_message", {
         method: "POST",
         cache: "no-cache",
@@ -294,14 +287,13 @@ async function addPostHome() {
         }),
     });
 
-    if (response.status == 403) {
+    if (response.status === 403) {
         showMessage("User does not exist")
-        return; 
-    }
-        else if (response.status != 200){
+        return;
+    } else if (response.status !== 200) {
         showMessage("Error")
         return;
-        }
+    }
   
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
@@ -312,16 +304,16 @@ async function addPostHome() {
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[2].appendChild(textNode);
     newPostHtml.classList.add("home-post");
-    newPostHtml.style.animation = "home-post-appear 1.5s";
-    newPostHtml.children[3].style.animation = "home-post-appear-inner 2.0s";
-    newPostHtml.children[4].style.animation = "home-post-appear-inner 2.0s";
+    newPostHtml.style.animation = "home-post-appear 0.75s";
+    newPostHtml.children[3].style.animation = "home-post-appear-inner 1.0s";
+    newPostHtml.children[4].style.animation = "home-post-appear-inner 1.0s";
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function () {
         newPostHtml.style.animation = "";
         newPostHtml.children[3].style.animation = "";
         newPostHtml.children[4].style.animation = "";
-    }, 2000);
+    }, 1000);
 }
 
 async function addPostBrowse() {
@@ -343,7 +335,6 @@ async function addPostBrowse() {
     let userEmail = userEmailHtml.innerHTML;
     let userMessage = newPostBoxHtml.value;
 
-    // TODO implement me
     const response = await fetch(HOST + "/post_message", {
         method: "POST",
         cache: "no-cache",
@@ -357,15 +348,13 @@ async function addPostBrowse() {
         }),
     });
 
-    if (response.status == 403) {
+    if (response.status === 403) {
         showMessage("User does not exist")
-        return; 
-    }
-        else if (response.status != 200){
+        return;
+    } else if (response.status !== 200) {
         showMessage("Error")
         return;
-        }
-  
+    }
 
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
@@ -375,16 +364,16 @@ async function addPostBrowse() {
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[1].appendChild(textNode);
     newPostHtml.classList.add("browse-post");
-    newPostHtml.style.animation = "browse-post-appear 1s";
-    newPostHtml.children[3].style.animation = "browse-post-appear-inner 2.0s";
-    newPostHtml.children[4].style.animation = "browse-post-appear-inner 2.0s";
+    newPostHtml.style.animation = "browse-post-appear 0.75s";
+    newPostHtml.children[3].style.animation = "browse-post-appear-inner 1.0s";
+    newPostHtml.children[4].style.animation = "browse-post-appear-inner 1.0s";
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function () {
         newPostHtml.style.animation = "";
         newPostHtml.children[3].style.animation = "";
         newPostHtml.children[4].style.animation = "";
-    }, 2000);
+    }, 1000);
 }
 
 function reloadHomeTab() {
@@ -407,7 +396,7 @@ function reloadHomeTab() {
 
     let htmlWall = document.getElementById("home-wall");
 
-    let posts = localStorage.getObject("posts");
+    let posts = localStorage.getObject("posts"); // TODO - at this moment, this is not up to date (so only old posts are loaded!)
     if (posts == null) {
         showMessage("Error: couldn't load user posts");
         return;
@@ -442,7 +431,6 @@ async function searchUser() {
 
     let searchInputHtml = document.getElementById("input-user-email");
     let userEmail = searchInputHtml.value;
-
     
     let userDataRequest = fetch(HOST + "/get_user_data_by_email/"+ userEmail, {
         method: "GET",
@@ -464,16 +452,16 @@ async function searchUser() {
     const userDataResponse = await userDataRequest;
     const userPostsResponse = await userPostsRequest;
 
-    if (userDataResponse.status == 404 || userDataResponse == 404 ){
+    if (userDataResponse.status === 404 || userDataResponse.status === 404) {
         showMessage("User not found")
-        return;}
-    else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200){
+        return;
+    } else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
         showMessage("Error")
         return;
     } 
 
     let userData = await userDataResponse.json();
-    let userMessages = (await userPostsResponse.json()).posts;
+    let posts = (await userPostsResponse.json()).posts;
 
     let searchButtonHtml = document.getElementById("browse-search-button");
     searchButtonHtml.innerHTML = "Reload";
@@ -496,20 +484,20 @@ async function searchUser() {
     let htmlWall = document.getElementById("browse-wall");
 
     let oldPosts = document.getElementsByClassName("browse-post");
-    for (var i = oldPosts.length - 1; i >= 0; i--) {
+    for (let i = oldPosts.length - 1; i >= 0; i--) {
         oldPosts[i].remove();
     }
 
-
     let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
-    for (let i = 0; i < userMessages.length; i++) {
+    for (let i = 0; i < posts.length; i++) {
         const newPostHtml = document.createElement("div");
         newPostHtml.innerHTML = postTemplateHtml;
-        newPostHtml.children[0].innerHTML = userMessages[i]["author"];
-        const textNode = document.createTextNode(userMessages[i]["content"]);
-        newPostHtml.children[1].appendChild(textNode);
-        //newPostHtml.children[3].setAttribute("id", userMessages[i]["id"]);
-        //newPostHtml.children[4].setAttribute("id", userMessages[i]["id"]);
+        newPostHtml.children[0].innerHTML = posts[i]["edited"]; // TODO for created != edited show edited icon
+        newPostHtml.children[1].innerHTML = posts[i]["author"];
+        const textNode = document.createTextNode(posts[i]["content"]);
+        newPostHtml.children[2].appendChild(textNode);
+        newPostHtml.children[3].setAttribute("id", posts[i]["id"]);
+        newPostHtml.children[4].setAttribute("id", posts[i]["id"]);
         newPostHtml.classList.add("browse-post");
         htmlWall.appendChild(newPostHtml);
     }

@@ -167,6 +167,10 @@
     outline: none;
 } */
 
+#browse-post-template {
+    display: none;
+}
+
 .browse-post {
     width: 400px;
     height: 150px;
@@ -177,20 +181,26 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
-#browse-post-template {
-    display: none;
-}
-
 .browse-post .author {
     font-family: Tahoma, sans-serif;
-    font-size: 16px; 
+    font-size: 14px;
+    color: gray;
+}
+
+.browse-post .time {
+    float: right;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    color: gray;
 }
 
 .browse-post .content {
+    padding-top: 6px;
     height: 104px;
     font-family: Tahoma, sans-serif;
-    font-size: 15px; 
-    color: gray;
+    font-size: 16px;
 }
 
 .browse-post .button-edit, .browse-post .button-delete {
