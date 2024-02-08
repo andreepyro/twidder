@@ -1,14 +1,10 @@
-import base64
 import datetime
 import http
-import json
-import uuid
 
-import bcrypt
-from email_validator import validate_email, EmailNotValidError
-from flask import Flask, Response, send_file, jsonify, request
+from flask import Flask, Response, send_file, jsonify, request, render_template
 
-import database_handler
+from twidder import database_handler
+from twidder import util
 
 app = Flask(__name__)
 
@@ -42,11 +38,11 @@ def post_parameters(*params):
             new_params = []
             for (p_name, p_type) in params:
                 if p_name not in body:
-                    return jsonify({"message": f"parameter '{p}' is not present"}), http.HTTPStatus.BAD_REQUEST
+                    return jsonify({"message": f"parameter '{p_name}' is not present"}), http.HTTPStatus.BAD_REQUEST
                 if body[p_name] is None:
-                    return jsonify({"message": f"parameter '{p}' must not be null"}), http.HTTPStatus.BAD_REQUEST
+                    return jsonify({"message": f"parameter '{p_name}' must not be null"}), http.HTTPStatus.BAD_REQUEST
                 if not isinstance(body[p_name], p_type):
-                    return jsonify({"message": f"parameter '{p}' must not be '{p_type}'"}), http.HTTPStatus.BAD_REQUEST
+                    return jsonify({"message": f"parameter '{p_name}' must not be '{p_type}'"}), http.HTTPStatus.BAD_REQUEST
                 new_params.append(body[p_name])
             return fun(*args, *new_params, **kwargs)
 
@@ -63,10 +59,10 @@ def sign_in(email: str, password: str):
     """Create a new session."""  # TODO change endpoint to /session POST
     user = database_handler.retrieve_user(email)
 
-    if user is not None and _check_password(password, user["password"]):
-        if not _revoke_tokens(email):
+    if user is not None and util.check_password(password, user["password"]):
+        if not util.revoke_tokens(email):
             return jsonify({"message": "couldn't revoke old user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-        token = _create_token(email)
+        token = util.create_token(email)
         if not database_handler.create_token(email, token, True):
             return jsonify({"message": "couldn't create a new token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
         resp = Response("")
@@ -87,15 +83,14 @@ def sign_up(email: str, password: str, firstname: str, familyname: str, gender: 
 
     if gender not in ["Female", "Male", "Other"]:
         return jsonify({"message": "forbidden gender"}), http.HTTPStatus.FORBIDDEN
-    try:
-        validate_email(email, check_deliverability=False)
-    except EmailNotValidError:
+
+    if not util.is_email_valid(email):
         return jsonify({"message": "invalid email"}), http.HTTPStatus.FORBIDDEN
 
     if database_handler.retrieve_user(email) is not None:
         return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.FORBIDDEN
 
-    hashed_password = _hash_password(password)
+    hashed_password = util.hash_password(password)
     if not database_handler.create_user(email, hashed_password, firstname, familyname, gender, city, country, None):
         return jsonify({"message": "couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
@@ -106,7 +101,7 @@ def sign_up(email: str, password: str, firstname: str, familyname: str, gender: 
 @authorize_user
 def sign_out(user_email: str):
     """Destroy existing session."""  # TODO change endpoint to /session DELETE
-    if not _revoke_tokens(user_email):
+    if not util.revoke_tokens(user_email):
         return jsonify({"message": "couldn't revoke user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     return "", http.HTTPStatus.OK
 
@@ -130,10 +125,10 @@ def change_password(user_email: str, old_password: str, new_password: str):
     if user is None:
         return jsonify({"message": "user not found"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
-    if not _check_password(old_password, user["password"]):
+    if not util.check_password(old_password, user["password"]):
         return jsonify({"message": "wrong current password"}), http.HTTPStatus.FORBIDDEN
 
-    hashed_password = _hash_password(new_password)
+    hashed_password = util.hash_password(new_password)
     if database_handler.update_user(
             user_email,
             user_email,
@@ -254,57 +249,11 @@ def get_page():
     return send_file("templates/index.html")
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html")  # TODO IMPLEMENT ME
+
+
 @app.teardown_request
 def after_request(exception):
     database_handler.disconnect_db()
-
-
-def _hash_password(password: str) -> str:
-    password_b = bytes(password, "utf-8")
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password_b, salt)
-    return hashed_password.decode('utf-8')
-
-
-def _check_password(password: str, hashed_password: str) -> bool:
-    password_b = bytes(password, "utf-8")
-    hashed_password_b = bytes(hashed_password, "utf-8")
-    return bcrypt.checkpw(password_b, hashed_password_b)
-
-
-def _encode_token(token_plain: dict) -> str:
-    token_str = json.dumps(token_plain)
-    token_b = bytes(token_str, "utf-8")
-    token_b64b = base64.b64encode(token_b)
-    return token_b64b.decode("utf-8")
-
-
-def _decode_token(token: str) -> dict:
-    token_str = base64.b64decode(token)
-    return json.loads(token_str)
-
-
-def _create_token(user_email: str) -> str:
-    token_plain = {
-        "user": user_email,
-        "session_id": str(uuid.uuid4()),
-    }
-    return _encode_token(token_plain)
-
-
-def _revoke_tokens(user_email: str) -> bool:
-    tokens = database_handler.retrieve_user_tokens(user_email)
-    for token in tokens:
-        if not database_handler.update_token(token["token"], user_email, False):
-            return False
-    return True
-
-
-def _verify_token(user_email: str, token: str) -> bool:
-    return database_handler.retrieve_token(token) and _decode_token(token)["user"] == user_email
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        database_handler.initialize_database()
-    app.run(host="0.0.0.0", port=8080, debug=True)

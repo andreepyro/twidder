@@ -3,7 +3,7 @@ import sqlite3
 from flask import g
 
 DATABASE_FILE = "./database.db"
-DATABASE_SCHEMA = "./app/schema.sql"
+DATABASE_SCHEMA = "./twidder/schema.sql"
 
 
 def get_db():

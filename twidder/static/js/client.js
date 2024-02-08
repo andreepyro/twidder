@@ -19,7 +19,7 @@ window.onload = function() {
 
 window.addEventListener('popstate', function(e) {
     // going back/forward using history API
-    loadApp().then(); // TODO don't load the whole app, but decide here (so we don't fetch user data all over again)
+    loadApp().then(); // TODO don't load the whole twidder, but decide here (so we don't fetch user data all over again)
 });
 
 async function loadApp() {
@@ -153,7 +153,7 @@ async function login(email, password) {
     }
     localStorage.setItem("token", token);
 
-    // reload app content
+    // reload twidder content
     loadApp().then();
 }
 
