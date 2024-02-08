@@ -7,7 +7,6 @@
     <link href="./css/tab-browse.css" type="text/css" rel="stylesheet">
     <link href="./css/tab-account.css" type="text/css" rel="stylesheet">
     <script src="./js/client.js"></script>
-    <script src="./js/serverstub.js"></script>
     <title>Twidder</title>
     <link rel="icon" type="image/x-icon" href="./src/favicon.ico">
     <meta charset="UTF-8">
@@ -17,7 +16,7 @@
     <script id="welcome-view" type=”text/view”>
         <img id="image-twidder-logo" src="src/logo.png" alt="twidder logo" width="170" height="170">
         <div id="login-container">
-            <form id="form-login" action="#" onsubmit="loginForm(this);return false;">
+            <form id="form-login" action="#" onsubmit="formLogin(this);return false;">
                 <input id="input-login-email" type="email" size="10" required placeholder="e-mail">
                 <input id="input-login-password" type="password" required size="10" minlength="8" placeholder="password">
                 <button id="button-login" type="submit" name="save" value="Save">Login</button>
@@ -31,7 +30,7 @@
             serious social networking!</p>
         <div id="register-container">
             <span onclick="hideRegisterContainer();" class="close-button" title="Close Modal">&times;</span>
-            <form id="form-register" action="#" onsubmit="registerForm(this);return false;">
+            <form id="form-register" action="#" onsubmit="formRegister(this);return false;">
                 <p>Create a new account</p>
                 <div>
                     <input id="input-sign-up-first-name" type="text" required size="10" placeholder="First name">
@@ -90,8 +89,11 @@
                   <button id="button-home-new-post" type="submit" name="save" value="Save">Post</button>
               </form>
               <div id="home-post-template">
+                <div class="time"></div>
                 <div class="author"></div>
                 <div class="content"></div>
+                <img onclick="deleteHomePost(this);" class="button-delete" src="src/bin.svg" alt="delete post" width="24" height="24">
+                <img onclick="editHomePost(this);" class="button-edit" src="src/edit.svg" alt="edit post" width="24" height="24">
               </div>
             </div>
           </div>
@@ -124,6 +126,8 @@
               <div id="browse-post-template">
                 <div class="author"></div>
                 <div class="content"></div>
+                <img onclick="deleteBrowsePost(this);" class="button-delete" src="src/bin.svg" alt="delete post" width="24" height="24">
+                <img onclick="editBrowsePost(this);"class="button-edit" src="src/edit.svg" alt="edit post" width="24" height="24">
               </div>
             </div>
           </div>
@@ -176,6 +180,11 @@
     </div>
     <div id="pop-message"></div>
     </script>
-    <div id="content"></div>
+    <div id="content">
+        <img id="loading-logo" src="src/logo.png" alt="twidder logo" width="170" height="170">
+        <p id="loading-text-title">Twidder</p>
+        <p id="loading-text-description">The page is loading...</p>
+        <div id="pop-message"></div>
+    </div>
   </body>
 </html>
