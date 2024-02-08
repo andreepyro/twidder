@@ -33,7 +33,8 @@ async function loadApp() {
         localStorage.setItem("user", null);
         showMessage("You have been logged out.");
         showView("welcome-view");
-    }
+        return; }
+   
 
     showView("user-view");
 }
@@ -179,7 +180,8 @@ async function loadUserDataByToken(token) {
     const userPostsResponse = await userPostsRequest;
 
     if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
-        return false;
+        showMessage("Error")
+        return;
     }
 
     let user = await userDataResponse.json();
@@ -193,10 +195,24 @@ async function loadUserDataByToken(token) {
 
 async function logout() {
     let token = localStorage.getItem("token");
+    const logOut = fetch(HOST + "/sign_out", {
+        method: "DELETE",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+    });
 
-    // TODO IMPLEMENT ME
+    const logOutResponse = await logOut;
+    if (logOutResponse.status !== 200) {
+        return false;
+    }
 
-    localStorage.removeItem("token");
+    data = await logOutResponse.json(); 
+    console.log(data)
+
+    localStorage.removeItem("token", token);
     loadApp().then();
 }
 
@@ -204,7 +220,7 @@ async function changedPasswordForm(form) {
     let passwordOld = form["input-change-password-old"].value;
     let passwordNew = form["input-change-password-new"].value;
     let passwordNew2 = form["input-change-password-new-repeat"].value;
-
+    
     if (passwordNew === passwordOld) {
         showMessage("New password can't be the same!");
         return
@@ -221,9 +237,28 @@ async function changedPasswordForm(form) {
         return;
     }
 
-    // TODO implement me
+    let response = fetch(HOST + "/change_password", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization" : token,
+        },
+        body: JSON.stringify({
+            old_password: passwordOld,
+            new_password: passwordNew,
+        }),
+    });
 
-    showTab("home"); // TODO only when successful
+    if (response.status == 403) {
+        showMessage("Invalid password.");
+        return;
+    } else if (response.status != 200) {
+        showMessage("Error");
+        return;
+    }
+    alert("number 1")
+    showTab("home");
 }
 
 // ADD POST
@@ -246,7 +281,28 @@ async function addPostHome() {
     let userMessage = newPostBoxHtml.value;
 
     // TODO implement me
+    const response = await fetch(HOST + "/post_message", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+        body: JSON.stringify({
+            email: user.email,
+            message: userMessage,
+        }),
+    });
 
+    if (response.status == 403) {
+        showMessage("User does not exist")
+        return; 
+    }
+        else if (response.status != 200){
+        showMessage("Error")
+        return;
+        }
+  
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
@@ -288,6 +344,28 @@ async function addPostBrowse() {
     let userMessage = newPostBoxHtml.value;
 
     // TODO implement me
+    const response = await fetch(HOST + "/post_message", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+        body: JSON.stringify({
+            email: userEmail,
+            message: userMessage,
+        }),
+    });
+
+    if (response.status == 403) {
+        showMessage("User does not exist")
+        return; 
+    }
+        else if (response.status != 200){
+        showMessage("Error")
+        return;
+        }
+  
 
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
@@ -365,9 +443,37 @@ async function searchUser() {
     let searchInputHtml = document.getElementById("input-user-email");
     let userEmail = searchInputHtml.value;
 
-    // TODO implement me
+    
+    let userDataRequest = fetch(HOST + "/get_user_data_by_email/"+ userEmail, {
+        method: "GET",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+    });
+    let userPostsRequest = fetch(HOST + "/get_user_messages_by_token", {
+        method: "GET",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+        },
+    });
 
-    let userData = userDataResult["data"];
+    const userDataResponse = await userDataRequest;
+    const userPostsResponse = await userPostsRequest;
+
+    if (userDataResponse.status == 404 || userDataResponse == 404 ){
+        showMessage("User not found")
+        return;}
+    else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200){
+        showMessage("Error")
+        return;
+    } 
+
+    let userData = await userDataResponse.json();
+    let userMessages = (await userPostsResponse.json()).posts;
 
     let searchButtonHtml = document.getElementById("browse-search-button");
     searchButtonHtml.innerHTML = "Reload";
@@ -376,7 +482,7 @@ async function searchUser() {
     containerUserPage.style.display = "block";
 
     let userNameHtml = document.getElementById("browse-user-name");
-    userNameHtml.innerHTML = userData.firstname + " " + userData.familyname;
+    userNameHtml.innerHTML = userData.first_name + " " + userData.family_name;
 
     let userGenderHtml = document.getElementById("browse-user-gender");
     userGenderHtml.innerHTML = userData.gender;
@@ -388,10 +494,6 @@ async function searchUser() {
     userEmailHtml.innerHTML = userData.email;
 
     let htmlWall = document.getElementById("browse-wall");
-
-    // TODO implement me
-
-    let userMessages = userPostsResult["data"]
 
     let oldPosts = document.getElementsByClassName("browse-post");
     for (var i = oldPosts.length - 1; i >= 0; i--) {
@@ -406,8 +508,8 @@ async function searchUser() {
         newPostHtml.children[0].innerHTML = userMessages[i]["author"];
         const textNode = document.createTextNode(userMessages[i]["content"]);
         newPostHtml.children[1].appendChild(textNode);
-        newPostHtml.children[3].setAttribute("id", userMessages[i]["id"]);
-        newPostHtml.children[4].setAttribute("id", userMessages[i]["id"]);
+        //newPostHtml.children[3].setAttribute("id", userMessages[i]["id"]);
+        //newPostHtml.children[4].setAttribute("id", userMessages[i]["id"]);
         newPostHtml.classList.add("browse-post");
         htmlWall.appendChild(newPostHtml);
     }
