@@ -1,5 +1,4 @@
 body {
-    /* background-image: url("src/background4.jpeg"); */
     background-size:     cover;
     background-repeat:   no-repeat;
     background-position: center center;
@@ -13,18 +12,6 @@ p {
 
 button {
     cursor: pointer;
-}
-
-
-.image-center {
-    width: 50%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.text-center {
-    text-align: center;
 }
 
 /* RESPONSIVE SIDEBAR AND PAGE LAYOUT */
@@ -42,28 +29,25 @@ button {
 #sidebar a {
     display: block;
     color: black;
-    padding: 16px;
+    padding: 12px;
     text-align: center;
     text-decoration: none;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin: 5px;
-    margin-left: 0px;
-    border-radius: 25px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+    border-radius: 10px;
     transition: 0.3s;
     animation-name: appear-from-left;
 	animation-duration: 0.4s;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.035);
 }
 
-#sidebar a.active {
-    background-color: #04AA6D;
+#sidebar a.active:hover {
     color: white;
 }
 
-#sidebar a:hover:not(.active) {
-    background-color: #555;
-    color: white;
+#sidebar a.active, #sidebar a:hover {
+    background-color: orange;
 }
 
 @keyframes appear-from-left {
@@ -90,26 +74,23 @@ button {
 }
 
 #sidebar .footer {
-    height:40px;
+    height:45px;
     width:100%;
     position:absolute;
     bottom:0;
+    border-top: 1px solid lightgray;
 }
 
 #sidebar .footer a {
     display: block;
     color: black;
-    padding: 0px;
-    padding-top: 7px;
+    padding: 4px;
     height: 28px;
     text-align: center;
     text-decoration: none;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin: 5px;
-    border-radius: 25px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    line-height: 25px;
+    border-radius: 10px;
+    line-height: 28px;
     animation-name: none;
 }
 
@@ -123,9 +104,7 @@ button {
         float: left;
         margin: 5px;
         margin-top: 0px;
-        border-radius: 25px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
+        border-radius: 0px 0px 10px 10px;
         animation-name: none;
     }
     .page {
@@ -141,6 +120,7 @@ button {
         height: 50px;
         right: 0px;
         bottom: unset;
+        border: 0px;
     }
     #sidebar .footer a {
         line-height: unset;
@@ -149,10 +129,7 @@ button {
         padding-left: 10px;
         padding-right: 5px;
         margin: 0px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 25px;
+        border-radius: 0px 0px 0px 10px;
     }
 }
 
@@ -188,11 +165,10 @@ button {
     position: fixed;
     bottom: -60px;
     right: 20px;
-    border: none;
-    border-color: #2196F3;
+    border: none #2196F3;
     color: dodgerblue;
     padding: 15px;
-    border-radius: 25px;
+    border-radius: 10px;
     transition: 0.3s;
     z-index: 100;
 }
@@ -213,15 +189,27 @@ button {
     position: fixed;
     border-radius: 3px;
     color: #ffffff;
-    background-color: #f44336;
+    background-color: deeppink;
     text-align: center;
     font-family: Tahoma, sans-serif;
     font-size: 16px;
 }
-  
+
 #pop-message.show {
     visibility: visible;
     animation: fadein 0.50s, fadeout 0.50s 4.05s;
+}
+
+#pop-message.error {
+    background-color: #f44336;
+}
+
+#pop-message.info {
+    background-color: #0e43b4;
+}
+
+#pop-message.success {
+    background-color: #15b40e;
 }
   
 @keyframes fadein {

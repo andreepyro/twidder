@@ -72,7 +72,7 @@
     <div id="tab-home" class="page">
       <div id="home-page">
         <div id="home-user-background"></div>
-        <img id="home-reload-button" alt="reload button" src="./static/src/reload.svg" width="32" height="32" onclick="reloadHomeTab(this);return false;">
+        <img id="home-reload-button" alt="reload button" src="./static/src/reload.svg" width="32" height="32" onclick="reloadUserData(this);return false;">
         <div id="home-user-page">
           <div id="home-user-page-user-info">
             <img alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
@@ -141,7 +141,7 @@
                 <div id="account-info">
                     <img alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
                 </div>
-                <form id="form-account-details" action="#" onsubmit="TODO(this);return false;">
+                <form id="form-account-details" action="#" onsubmit="formEditAccountDetails(this);return false;">
                     <p id="title-account-details">Account details</p>
                     <div>
                         <input id="input-account-first-name" type="text" required size="10" placeholder="First name">
@@ -157,11 +157,11 @@
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
-                        <p id="account-email" >email@example.com</p>
+                        <p id="account-email">email@example.com</p>
                     </div>
                     <button type="submit" name="save" value="Save">Save changes</button>
                 </form>
-                <form id="form-change-password" action="#" onsubmit="changedPasswordForm(this);return false;">
+                <form id="form-change-password" action="#" onsubmit="formChangePassword(this);return false;">
                     <p>Change password</p>
                     <input id="input-change-password-old" type="password" required size="10" minlength="8" placeholder="Old password">
                     <input id="input-change-password-new" type="password" required size="10" minlength="8" onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');" placeholder="New password">
@@ -173,7 +173,7 @@
                 <div>
                     <p>Delete user account?</p>
                 </div>
-                <button id="button-delete-account">Delete account</button>
+                <button id="button-delete-account" onclick="buttonDeleteUserAccount(this);return false;">Delete account</button>
             </div>
         </div>
       </div>

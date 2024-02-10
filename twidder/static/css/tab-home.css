@@ -59,6 +59,11 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
+#home-user-page-user-info div {
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
 #container-home-wall {
     display: flex;
     height: fit-content;

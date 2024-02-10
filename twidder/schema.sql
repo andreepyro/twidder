@@ -2,7 +2,7 @@ create table if not exists user (
     email text primary key,
     password text NOT NULL, 
     firstname text NOT NULL, 
-    familyname text NOT NULL, 
+    lastname text NOT NULL,
     gender text NOT NULL, 
     city text NOT NULL,
     country text NOT NULL,
@@ -16,7 +16,7 @@ create table if not exists post (
   	content text NOT NULL,
   	created datetime NOT NULL,
   	edited datetime,
-  	foreign key(author) references user(email)
+  	foreign key(author) references user(email),
   	foreign key(user) references user(email)
 );
 

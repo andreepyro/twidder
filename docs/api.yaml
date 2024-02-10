@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Twidder Backend
-  version: 1.0.11
+  version: 1.0.0
 servers:
   - url: http://localhost/api/v1
 paths:
@@ -126,6 +126,33 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
+    delete:
+      tags:
+        - users
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: userEmail
+          schema:
+            type: string
+          required: true
+          description: User email address
+      responses:
+        '200':
+          description: User account successfully deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: [ ]
   /posts:
     post:
       tags:
@@ -158,12 +185,12 @@ paths:
       operationId: getPosts
       parameters:
         - in: query
-          name: email
+          name: user_email
           schema:
             type: string
             format: email
           required: false
-          description: User email address to filter posts by author
+          description: User email address to filter posts by user
       responses:
         '200':
           $ref: '#/components/responses/UserPosts'

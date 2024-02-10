@@ -105,6 +105,11 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
+#browse-container-user-info div {
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
 #container-wall {
     display: flex;
     height: fit-content;
