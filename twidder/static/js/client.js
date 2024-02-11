@@ -1,5 +1,6 @@
 // Constants
 const HOST = "localhost:8080";
+const POPUP_MESSAGE_TIME = 4500
 
 // App state management
 window.onload = function() {
@@ -191,24 +192,84 @@ async function reloadUserData() {
     document.getElementById("account-email").innerHTML = user.email;
 
     // User's posts
-    let htmlWall = document.getElementById("home-wall");
+    reloadWall(
+        document.getElementById("home-wall"),
+        document.getElementById("home-post-template").innerHTML,
+        posts
+    );
+}
 
-    let oldPosts = document.getElementsByClassName("home-post");
-    for (let i = oldPosts.length - 1; i >= 0; i--) {
-        oldPosts[i].remove();
+async function searchUser(form) {
+    let userEmail = form["input-user-email"].value;
+
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showError("Error: couldn't load token");
+        return;
     }
 
-    let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
+    let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
+        method: "GET", cache: "no-cache", headers: {
+            "Content-Type": "application/json", "Authorization": token,
+        },
+    });
+    let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
+        method: "GET", cache: "no-cache", headers: {
+            "Content-Type": "application/json", "Authorization": token,
+        },
+    });
+
+    const userDataResponse = await userDataRequest;
+    const userPostsResponse = await userPostsRequest;
+
+    if (userDataResponse.status === 404 || userDataResponse.status === 404) {
+        showInfo("User not found")
+        return;
+    } else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
+        showError("Error")
+        return;
+    }
+
+    let userData = await userDataResponse.json();
+    let posts = (await userPostsResponse.json()).posts;
+
+    document.getElementById("browse-search-button").innerHTML = "Reload";
+
+    // User data
+    document.getElementById("container-user-page").style.display = "block";
+    document.getElementById("browse-user-name").innerHTML = userData.firstname + " " + userData.lastname;
+    document.getElementById("browse-user-gender").innerHTML = userData.gender;
+    document.getElementById("browse-user-location").innerHTML = userData.city + ", " + userData.country;
+    document.getElementById("browse-user-email").innerHTML = userData.email;
+
+    // User posts
+    reloadWall(
+        document.getElementById("browse-wall"),
+        document.getElementById("browse-post-template").innerHTML,
+        posts
+    );
+}
+
+function reloadWall(htmlWall, postTemplateHtml, posts) {
+    // remove all old posts
+    for (let i = htmlWall.children.length - 1; i >= 0; i--) {
+        let element = htmlWall.children[i];
+        if (element.classList.contains("user-post")) {
+            element.remove();
+        }
+    }
+
+    // add new posts from template
     for (let i = 0; i < posts.length; i++) {
         const newPostHtml = document.createElement("div");
         newPostHtml.innerHTML = postTemplateHtml;
+        newPostHtml.classList.add("user-post");
+        newPostHtml.setAttribute("data-id", posts[i]["id"]);
         newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
         newPostHtml.children[1].innerHTML = posts[i]["author"];
-        const textNode = document.createTextNode(posts[i]["content"]);
-        newPostHtml.children[2].appendChild(textNode);
-        newPostHtml.children[3].setAttribute("id", "home-post-id-" + posts[i]["id"]);
-        newPostHtml.children[4].setAttribute("id", "home-post-id-" + posts[i]["id"]);
-        newPostHtml.classList.add("home-post");
+        newPostHtml.children[2].appendChild(
+            document.createTextNode(posts[i]["content"])
+        );
         htmlWall.appendChild(newPostHtml);
     }
 }
@@ -410,86 +471,49 @@ async function buttonDeleteUserAccount() {
 }
 
 async function addPostHome() {
-    let token = localStorage.getItem("token");
-    if (token == null) {
-        showError("Error: couldn't load token");
-        return;
-    }
-
     let email = localStorage.getItem("email");
     if (email == null) {
         showError("Error: couldn't load user email");
         return;
     }
 
-    let wallHtml = document.getElementById("home-wall");
     let newPostBoxHtml = document.getElementById("input-home-new-post");
-    let userMessage = newPostBoxHtml.value;
-
-    const response = await fetch("http://" + HOST + "/api/v1/posts", {
-        method: "POST",
-        cache: "no-cache",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        },
-        body: JSON.stringify({
-            email: email,
-            message: userMessage,
-        }),
-    });
-
-    if (response.status === 403) {
-        showError("User does not exist")
-        return;
-    } else if (response.status !== 200) {
-        showError("Error")
-        return;
+    if (await addPostToWall(
+        document.getElementById("home-wall"),
+        document.getElementById("home-post-template").innerHTML,
+        email,
+        newPostBoxHtml.value,
+        "home-post-id-",
+    )) {
+        newPostBoxHtml.value = "";
     }
-
-    let newPostID = (await response.json()).id
-
-    newPostBoxHtml.value = "";
-    let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
-    const newPostHtml = document.createElement("div");
-    newPostHtml.innerHTML = postTemplateHtml;
-    newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date());
-    newPostHtml.children[1].innerHTML = email;
-    const textNode = document.createTextNode(userMessage);
-    newPostHtml.children[2].appendChild(textNode);
-    newPostHtml.classList.add("home-post");
-    newPostHtml.style.animation = "post-appear 0.75s";
-    newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
-    newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
-    newPostHtml.children[3].setAttribute("id", "home-post-id-" + newPostID);
-    newPostHtml.children[4].setAttribute("id", "home-post-id-" + newPostID);
-    wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
-
-    setTimeout(function () {
-        newPostHtml.style.animation = "";
-        newPostHtml.children[3].style.animation = "";
-        newPostHtml.children[4].style.animation = "";
-    }, 1000);
 }
 
 async function addPostBrowse() {
+    let newPostBoxHtml = document.getElementById("input-browse-new-post");
+    if (await addPostToWall(
+        document.getElementById("browse-wall"),
+        document.getElementById("browse-post-template").innerHTML,
+        document.getElementById("browse-user-email").innerHTML,
+        newPostBoxHtml.value,
+        "browse-post-id-",
+    )) {
+        newPostBoxHtml.value = "";
+    }
+}
+
+async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, postIdentifier) {
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
-        return;
+        return false;
     }
 
     let email = localStorage.getItem("email");
     if (email == null) {
         showError("Error: couldn't load user email");
-        return;
+        return false;
     }
-
-    let userEmailHtml = document.getElementById("browse-user-email");
-    let wallHtml = document.getElementById("browse-wall");
-    let newPostBoxHtml = document.getElementById("input-browse-new-post");
-    let userEmail = userEmailHtml.innerHTML;
-    let userMessage = newPostBoxHtml.value;
 
     const response = await fetch("http://" + HOST + "/api/v1/posts", {
         method: "POST",
@@ -500,142 +524,59 @@ async function addPostBrowse() {
         },
         body: JSON.stringify({
             email: userEmail,
-            message: userMessage,
+            message: content,
         }),
     });
 
     if (response.status === 403) {
         showError("User does not exist")
-        return;
+        return false;
     } else if (response.status !== 200) {
         showError("Error")
-        return;
+        return false;
     }
 
+    // get new post id
     let newPostID = (await response.json()).id
 
-    newPostBoxHtml.value = "";
-    let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
+    // create the new post element
     const newPostHtml = document.createElement("div");
     newPostHtml.innerHTML = postTemplateHtml;
+    newPostHtml.classList.add("user-post");
+    newPostHtml.setAttribute("data-id", newPostID);
     newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date());
     newPostHtml.children[1].innerHTML = email;
-    const textNode = document.createTextNode(userMessage);
-    newPostHtml.children[2].appendChild(textNode);
-    newPostHtml.classList.add("browse-post");
+    newPostHtml.children[2].appendChild(
+        document.createTextNode(content)
+    );
     newPostHtml.style.animation = "post-appear 0.75s";
     newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
     newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
-    newPostHtml.children[3].setAttribute("id", "browse-post-id-" + newPostID);
-    newPostHtml.children[4].setAttribute("id", "browse-post-id-" + newPostID);
-    wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
+    htmlWall.insertBefore(newPostHtml, htmlWall.childNodes[2]);
 
+    // clear animation eventually
     setTimeout(function () {
         newPostHtml.style.animation = "";
         newPostHtml.children[3].style.animation = "";
         newPostHtml.children[4].style.animation = "";
     }, 1000);
+
+    return true;
 }
 
-async function searchUser() {
+async function buttonEditPost(button) {
+    let postID = button.parentElement.getAttribute("data-id");
+    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
+}
+
+async function buttonDeletePost(button) {
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
         return;
     }
 
-    let searchInputHtml = document.getElementById("input-user-email");
-    let userEmail = searchInputHtml.value;
-
-    let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
-        method: "GET",
-        cache: "no-cache",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        },
-    });
-    let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
-        method: "GET",
-        cache: "no-cache",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        },
-    });
-
-    const userDataResponse = await userDataRequest;
-    const userPostsResponse = await userPostsRequest;
-
-    if (userDataResponse.status === 404 || userDataResponse.status === 404) {
-        showInfo("User not found")
-        return;
-    } else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
-        showError("Error")
-        return;
-    } 
-
-    let userData = await userDataResponse.json();
-    let posts = (await userPostsResponse.json()).posts;
-
-    let searchButtonHtml = document.getElementById("browse-search-button");
-    searchButtonHtml.innerHTML = "Reload";
-
-    let containerUserPage = document.getElementById("container-user-page");
-    containerUserPage.style.display = "block";
-
-    let userNameHtml = document.getElementById("browse-user-name");
-    userNameHtml.innerHTML = userData.firstname + " " + userData.lastname;
-
-    let userGenderHtml = document.getElementById("browse-user-gender");
-    userGenderHtml.innerHTML = userData.gender;
-
-    let userLocationHtml = document.getElementById("browse-user-location");
-    userLocationHtml.innerHTML = userData.city + ", " + userData.country;
-
-    let userEmailHtml = document.getElementById("browse-user-email");
-    userEmailHtml.innerHTML = userData.email;
-
-    let htmlWall = document.getElementById("browse-wall");
-
-    let oldPosts = document.getElementsByClassName("browse-post");
-    for (let i = oldPosts.length - 1; i >= 0; i--) {
-        oldPosts[i].remove();
-    }
-
-    let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
-    for (let i = 0; i < posts.length; i++) {
-        const newPostHtml = document.createElement("div");
-        newPostHtml.innerHTML = postTemplateHtml;
-        newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO for created != edited show edited icon
-        newPostHtml.children[1].innerHTML = posts[i]["author"];
-        const textNode = document.createTextNode(posts[i]["content"]);
-        newPostHtml.children[2].appendChild(textNode);
-        newPostHtml.children[3].setAttribute("id", "browse-post-id-" + posts[i]["id"]);
-        newPostHtml.children[4].setAttribute("id", "browse-post-id-" + posts[i]["id"]);
-        newPostHtml.classList.add("browse-post");
-        htmlWall.appendChild(newPostHtml);
-    }
-}
-
-async function editHomePost(button) {
-    let postID = button.getAttribute("id");
-    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
-}
-
-async function editBrowsePost(button) {
-    let postID = button.getAttribute("id");
-    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
-}
-
-async function deleteHomePost(button) {
-    let token = localStorage.getItem("token");
-    if (token == null) {
-        showError("Error: couldn't load token");
-        return;
-    }
-
-    let postID = button.getAttribute("id").replace("home-post-id-", "");
+    let postID = button.parentElement.getAttribute("data-id");
     let response = await fetch("http://" + HOST + "/api/v1/posts/" + postID, {
         method: "DELETE",
         cache: "no-cache",
@@ -651,33 +592,7 @@ async function deleteHomePost(button) {
         showError("Error")
         return;
     }
-    document.getElementById("home-post-id-" + postID).parentElement.remove(); // TODO animation
-}
-
-async function deleteBrowsePost(button) {
-    let token = localStorage.getItem("token");
-    if (token == null) {
-        showError("Error: couldn't load token");
-        return;
-    }
-
-    let postID = button.getAttribute("id").replace("browse-post-id-", "");
-    let response = await fetch("http://" + HOST + "/api/v1/posts/" + postID, {
-        method: "DELETE",
-        cache: "no-cache",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        },
-    });
-    if (response.status === 404) {
-        showError("Post not found")
-        return;
-    } else if (response.status !== 200) {
-        showError("Error")
-        return;
-    }
-    document.getElementById("browse-post-id-" + postID).parentElement.remove(); // TODO animation
+    button.parentElement.remove();  // TODO add animation
 }
 
 // INTERACTIVE CSS ELEMENTS
@@ -747,7 +662,7 @@ function showMessage(message, type) {
         setTimeout(function() {
             messageHtml.innerHTML = "";
             messageHtml.className = messageHtml.className.replace("show", "");
-        }, 4500);
+        }, POPUP_MESSAGE_TIME);
     }
 }
 
@@ -829,16 +744,13 @@ async function formRegister(form) {
         }),
     });
 
-    switch (response.status) {
-        case 200: // Ok
-            await login(email, password);
-            showSuccess("Account successfully register!");
-            break;
-        case 404: // Forbidden
-            showError("Invalid data!"); // TODO decide on error message
-            break
-        default:
-            showError("Error");
+    if (response.status === 200) {
+        await login(email, password);
+        showSuccess("Account successfully register!");
+    } else if (response.status === 404) {
+        showError("Invalid data!"); // TODO decide on error message
+    } else {
+        showError("Error");
     }
 }
 

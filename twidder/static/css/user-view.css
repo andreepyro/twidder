@@ -348,7 +348,7 @@
     display: none;
 }
 
-.home-post, .browse-post {
+.user-post {
     width: 400px;
     height: 150px;
     border-radius: 10px;
@@ -358,13 +358,13 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
-.home-post .author, .browse-post .author {
+.user-post .author {
     font-family: Tahoma, sans-serif;
     font-size: 14px;
     color: gray;
 }
 
-.home-post .time, .browse-post .time {
+.user-post .time {
     float: right;
     font-family: Tahoma, sans-serif;
     font-size: 12px;
@@ -373,14 +373,14 @@
     color: gray;
 }
 
-.home-post .content, .browse-post .content {
+.user-post .content {
     padding-top: 6px;
     height: 104px;
     font-family: Tahoma, sans-serif;
     font-size: 16px;
 }
 
-.home-post .button-edit, .home-post .button-delete, .browse-post .button-edit, .browse-post .button-delete {
+.user-post .button-edit, .user-post .button-delete {
     float: right;
     padding: 3px;
     margin-left: 2px;
@@ -390,11 +390,11 @@
     transition: 0.3s;
 }
 
-.home-post .button-edit:hover, .browse-post .button-edit:hover {
+.user-post .button-edit:hover {
     background-color: green;
 }
 
-.home-post .button-delete:hover, .browse-post .button-delete:hover {
+.user-post .button-delete:hover {
     background-color: red;
 }
 
@@ -442,7 +442,7 @@
     #form-home-new-post textarea, #form-browse-new-post textarea {
         width: 294px;
     }
-    .home-post, .browse-post {
+    .user-post {
         width: 300px;
     }
 }
