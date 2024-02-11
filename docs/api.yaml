@@ -167,7 +167,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Post successfully created
+          $ref: '#/components/responses/NewPostID'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -408,3 +408,14 @@ components:
                 type: string
             required:
               - message
+    NewPostID:
+      description: New post ID
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+            required:
+              - id
