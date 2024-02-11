@@ -46,18 +46,25 @@ async function loadApp() {
         { showError("error")  }
        
     }
-    
 
     socket.onclose = (event) => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
-        showWelcomeView();
-        showInfo("You have been logged out.");
-        console.log("Connection closed");
+        let token = localStorage.getItem("token");
+        let email = localStorage.getItem("email");
+        if (token != null && email != null) {
+        // data are manipulated or something is wrong
+            localStorage.removeItem("token");
+            localStorage.removeItem("email");
+            showWelcomeView();
+            showInfo("You have been logged out.");
+            console.log("Connection closed");
+            console.log(token);
+            console.log(email);
+            return;
+        }
     }
 
     socket.onerror = (event) => {
-        showError("Error");
+        showError("socket error");
     }
     
 }
