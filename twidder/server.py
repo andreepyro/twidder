@@ -1,11 +1,13 @@
+import time
+
 from flask import Flask
 from flask import render_template, send_file
 from flask_sock import Sock
 
+from twidder import session_handler
 from twidder.api.v1.posts import blueprint as api_v1_posts
 from twidder.api.v1.session import blueprint as api_v1_session
 from twidder.api.v1.users import blueprint as api_v1_users
-from twidder import session_handler 
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -27,20 +29,27 @@ def get_page():
 
 @sock.route('/session')
 def session(ws):
-    session_id = ws.receive()
+    session_id = ws.receive(timeout=10)
+    app.logger.info(f"new session request, {session_id=}")
+    if session_id is None:
+        return
+
     user_email = session_handler.get_email_from_session(session_id)
     if user_email is None:
         ws.send("faiL")
-    if not session_handler.check_session(user_email, session_id):
-        ws.send("faiL")
+        app.logger.info("no email found for this session id")
+        return
+
+    app.logger.info("session id verified")
     ws.send("ok")
        
     while True:
-        data = ws.receive(timeout=1)
-        if data == 'close':
-            break
-        ws.send(data)
-        #app.logger.info("while loop") 
+        time.sleep(0.5)
+        if not session_handler.check_session(user_email, session_id):
+            app.logger.info(f"session {session_id=} expired, closing the socket")
+            ws.send("close")
+            time.sleep(1.0)
+            return
 
 
 @app.errorhandler(404)
