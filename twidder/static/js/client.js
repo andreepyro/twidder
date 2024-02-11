@@ -1,5 +1,8 @@
 // Constants
-const HOST = "http://localhost:8080";
+const HOST = "localhost:8080";
+
+// Socket initialization
+let socket = null;
 
 // App state management
 window.onload = function() {
@@ -24,18 +27,39 @@ async function loadApp() {
     }
 
     // TODO init socket
-    // TODO load user data
+    socket = new WebSocket('ws://' + HOST + '/session');
 
-    let success = true;
-    if (!success) {
+    //socket.addEventListener('message', ev => { log("<< HELLO");}); // TODO xx = some function
+    socket.onopen = (event) => {
+        socket.send(token);
+       
+    }
+
+    socket.onmessage = (event) => {
+        if (event.data == "ok"){
+            showUserView();
+        } else if (event.data == "fail")
+        {showError("failed to initialize connection");}
+        //else if (event.data == "expired")
+        //{showError("connection expired");} TODO
+        else 
+        { showError("error")  }
+       
+    }
+    
+
+    socket.onclose = (event) => {
         localStorage.removeItem("token");
         localStorage.removeItem("email");
         showWelcomeView();
-        showSuccess("You have been logged out.");
-        return;
+        showInfo("You have been logged out.");
+        console.log("Connection closed");
     }
 
-    await showUserView();
+    socket.onerror = (event) => {
+        showError("Error");
+    }
+    
 }
 
 function showWelcomeView() {
@@ -119,7 +143,7 @@ async function reloadUserData() {
     }
 
     // load user data
-    let userDataRequest = fetch(HOST + "/api/v1/users/" + email, {
+    let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + email, {
         method: "GET",
         cache: "no-cache",
         headers: {
@@ -127,7 +151,7 @@ async function reloadUserData() {
             "Authorization": token,
         },
     });
-    let userPostsRequest = fetch(HOST + "/api/v1/posts?" + new URLSearchParams({user_email: email}).toString(), {
+    let userPostsRequest = fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: email}).toString(), {
         method: "GET",
         cache: "no-cache",
         headers: {
@@ -185,7 +209,7 @@ async function reloadUserData() {
 
 async function login(email, password) {
     // create a new session
-    const response = await fetch(HOST + "/api/v1/session", {
+    const response = await fetch("http://" + HOST + "/api/v1/session", {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -219,7 +243,7 @@ async function login(email, password) {
 async function logout() {
     let token = localStorage.getItem("token");
     if (token != null) {
-        const response = await fetch(HOST + "/api/v1/session", {
+        const response = await fetch("http://" + HOST + "/api/v1/session", {
             method: "DELETE", cache: "no-cache", headers: {
                 "Content-Type": "application/json", "Authorization": token,
             },
@@ -261,7 +285,7 @@ async function formEditAccountDetails(form) {
         return;
     }
 
-    const response = await fetch(HOST + "/api/v1/users/" + email, {
+    const response = await fetch("http://" + HOST + "/api/v1/users/" + email, {
         method: "PATCH",
         cache: "no-cache",
         headers: {
@@ -317,7 +341,7 @@ async function formChangePassword(form) {
         return;
     }
 
-    let response = await fetch(HOST + "/api/v1/users/" + email, {
+    let response = await fetch("http://" + HOST + "/api/v1/users/" + email, {
         method: "PATCH",
         cache: "no-cache",
         headers: {
@@ -359,7 +383,7 @@ async function buttonDeleteUserAccount() {
         return;
     }
 
-    let response = await fetch(HOST + "/api/v1/users/" + email, {
+    let response = await fetch("http://" + HOST + "/api/v1/users/" + email, {
         method: "DELETE",
         cache: "no-cache",
         headers: {
@@ -396,7 +420,7 @@ async function addPostHome() {
     let newPostBoxHtml = document.getElementById("input-home-new-post");
     let userMessage = newPostBoxHtml.value;
 
-    const response = await fetch(HOST + "/api/v1/posts", {
+    const response = await fetch("http://" + HOST + "/api/v1/posts", {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -461,7 +485,7 @@ async function addPostBrowse() {
     let userEmail = userEmailHtml.innerHTML;
     let userMessage = newPostBoxHtml.value;
 
-    const response = await fetch(HOST + "/api/v1/posts", {
+    const response = await fetch("http://" + HOST + "/api/v1/posts", {
         method: "POST",
         cache: "no-cache",
         headers: {
@@ -517,7 +541,7 @@ async function searchUser() {
     let searchInputHtml = document.getElementById("input-user-email");
     let userEmail = searchInputHtml.value;
 
-    let userDataRequest = fetch(HOST + "/api/v1/users/" + userEmail, {
+    let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
         method: "GET",
         cache: "no-cache",
         headers: {
@@ -525,7 +549,7 @@ async function searchUser() {
             "Authorization": token,
         },
     });
-    let userPostsRequest = await fetch(HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
+    let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
         method: "GET",
         cache: "no-cache",
         headers: {
@@ -606,7 +630,7 @@ async function deleteHomePost(button) {
     }
 
     let postID = button.getAttribute("id").replace("home-post-id-", "");
-    let response = await fetch(HOST + "/api/v1/posts/" + postID, {
+    let response = await fetch("http://" + HOST + "/api/v1/posts/" + postID, {
         method: "DELETE",
         cache: "no-cache",
         headers: {
@@ -632,7 +656,7 @@ async function deleteBrowsePost(button) {
     }
 
     let postID = button.getAttribute("id").replace("browse-post-id-", "");
-    let response = await fetch(HOST + "/api/v1/posts/" + postID, {
+    let response = await fetch("http://" + HOST + "/api/v1/posts/" + postID, {
         method: "DELETE",
         cache: "no-cache",
         headers: {
@@ -782,7 +806,7 @@ async function formRegister(form) {
         return
     }
 
-    const response = await fetch(HOST + "/api/v1/users", {
+    const response = await fetch("http://" + HOST + "/api/v1/users", {
         method: "POST",
         cache: "no-cache",
         headers: {
