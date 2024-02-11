@@ -3,13 +3,22 @@ const HOST = "localhost:8080";
 
 // App state management
 window.onload = function() {
-    // page load
     loadApp().then();
 };
 
 window.addEventListener('popstate', function(e) {
     // going back/forward using history API
-    loadApp().then(); // TODO don't load the whole app and session!, but decide here (so we don't fetch user data all over again)
+    let token = localStorage.getItem("token");
+    let email = localStorage.getItem("email");
+    if (token == null || email == null) {
+        // user is not logged in, set correct state
+        history.pushState("welcome", "", "/");
+    } else {
+        // user is logged in, switch to correct tab
+        if (window.location.pathname === "/browse") showTab("browse");
+        else if (window.location.pathname === "/account") showTab("account");
+        else showTab("home");
+    }
 });
 
 async function loadApp() {
@@ -30,7 +39,7 @@ async function loadApp() {
     socket.onmessage = (event) => {
         // check for server response
         if (event.data === "ok") {
-            showUserView();
+            showUserView().then();
         } else if (event.data === "fail") {
             showError("failed to initialize connection");
         } else {
