@@ -18,10 +18,10 @@ def create_post(user_email: str, message: str, email: str):
         return jsonify({"message": "user doesn't exist"}), http.HTTPStatus.FORBIDDEN
 
     curr_datetime = datetime.datetime.now(datetime.timezone.utc)
-    if database_handler.create_post(user_email, email, message, curr_datetime, curr_datetime) is False:
+    post_id = database_handler.create_post(user_email, email, message, curr_datetime, curr_datetime)
+    if post_id == -1:
         return jsonify({"message": "couldn't create a new post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-
-    return jsonify({"message": "post successfully created"}), http.HTTPStatus.OK
+    return jsonify({"message": "post successfully created", "id": post_id}), http.HTTPStatus.OK
 
 
 @blueprint.route("", methods=["GET"])

@@ -75,13 +75,15 @@ def delete_user_by_email(email: str) -> bool:
         return False
 
 
-def create_post(author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime) -> bool:
+def create_post(author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime) -> int:
     try:
-        get_db().execute("insert into post (author, user, content, created, edited) values (?, ?, ?, ?, ?)", [author, user, content, created, edited])
-        get_db().commit()
-        return True
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("insert into post (author, user, content, created, edited) values (?, ?, ?, ?, ?)", [author, user, content, created, edited])
+        db.commit()
+        return cursor.lastrowid
     except Exception:
-        return False
+        return -1
 
 
 def get_post_by_id(post_id: str) -> None | dict:

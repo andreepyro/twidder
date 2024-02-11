@@ -416,7 +416,9 @@ async function addPostHome() {
         showError("Error")
         return;
     }
-  
+
+    let newPostID = (await response.json()).id
+
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("home-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
@@ -429,9 +431,8 @@ async function addPostHome() {
     newPostHtml.style.animation = "home-post-appear 0.75s";
     newPostHtml.children[3].style.animation = "home-post-appear-inner 1.0s";
     newPostHtml.children[4].style.animation = "home-post-appear-inner 1.0s";
-    // TODO set correct id (need to return from server)
-    newPostHtml.children[3].setAttribute("id", "home-post-id-" + 0);
-    newPostHtml.children[4].setAttribute("id", "home-post-id-" + 0);
+    newPostHtml.children[3].setAttribute("id", "home-post-id-" + newPostID);
+    newPostHtml.children[4].setAttribute("id", "home-post-id-" + newPostID);
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function () {
@@ -481,6 +482,8 @@ async function addPostBrowse() {
         return;
     }
 
+    let newPostID = (await response.json()).id
+
     newPostBoxHtml.value = "";
     let postTemplateHtml = document.getElementById("browse-post-template").innerHTML;
     const newPostHtml = document.createElement("div");
@@ -493,9 +496,8 @@ async function addPostBrowse() {
     newPostHtml.style.animation = "browse-post-appear 0.75s";
     newPostHtml.children[3].style.animation = "browse-post-appear-inner 1.0s";
     newPostHtml.children[4].style.animation = "browse-post-appear-inner 1.0s";
-    // TODO set correct id (need to return from server)
-    newPostHtml.children[3].setAttribute("id", "browse-post-id-" + 0);
-    newPostHtml.children[4].setAttribute("id", "browse-post-id-" + 0);
+    newPostHtml.children[3].setAttribute("id", "browse-post-id-" + newPostID);
+    newPostHtml.children[4].setAttribute("id", "browse-post-id-" + newPostID);
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
 
     setTimeout(function () {
