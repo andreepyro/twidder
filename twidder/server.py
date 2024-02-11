@@ -40,15 +40,15 @@ def session(ws):
         app.logger.info("no email found for this session id")
         return
 
-    app.logger.info("session id verified")
+    app.logger.info(f"session id verified, {user_email=}")
     ws.send("ok")
        
     while True:
         time.sleep(0.5)
         if not session_handler.check_session(user_email, session_id):
             app.logger.info(f"session {session_id=} expired, closing the socket")
-            ws.send("close")
-            time.sleep(1.0)
+            ws.close(message="session expired")
+            time.sleep(10.0)  # NOTE: it takes some time for the socket to be closed successfully
             return
 
 

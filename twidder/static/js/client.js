@@ -1,9 +1,6 @@
 // Constants
 const HOST = "localhost:8080";
 
-// Socket initialization
-let socket = null;
-
 // App state management
 window.onload = function() {
     // page load
@@ -12,61 +9,54 @@ window.onload = function() {
 
 window.addEventListener('popstate', function(e) {
     // going back/forward using history API
-    loadApp().then(); // TODO don't load the whole app, but decide here (so we don't fetch user data all over again)
+    loadApp().then(); // TODO don't load the whole app and session!, but decide here (so we don't fetch user data all over again)
 });
 
 async function loadApp() {
     let token = localStorage.getItem("token");
     let email = localStorage.getItem("email");
     if (token == null || email == null) {
-        // data are manipulated or something is wrong
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
         showWelcomeView();
         return;
     }
 
-    // TODO init socket
-    socket = new WebSocket('ws://' + HOST + '/session');
+    const socket = new WebSocket('ws://' + HOST + '/session');
 
-    //socket.addEventListener('message', ev => { log("<< HELLO");}); // TODO xx = some function
     socket.onopen = (event) => {
+        // send the session id (token) to the server
         socket.send(token);
-       
     }
 
     socket.onmessage = (event) => {
-        if (event.data == "ok"){
+        // check for server response
+        if (event.data === "ok") {
             showUserView();
-        } else if (event.data == "fail")
-        {showError("failed to initialize connection");}
-        //else if (event.data == "expired")
-        //{showError("connection expired");} TODO
-        else 
-        { showError("error")  }
-       
+        } else if (event.data === "fail") {
+            showError("failed to initialize connection");
+        } else {
+            showError("error")
+            console.log("unexpected message from the server: " + event.data)
+        }
     }
 
     socket.onclose = (event) => {
+        // logging user out
         let token = localStorage.getItem("token");
         let email = localStorage.getItem("email");
         if (token != null && email != null) {
-        // data are manipulated or something is wrong
             localStorage.removeItem("token");
             localStorage.removeItem("email");
             showWelcomeView();
             showInfo("You have been logged out.");
-            console.log("Connection closed");
-            console.log(token);
-            console.log(email);
             return;
         }
+        console.log("socket closed");
     }
 
     socket.onerror = (event) => {
-        showError("socket error");
+        showError("Error");
+        console.log("socket error");
     }
-    
 }
 
 function showWelcomeView() {
@@ -265,7 +255,7 @@ async function logout() {
     showSuccess("You have successfully logged out.")
     localStorage.removeItem("token");
     localStorage.removeItem("email");
-    loadApp().then();
+    showWelcomeView();
 }
 
 async function formEditAccountDetails(form) {
@@ -407,7 +397,7 @@ async function buttonDeleteUserAccount() {
     showSuccess("Account successfully deleted.")
     localStorage.removeItem("token");
     localStorage.removeItem("email");
-    loadApp().then();
+    showWelcomeView();
 }
 
 async function addPostHome() {
