@@ -590,7 +590,16 @@ async function buttonDeletePost(button) {
         showError("Error")
         return;
     }
-    button.parentElement.remove();  // TODO add animation
+
+    // show animation
+    button.parentElement.style.animation = "post-disappear 0.25s 0.25s";
+    button.parentElement.children[3].style.animation = "post-disappear-inner 0.50s";
+    button.parentElement.children[4].style.animation = "post-disappear-inner 0.50s";
+
+    // remove element eventually
+    setTimeout(function () {
+        button.parentElement.remove();
+    }, 500);
 }
 
 // INTERACTIVE CSS ELEMENTS
