@@ -483,7 +483,6 @@ async function addPostHome() {
         document.getElementById("home-post-template").innerHTML,
         email,
         newPostBoxHtml.value,
-        "home-post-id-",
     )) {
         newPostBoxHtml.value = "";
     }
@@ -496,13 +495,12 @@ async function addPostBrowse() {
         document.getElementById("browse-post-template").innerHTML,
         document.getElementById("browse-user-email").innerHTML,
         newPostBoxHtml.value,
-        "browse-post-id-",
     )) {
         newPostBoxHtml.value = "";
     }
 }
 
-async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, postIdentifier) {
+async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
