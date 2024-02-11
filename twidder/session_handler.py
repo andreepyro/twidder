@@ -21,7 +21,7 @@ def create_session(email: str) -> str:
 
 def check_session(email: str, session: str) -> bool:
     with session_lock:
-        return email in session_map and session_map[session] == email
+        return session in session_map and session_map[session] == email
 
 
 def get_email_from_session(session: str) -> None | str:
