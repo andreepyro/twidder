@@ -85,7 +85,7 @@
 }
 
 #text-twidder {
-    position: absolute;
+    position: fixed;
     width: 128px;
     top: calc(50% + 140px);
     left: calc(50% - 64px);
@@ -97,7 +97,7 @@
 }
 
 #text-twidder-description {
-    position: absolute;
+    position: fixed;
     width: 700px;
     top: calc(50% + 170px);
     left: calc(50% - 350px);
@@ -106,6 +106,18 @@
     margin: 0px;
     font-family: Tahoma, sans-serif;
     font-size: 16px;
+}
+
+#text-authors {
+    position: fixed;
+    width: 400px;
+    left: calc(50% - 200px);
+    bottom: 0;
+    margin: 8px;
+    color: gray;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+    text-align: center;
 }
 
 #register-container {
@@ -204,4 +216,41 @@
 
 #form-register button:hover {
     background-color: orange;
+}
+
+@media screen and (max-width: 700px) {
+    #text-twidder-description {
+        width: 350px;
+        left: calc(50% - 175px);
+    }
+}
+
+@media screen and (max-width: 400px) {
+    #text-twidder-description {
+        width: 250px;
+        left: calc(50% - 125px);
+    }
+
+    #text-authors {
+        width: 200px;
+        left: calc(50% - 105px);
+    }
+}
+
+@media screen and (max-height: 650px) {
+    #image-twidder-logo {
+        top: 16px;
+    }
+
+    #login-container {
+        top: 160px;
+    }
+
+    #text-twidder {
+        top: 416px;
+    }
+
+    #text-twidder-description {
+        top: 446px;
+    }
 }
