@@ -1,9 +1,8 @@
 import http
 
-from flask import Response, jsonify, Blueprint
+from flask import jsonify, Blueprint, request
 
-from twidder import database_handler
-from twidder import util
+from twidder import database_handler, session_handler, util
 
 blueprint = Blueprint('session', __name__)
 
@@ -15,11 +14,7 @@ def create_session(email: str, password: str):
     user = database_handler.get_user_by_email(email)
 
     if user is not None and util.check_password(password, user["password"]):
-        if not util.revoke_user_tokens(email):
-            return jsonify({"message": "couldn't revoke old user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-        token = util.create_token(email)
-        if not database_handler.create_token(email, token, True):
-            return jsonify({"message": "couldn't create a new token"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+        token = session_handler.create_session(email)
         resp = jsonify({"message": "session successfully created"})
         resp.headers["Authorization"] = token
         return resp, http.HTTPStatus.OK
@@ -30,8 +25,8 @@ def create_session(email: str, password: str):
 @util.authorize_user
 def delete_session(user_email: str):
     """Destroy existing session."""
-    if not util.revoke_user_tokens(user_email):
-        return jsonify({"message": "couldn't revoke user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    session_id = request.headers["Authorization"]
+    session_handler.delete_session(session_id)
     return jsonify({"message": "session successfully deleted"}), http.HTTPStatus.OK
 
 

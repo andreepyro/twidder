@@ -33,7 +33,6 @@ def session(ws):
         if data == 'close':
             break
         ws.send(data)
-        # TODO query database, even though it is a really bad practice
 
 
 @app.errorhandler(404)

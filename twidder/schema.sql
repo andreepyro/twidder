@@ -19,9 +19,3 @@ create table if not exists post (
   	foreign key(author) references user(email),
   	foreign key(user) references user(email)
 );
-
-create table if not exists token (
-    email text NOT NULL,
-    valid boolean NOT NULL,
-    token text primary key
-);

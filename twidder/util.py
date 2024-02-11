@@ -1,13 +1,10 @@
-import base64
 import http
-import json
-import uuid
 
 import bcrypt
 from email_validator import validate_email, EmailNotValidError
 from flask import jsonify, request
 
-from twidder import database_handler
+from twidder import session_handler
 
 
 def authorize_user(fun):
@@ -16,13 +13,10 @@ def authorize_user(fun):
     def wrapper(*args, **kwargs):
         if "Authorization" not in request.headers:
             return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
-        token = request.headers["Authorization"]
-        token_data = database_handler.get_token_by_token(token)
-        if token_data is None:
+        session_id = request.headers["Authorization"]
+        user_email = session_handler.get_email_from_session(session_id)
+        if user_email is None:
             return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
-        if bool(token_data["valid"]) is False:
-            return jsonify({"message": "session expired"}), http.HTTPStatus.UNAUTHORIZED
-        user_email = token_data["email"]
         return fun(user_email, *args, **kwargs)
 
     # renaming wrapper to function name, so flask doesn't throw exception
@@ -90,38 +84,6 @@ def check_password(password: str, hashed_password: str) -> bool:
     password_b = bytes(password, "utf-8")
     hashed_password_b = bytes(hashed_password, "utf-8")
     return bcrypt.checkpw(password_b, hashed_password_b)
-
-
-def encode_token(token_plain: dict) -> str:
-    token_str = json.dumps(token_plain)
-    token_b = bytes(token_str, "utf-8")
-    token_b64b = base64.b64encode(token_b)
-    return token_b64b.decode("utf-8")
-
-
-def decode_token(token: str) -> dict:
-    token_str = base64.b64decode(token)
-    return json.loads(token_str)
-
-
-def create_token(user_email: str) -> str:
-    token_plain = {
-        "user": user_email,
-        "session_id": str(uuid.uuid4()),
-    }
-    return encode_token(token_plain)
-
-
-def revoke_user_tokens(user_email: str) -> bool:
-    tokens = database_handler.list_tokens_by_user(user_email)
-    for token in tokens:
-        if not database_handler.update_token_by_token(token["token"], user_email, False):
-            return False
-    return True
-
-
-def verify_token(user_email: str, token: str) -> bool:
-    return database_handler.get_token_by_token(token) and decode_token(token)["user"] == user_email
 
 
 def is_email_valid(email: str) -> bool:

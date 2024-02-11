@@ -1,9 +1,8 @@
 import http
 
-from flask import jsonify, Blueprint, current_app
+from flask import jsonify, Blueprint, current_app, request
 
-from twidder import database_handler
-from twidder import util
+from twidder import database_handler, session_handler, util
 
 blueprint = Blueprint('users', __name__)
 
@@ -138,8 +137,8 @@ def delete_user(user_email: str, target_user: str):
         return jsonify({"message": "you are not allowed to delete other user accounts"}), http.HTTPStatus.FORBIDDEN
     if not database_handler.delete_user_by_email(target_user):
         return jsonify({"message": "couldn't delete user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    if not util.revoke_user_tokens(target_user):
-        return jsonify({"message": "couldn't revoke old user tokens"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    session_id = request.headers["Authorization"]
+    session_handler.delete_session(session_id)
     return jsonify({"message": "user successfully deleted"}), http.HTTPStatus.OK
 
 
