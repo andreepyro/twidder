@@ -458,9 +458,9 @@ async function addPostHome() {
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[2].appendChild(textNode);
     newPostHtml.classList.add("home-post");
-    newPostHtml.style.animation = "home-post-appear 0.75s";
-    newPostHtml.children[3].style.animation = "home-post-appear-inner 1.0s";
-    newPostHtml.children[4].style.animation = "home-post-appear-inner 1.0s";
+    newPostHtml.style.animation = "post-appear 0.75s";
+    newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
+    newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
     newPostHtml.children[3].setAttribute("id", "home-post-id-" + newPostID);
     newPostHtml.children[4].setAttribute("id", "home-post-id-" + newPostID);
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);
@@ -523,9 +523,9 @@ async function addPostBrowse() {
     const textNode = document.createTextNode(userMessage);
     newPostHtml.children[2].appendChild(textNode);
     newPostHtml.classList.add("browse-post");
-    newPostHtml.style.animation = "browse-post-appear 0.75s";
-    newPostHtml.children[3].style.animation = "browse-post-appear-inner 1.0s";
-    newPostHtml.children[4].style.animation = "browse-post-appear-inner 1.0s";
+    newPostHtml.style.animation = "post-appear 0.75s";
+    newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
+    newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
     newPostHtml.children[3].setAttribute("id", "browse-post-id-" + newPostID);
     newPostHtml.children[4].setAttribute("id", "browse-post-id-" + newPostID);
     wallHtml.insertBefore(newPostHtml, wallHtml.childNodes[2]);

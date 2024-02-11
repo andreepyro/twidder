@@ -1,0 +1,687 @@
+/* Sidebar and page layout */
+
+#sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: white;
+    position: fixed;
+    height: 100%;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#sidebar a {
+    display: block;
+    color: black;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+    animation-name: appear-from-left;
+	animation-duration: 0.4s;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.035);
+}
+
+#sidebar a.active:hover {
+    color: white;
+}
+
+#sidebar a.active, #sidebar a:hover {
+    background-color: orange;
+}
+
+@keyframes appear-from-left {
+    0%   {margin-left: -250px; margin-right: 250px;}
+    50%   {margin-left: -250px; margin-right: 250px;}
+    100% {}
+}
+
+.page {
+    margin-left: 200px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+#page-content {
+    width: 100%;
+}
+
+#sidebar img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#sidebar .footer {
+    height:45px;
+    width:100%;
+    position:absolute;
+    bottom:0;
+    border-top: 1px solid lightgray;
+}
+
+#sidebar .footer a {
+    display: block;
+    color: black;
+    padding: 4px;
+    height: 28px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px;
+    border-radius: 10px;
+    line-height: 28px;
+    animation-name: none;
+}
+
+@media screen and (max-width: 700px) {
+    #sidebar {
+        width: 100%;
+        height: auto;
+        z-index: 100;
+    }
+    #sidebar a {
+        float: left;
+        margin: 0 5px 5px;
+        border-radius: 0 0 10px 10px;
+        animation-name: none;
+    }
+    .page {
+        height: auto;
+        margin-left: 0;
+        padding-top: 55px;
+    }
+    #sidebar img {
+        display: none
+    }
+    #sidebar .footer {
+        width: fit-content;
+        height: 50px;
+        right: 0;
+        bottom: unset;
+        border: 0;
+    }
+    #sidebar .footer a {
+        line-height: unset;
+        float: right;
+        padding-top: 8px;
+        padding-left: 10px;
+        padding-right: 5px;
+        margin: 0;
+        border-radius: 0 0 0 10px;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    #sidebar a {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: 0 0 0 0;
+    }
+    .page {
+        padding-top: 50px;
+    }
+    #sidebar .footer a {
+        float: right;
+    }
+}
+
+/* Tabs */
+#tab-home {
+    display: flex;
+}
+
+#tab-browse, #tab-account {
+    display: none;
+}
+
+/* Home tab specific */
+
+#home-page {
+    width: 100%;
+    height: 100%;
+}
+
+#home-reload-button {
+    position: absolute;
+    top: 100px;
+    left: calc(50% + 100px - 24px);
+    border-radius: 100%;
+    transition: 0.2s;
+    padding: 8px;
+    cursor: pointer;
+}
+
+#home-reload-button:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+@media screen and (max-width: 700px) {
+    #home-reload-button {
+        top: 266px;
+        left: calc(50% + 128px - 24px);
+    }
+}
+
+#home-user-background {
+    width: 100%;
+    height: 160px;
+    background-color: white; /* background color here */
+}
+
+#home-user-page {
+    width: 100%;
+    height: fit-content;
+    margin: auto;
+    background-color: white;
+    padding-bottom: 10px;
+    transition: 0.2s;
+}
+
+/* Browse tab specific */
+
+#browse-page {
+    width: 100%;
+    height: 100%;
+}
+
+#form-search-user {
+    position: fixed;
+    width: calc(100% - 200px);
+    top: 5px;
+    transition: 0.3s;
+    z-index: 50;
+}
+
+#search-bar {
+    margin: 10px;
+    display: flex;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#search-bar input {
+    width: 100%;
+    height: 36px;
+    border-radius: 25px 0 0 25px;
+    text-align: left;
+    padding-left: 20px;
+    padding-right: 0;
+    transition: 0.2s;
+}
+
+#search-bar input:focus:invalid {
+    border: 1px solid #e7e7e7;
+    outline: none;
+}
+
+#search-bar input:focus:valid {
+    border: 1px solid #e7e7e7;
+    outline: none;
+}
+
+#search-bar input:not(:focus) {
+    border: 1px solid #e7e7e7;
+    outline: none;
+}
+
+#search-bar button {
+    width: 120px;
+    padding-left: 0;
+    color: #2196F3;
+    background-color: white;
+    border: 1px solid #2196F3;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    transition: 0.2s;
+}
+
+#search-bar button:hover {
+    background: #2196F3;
+    color: #ffffff;
+}
+
+@media screen and (max-width: 700px) {
+    #form-search-user {
+        margin-top: 55px;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    #form-search-user {
+        margin-top: 50px;
+    }
+}
+
+#browse-user-background {
+    width: 100%;
+    height: 160px;
+    background-color: orange;
+}
+
+#container-user-page {
+    display: none;
+    width: 100%;
+    height: fit-content;
+    margin: auto;
+    background-color: white;
+    padding-bottom: 10px;
+    transition: 0.2s;
+}
+
+/* Shared between Home tab and Browse tab */
+
+#home-user-page-user-info, #browse-container-user-info {
+    position: absolute;
+    width: fit-content;
+    top: 100px;
+    left: 340px;
+}
+
+#home-user-page-user-info img, #browse-container-user-info img {
+    width: 120px;
+    height: 120px;
+    padding: 16px;
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#home-user-page-user-info div, #browse-container-user-info div {
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#container-home-wall, #container-wall {
+    display: flex;
+    height: fit-content;
+}
+
+#home-wall, #browse-wall {
+    display: block;
+    margin: auto;
+}
+
+#form-home-new-post, #form-browse-new-post {
+    width: 400px;
+    height: 150px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+#form-home-new-post textarea, #form-browse-new-post textarea {
+    width: 394px;
+    height: 120px;
+    text-align: left;
+    transition: 0.2s;
+    border: 0;
+    outline: 0;
+    resize: none;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#form-home-new-post button, #form-browse-new-post button {
+    float: right;
+    width: 130px;
+    height: 30px;
+    background-color: white;
+    border: 1px solid #04AA6D;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+#form-home-new-post button:hover, #form-browse-new-post button:hover {
+    color: white;
+    background: #04AA6D;
+}
+
+#home-post-template, #browse-post-template {
+    display: none;
+}
+
+.home-post, .browse-post {
+    width: 400px;
+    height: 150px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.home-post .author, .browse-post .author {
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+    color: gray;
+}
+
+.home-post .time, .browse-post .time {
+    float: right;
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    color: gray;
+}
+
+.home-post .content, .browse-post .content {
+    padding-top: 6px;
+    height: 104px;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+.home-post .button-edit, .home-post .button-delete, .browse-post .button-edit, .browse-post .button-delete {
+    float: right;
+    padding: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.home-post .button-edit:hover, .browse-post .button-edit:hover {
+    background-color: green;
+}
+
+.home-post .button-delete:hover, .browse-post .button-delete:hover {
+    background-color: red;
+}
+
+@keyframes post-appear {
+    0%  {opacity: 0; height: 0;}
+    50%  {opacity: 0; height: 150px;}
+    100%   {opacity: 1;}
+}
+
+@keyframes post-appear-inner {
+    0%  {display: none;}
+    75%  {display: none; opacity: 0;}
+    100%  {display: unset; opacity: 1;}
+}
+
+@media screen and (max-width: 1275px) {
+    #home-user-page-user-info, #browse-container-user-info {
+        left: 240px;
+    }
+}
+
+@media screen and (max-width: 1050px) {
+    #home-wall, #browse-wall {
+        margin: unset;
+        margin-left: auto;
+        margin-right: 30px;
+    }
+}
+
+@media screen and (max-width: 880px) {
+    #home-user-page-user-info, #browse-container-user-info {
+        position: static;
+        margin: auto;
+    }
+
+    #home-wall, #browse-wall {
+        margin: auto;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    #form-home-new-post, #form-browse-new-post {
+        width: 300px;
+    }
+    #form-home-new-post textarea, #form-browse-new-post textarea {
+        width: 294px;
+    }
+    .home-post, .browse-post {
+        width: 300px;
+    }
+}
+
+/* Account tab specific */
+
+#account-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#account-window {
+    margin: auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+}
+
+#account-container {
+    display: flex;
+    border-bottom: 1px solid lightgray;
+}
+
+#delete-account-container {
+    display: flex;
+    height: fit-content;
+    padding: 0 16px;
+    align-items: center;
+}
+
+#delete-account-container p {
+    max-width: 256px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#button-delete-account {
+    float: right;
+    width: 256px;
+    height: 36px;
+    margin: 8px 8px 8px auto;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 0 solid #e7e7e7;
+    color: red;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+#button-delete-account:hover {
+    color: white;
+    background-color: red;
+}
+
+#account-info {
+    display: flex;
+    max-width: 300px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+    padding: 14px;
+}
+
+#account-info img {
+    margin: auto;
+}
+
+#account-email {
+    width: 202px;
+    height: 36px;
+    line-height:36px;
+    margin: 8px 8px;
+    padding: 0 10px;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+    text-align: center;
+}
+
+#form-account-details {
+    padding: 8px;
+}
+
+#form-change-password {
+    width: 288px;
+    padding: 8px;
+    border-left: 1px solid lightgray;
+}
+
+#title-account-details, #form-change-password p {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+    font-size: 16px;
+}
+
+#form-account-details div, #form-change-password div {
+    display: flex;
+}
+
+#form-account-details input {
+    width: 202px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-change-password input {
+    width: 236px;
+    height: 36px;
+    margin: 8px 16px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details select {
+    width: 224px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #00000000;
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.035);
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details input:required:valid, #form-account-details select:valid, #form-change-password input:required:valid, #form-change-password select:valid {
+    border: 1px solid green;
+}
+
+#form-account-details input:required:invalid:not(:placeholder-shown), #form-change-password input:required:invalid:not(:placeholder-shown) {
+    border: 1px solid red;
+}
+
+#form-account-details input:focus, #form-account-details input:hover, #form-change-password input:focus, #form-change-password input:hover {
+    background-color: rgba(0, 0, 0, 0.100);
+}
+
+#form-account-details input::placeholder, #form-account-details select::placeholder, #form-change-password input::placeholder {
+    text-align: start;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+#form-account-details button {
+    width: 464px;
+    height: 36px;
+    margin: 8px 8px;
+    padding: 0;
+    border-radius: 10px;
+    border: 0 solid #e7e7e7;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+#form-change-password button {
+    width: 256px;
+    height: 36px;
+    margin: 8px 16px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 0 solid #e7e7e7;
+    outline-color: orange;
+    transition: 0.3s;
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+#form-account-details button:hover, #form-change-password button:hover {
+    background-color: orange;
+}
+
+@media screen and (max-width: 1200px) {
+    #account-info {
+        margin: auto;
+    }
+
+    #account-container {
+        display: block;
+    }
+
+    #form-account-details {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #form-change-password {
+        margin: auto;
+        border-left: 0 solid lightgray;
+    }
+
+    #delete-account-container {
+        display: block;
+    }
+
+    #delete-account-container p {
+        margin-top: 16px;
+        max-width: unset;
+    }
+
+    #button-delete-account {
+        float: unset;
+        display: block;
+        margin: auto auto 8px;
+    }
+}
+
+@media screen and (max-width: 520px) {
+    #form-account-details div {
+        display: grid;
+        width: fit-content;
+        margin: auto;
+    }
+
+    #form-account-details button {
+        width: 226px;
+        margin: 8px auto auto;
+        display: block;
+    }
+}
