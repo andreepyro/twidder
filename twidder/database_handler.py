@@ -154,3 +154,12 @@ def delete_post_by_id(post_id: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def delete_posts_by_user(user: str) -> bool:
+    try:
+        get_db().execute("delete from post where user==?", [user])
+        get_db().commit()
+        return True
+    except Exception:
+        return False

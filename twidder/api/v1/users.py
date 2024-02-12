@@ -135,6 +135,8 @@ def delete_user(user_email: str, target_user: str):
         return jsonify({"message": "user not found"}), http.HTTPStatus.NOT_FOUND
     if user_email != target_user:
         return jsonify({"message": "you are not allowed to delete other user accounts"}), http.HTTPStatus.FORBIDDEN
+    if not database_handler.delete_posts_by_user(target_user):
+        return jsonify({"message": "couldn't delete user posts"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     if not database_handler.delete_user_by_email(target_user):
         return jsonify({"message": "couldn't delete user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     session_id = request.headers["Authorization"]
