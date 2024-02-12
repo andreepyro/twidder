@@ -289,9 +289,11 @@ function reloadWall(htmlWall, postTemplateHtml, posts) {
         newPostHtml.setAttribute("data-id", posts[i]["id"]);
         newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
         newPostHtml.children[1].innerHTML = posts[i]["author"];
-        newPostHtml.children[2].appendChild(
-            document.createTextNode(posts[i]["content"])
-        );
+        let lines = posts[i]["content"].split("\n");
+        for (let j = 0; j < lines.length; j++) {
+            newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
+            newPostHtml.children[2].appendChild(document.createElement("br"));
+        }
         htmlWall.appendChild(newPostHtml);
     }
 }
@@ -578,9 +580,11 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
     newPostHtml.setAttribute("data-id", newPostID);
     newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date());
     newPostHtml.children[1].innerHTML = email;
-    newPostHtml.children[2].appendChild(
-        document.createTextNode(content)
-    );
+    let lines = content.split("\n");
+    for (let j = 0; j < lines.length; j++) {
+        newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
+        newPostHtml.children[2].appendChild(document.createElement("br"));
+    }
     newPostHtml.style.animation = "post-appear 0.75s";
     newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
     newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
