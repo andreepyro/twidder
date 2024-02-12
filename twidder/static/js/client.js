@@ -8,6 +8,8 @@ window.onload = function() {
 };
 
 window.addEventListener('popstate', function(e) {
+    console.log("Url path changed: " + window.location.pathname);
+
     // going back/forward using history API
     let token = localStorage.getItem("token");
     let email = localStorage.getItem("email");
@@ -23,6 +25,8 @@ window.addEventListener('popstate', function(e) {
 });
 
 async function loadApp() {
+    console.log("Loading application");
+
     let token = localStorage.getItem("token");
     let email = localStorage.getItem("email");
     if (token == null || email == null) {
@@ -30,14 +34,17 @@ async function loadApp() {
         return;
     }
 
+    console.log("Initializing socket connection");
     const socket = new WebSocket('ws://' + HOST + '/session');
 
     socket.onopen = (event) => {
+        console.log("Socket is open");
         // send the session id (token) to the server
         socket.send(token);
     }
 
     socket.onmessage = (event) => {
+        console.log("Socket message received: " + event.data);
         // check for server response
         if (event.data === "ok") {
             showUserView().then();
@@ -45,11 +52,12 @@ async function loadApp() {
             showError("failed to initialize connection");
         } else {
             showError("error")
-            console.log("unexpected message from the server: " + event.data)
+            console.log("unexpected message from the server: " + event.data);
         }
     }
 
     socket.onclose = (event) => {
+        console.log("Socket is closed");
         // logging user out
         let token = localStorage.getItem("token");
         let email = localStorage.getItem("email");
@@ -64,12 +72,14 @@ async function loadApp() {
     }
 
     socket.onerror = (event) => {
-        showError("Error");
-        console.log("socket error");
+        console.log("Socket error");
+        showError("Connection error");
     }
 }
 
 function showWelcomeView() {
+    console.log("Loading welcome view");
+
     // load view
     document.getElementById("content").innerHTML = document.getElementById("welcome-view").innerHTML;
 
@@ -84,6 +94,8 @@ function showWelcomeView() {
 }
 
 async function showUserView() {
+    console.log("Loading user view");
+
     // load view
     document.getElementById("content").innerHTML = document.getElementById("user-view").innerHTML;
 
@@ -97,6 +109,8 @@ async function showUserView() {
 }
 
 function showTab(tabName) {
+    console.log("Showing tab: " + tabName);
+
     // deactivate all buttons
     let homeTabButton = document.getElementById("sidebar-tab-home");
     let browseTabButton = document.getElementById("sidebar-tab-browse");
@@ -136,6 +150,8 @@ function showTab(tabName) {
 }
 
 async function reloadUserData() {
+    console.log("Loading user data");
+
     // load locally saved data
     let token = localStorage.getItem("token");
     if (token == null) {
@@ -201,6 +217,7 @@ async function reloadUserData() {
 
 async function searchUser(form) {
     let userEmail = form["input-user-email"].value;
+    console.log("Querying user data: " + userEmail);
 
     let token = localStorage.getItem("token");
     if (token == null) {
@@ -275,6 +292,8 @@ function reloadWall(htmlWall, postTemplateHtml, posts) {
 }
 
 async function login(email, password) {
+    console.log("Log in request");
+
     // create a new session
     const response = await fetch("http://" + HOST + "/api/v1/session", {
         method: "POST",
@@ -308,6 +327,8 @@ async function login(email, password) {
 
 
 async function logout() {
+    console.log("Log out request");
+
     let token = localStorage.getItem("token");
     if (token != null) {
         const response = await fetch("http://" + HOST + "/api/v1/session", {
@@ -329,6 +350,8 @@ async function logout() {
 }
 
 async function formEditAccountDetails(form) {
+    console.log("Edit account details request");
+
     let firstName = form["input-account-first-name"].value;
     let lastName = form["input-account-last-name"].value;
     let city = form["input-account-city"].value;
@@ -382,6 +405,8 @@ async function formEditAccountDetails(form) {
 }
 
 async function formChangePassword(form) {
+    console.log("Change password request");
+
     let passwordOld = form["input-change-password-old"].value;
     let passwordNew = form["input-change-password-new"].value;
     let passwordNew2 = form["input-change-password-new-repeat"].value;
@@ -436,6 +461,8 @@ async function formChangePassword(form) {
 }
 
 async function buttonDeleteUserAccount() {
+    console.log("Delete account request");
+
     // TODO ask user if they are sure
 
     let token = localStorage.getItem("token");
@@ -501,6 +528,8 @@ async function addPostBrowse() {
 }
 
 async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
+    console.log("Creating a new post: " + userEmail + ", " + content);
+
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
@@ -564,6 +593,7 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
 
 async function buttonEditPost(button) {
     let postID = button.parentElement.getAttribute("data-id");
+    console.log("Edit post, post id: " + postID);
     alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
 }
 
@@ -575,6 +605,8 @@ async function buttonDeletePost(button) {
     }
 
     let postID = button.parentElement.getAttribute("data-id");
+    console.log("Delete post, post id: " + postID);
+
     let response = await fetch("http://" + HOST + "/api/v1/posts/" + postID, {
         method: "DELETE",
         cache: "no-cache",
@@ -660,6 +692,8 @@ function jumpToStart() {
 }
 
 function showMessage(message, type) {
+    console.log("Showing popup message, message: " + message + ", type: " + type);
+
     let messageHtml = document.getElementById("pop-message");
     messageHtml.innerHTML = message;
     messageHtml.classList.remove(...messageHtml.classList);
@@ -693,14 +727,14 @@ function hideRegisterContainer() {
     document.getElementById("register-container").style.display = "none";
 }
 
-document.addEventListener('keydown', function (e) {
-    if (e.key === "Escape") {
+window.onkeydown = function (event) {
+    if (event.key === "Escape") {
         // close register form if visible
         if (document.getElementById("register-container").style.display === "block") {
             document.getElementById("register-container").style.display = "none";
         }
     }
-});
+}
 
 window.onclick = function (event) {
     if (event.target === document.getElementById("register-container")) {
