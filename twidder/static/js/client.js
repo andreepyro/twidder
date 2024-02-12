@@ -276,6 +276,11 @@ function reloadWall(htmlWall, postTemplateHtml, posts) {
         }
     }
 
+    // sort posts by date
+    posts.sort(function(a, b){
+      return new Date(b.created) - new Date(a.created);
+    });
+
     // add new posts from template
     for (let i = 0; i < posts.length; i++) {
         const newPostHtml = document.createElement("div");
@@ -798,5 +803,5 @@ async function formRegister(form) {
 // other helper function
 
 function getDateTimeFormat(date) {
-    return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
+    return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + (date.getHours() < 10 ? " 0" : " ") + date.getHours() + (date.getMinutes() < 10 ? ":0" : ":") + date.getMinutes();
 }
