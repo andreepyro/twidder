@@ -350,10 +350,9 @@
 
 .user-post {
     width: 400px;
-    height: 150px;
     border-radius: 10px;
-    padding: 10px;
     margin-top: 10px;
+    padding: 10px 10px 34px;
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
@@ -375,7 +374,6 @@
 
 .user-post .content {
     padding-top: 6px;
-    height: 104px;
     font-family: Tahoma, sans-serif;
     font-size: 16px;
 }
@@ -399,9 +397,9 @@
 }
 
 @keyframes post-appear {
-    0%  {opacity: 0; height: 0;}
-    50%  {opacity: 0; height: 150px;}
-    100%   {opacity: 1;}
+    0%  {opacity: 0; max-height: 0;}
+    50%  {opacity: 0; max-height: 300px;}
+    100%   {opacity: 1; max-height: 1000px;} /* this is enough for the user not to see the lag transition */
 }
 
 @keyframes post-appear-inner {
