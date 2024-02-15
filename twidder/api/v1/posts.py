@@ -88,8 +88,8 @@ def delete_post(user_email: str, post_id: str):
     post = database_handler.get_post_by_id(post_id)
     if post is None:
         return jsonify({"message": "post not found"}), http.HTTPStatus.NOT_FOUND
-    if post["author"] != user_email:
-        return jsonify({"message": "you can delete only your posts"}), http.HTTPStatus.FORBIDDEN
+    if post["author"] != user_email and post["user"] != user_email:
+        return jsonify({"message": "you can delete only your posts, or posts on your wall"}), http.HTTPStatus.FORBIDDEN
     if not database_handler.delete_post_by_id(post_id):
         return jsonify({"message": "couldn't delete the post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     return jsonify({"message": "post successfully deleted"}), http.HTTPStatus.OK
