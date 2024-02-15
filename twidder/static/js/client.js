@@ -7,8 +7,8 @@ window.onload = function() {
     loadApp().then();
 };
 
-window.addEventListener('popstate', function(e) {
-    console.log("Url path changed: " + window.location.pathname);
+window.onpopstate = function (e) {
+    console.log("Url path changed: " + window.location.href);
 
     // going back/forward using history API
     let token = localStorage.getItem("token");
@@ -22,7 +22,7 @@ window.addEventListener('popstate', function(e) {
         else if (window.location.pathname === "/account") showTab("account");
         else showTab("home");
     }
-});
+}
 
 async function loadApp() {
     console.log("Loading application");
@@ -147,6 +147,21 @@ function showTab(tabName) {
 
     // always show the top part of the page
     jumpToStart();
+
+    if (tabName === "browse") {
+        if (window.location.search.startsWith("?email=")) {
+            // search for user from query
+            let userEmail = window.location.search.replace("?email=", "");
+            loadBrowseUser(userEmail).then();
+            document.getElementById("input-user-email").value = userEmail;
+        } else {
+            // specify query by current value
+            let userEmail = document.getElementById("input-user-email").value;
+            if (userEmail !== "") {
+                history.replaceState("browse", "", "browse?email=" + userEmail);
+            }
+        }
+    }
 }
 
 async function reloadUserData() {
@@ -216,8 +231,15 @@ async function reloadUserData() {
     );
 }
 
-async function searchUser(form) {
+function formSearchUser(form) {
     let userEmail = form["input-user-email"].value;
+    loadBrowseUser(userEmail).then();
+
+    // History API
+    history.pushState("browse", "", "browse?email=" + userEmail);
+}
+
+async function loadBrowseUser(userEmail) {
     console.log("Querying user data: " + userEmail);
 
     let token = localStorage.getItem("token");
@@ -274,6 +296,7 @@ async function searchUser(form) {
         email
     );
 }
+
 
 function reloadWall(htmlWall, postTemplateHtml, posts, email) {
     // remove all old posts
