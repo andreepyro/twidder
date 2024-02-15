@@ -382,7 +382,7 @@ async function our_fetch(data) {
         cache: "no-cache",
         headers: {
             "Content-Type": "application/json",
-             Authorization  : signature,
+            "Authorization"  : signature,
             "hash": secret,
          },
         body: JSON.stringify({
