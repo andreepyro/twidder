@@ -1,5 +1,6 @@
 import http
-
+import hashlib
+import hmac
 from flask import jsonify, Blueprint, request
 
 from twidder import database_handler, session_handler, util
@@ -18,7 +19,9 @@ def create_session(email: str, password: str):
         resp = jsonify({"message": "session successfully created"})
         resp.headers["Authorization"] = token
         return resp, http.HTTPStatus.OK
+    
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
+
 
 
 @blueprint.route("", methods=["DELETE"])

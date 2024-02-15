@@ -1,3 +1,4 @@
+
 // Constants
 const HOST = "localhost:8080";
 
@@ -204,32 +205,203 @@ async function reloadUserData() {
     }
 }
 
+function reloadWall(htmlWall, postTemplateHtml, posts, email) {
+// remove all old posts
+for (let i = htmlWall.children.length - 1; i >= 0; i--) {
+    let element = htmlWall.children[i];
+    if (element.classList.contains("user-post")) {
+        element.remove();
+    }
+}
+
+// sort posts by date
+posts.sort(function(a, b){
+  return new Date(b.created) - new Date(a.created);
+});
+
+// add new posts from template
+for (let i = 0; i < posts.length; i++) {
+    const newPostHtml = document.createElement("div");
+    newPostHtml.innerHTML = postTemplateHtml;
+    newPostHtml.classList.add("user-post");
+    newPostHtml.setAttribute("data-id", posts[i]["id"]);
+    newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
+    newPostHtml.children[1].innerHTML = posts[i]["author"];
+    let lines = posts[i]["content"].split("\n");
+    for (let j = 0; j < lines.length; j++) {
+        newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
+        newPostHtml.children[2].appendChild(document.createElement("br"));
+    }
+    newPostHtml.children[3].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
+    newPostHtml.children[4].style.display = posts[i]["author"] === email ? "block" : "none";
+    htmlWall.appendChild(newPostHtml);
+}
+}
+
+async function loadBrowseUser(userEmail) {
+    console.log("Querying user data: " + userEmail);
+
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showError("Error: couldn't load token");
+        return;
+    }
+
+    let email = localStorage.getItem("email");
+    if (email == null) {
+        showError("Error: couldn't load user email");
+        return;
+    }
+
+    let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
+        method: "GET", cache: "no-cache", headers: {
+            "Content-Type": "application/json", "Authorization": token,
+        },
+    });
+    let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
+        method: "GET", cache: "no-cache", headers: {
+            "Content-Type": "application/json", "Authorization": token,
+        },
+    });
+
+    const userDataResponse = await userDataRequest;
+    const userPostsResponse = await userPostsRequest;
+
+    if (userDataResponse.status === 404 || userDataResponse.status === 404) {
+        showInfo("User not found.")
+        return;
+    } else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
+        showError("Unexpected error")
+        return;
+    }
+
+    let userData = await userDataResponse.json();
+    let posts = (await userPostsResponse.json()).posts;
+
+    document.getElementById("browse-search-button").innerHTML = "Reload";
+
+    // User data
+    document.getElementById("container-user-page").style.display = "block";
+    document.getElementById("browse-user-name").innerHTML = userData.firstname + " " + userData.lastname;
+    document.getElementById("browse-user-gender").innerHTML = userData.gender;
+    document.getElementById("browse-user-location").innerHTML = userData.city + ", " + userData.country;
+    document.getElementById("browse-user-email").innerHTML = userData.email;
+    document.getElementById("browse-user-image").src = getProfilePicturePath(userData.gender);
+
+    // User posts
+    reloadWall(
+        document.getElementById("browse-wall"),
+        document.getElementById("browse-post-template").innerHTML,
+        posts,
+        email
+    );
+}
+
+function reloadWall(htmlWall, postTemplateHtml, posts, email) {
+    // remove all old posts
+    for (let i = htmlWall.children.length - 1; i >= 0; i--) {
+        let element = htmlWall.children[i];
+        if (element.classList.contains("user-post")) {
+            element.remove();
+        }
+    }
+
+    // sort posts by date
+    posts.sort(function(a, b){
+      return new Date(b.created) - new Date(a.created);
+    });
+
+    // add new posts from template
+    for (let i = 0; i < posts.length; i++) {
+        const newPostHtml = document.createElement("div");
+        newPostHtml.innerHTML = postTemplateHtml;
+        newPostHtml.classList.add("user-post");
+        newPostHtml.setAttribute("data-id", posts[i]["id"]);
+        newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
+        newPostHtml.children[1].innerHTML = posts[i]["author"];
+        let lines = posts[i]["content"].split("\n");
+        for (let j = 0; j < lines.length; j++) {
+            newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
+            newPostHtml.children[2].appendChild(document.createElement("br"));
+        }
+        newPostHtml.children[3].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
+        newPostHtml.children[4].style.display = posts[i]["author"] === email ? "block" : "none";
+        htmlWall.appendChild(newPostHtml);
+    }
+}
+
 async function login(email, password) {
-    // create a new session
+console.log("Log in request");
+
+// create a new session
+const response = await fetch("http://" + HOST + "/api/v1/session", {
+    method: "POST",
+    cache: "no-cache",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+        email: email,
+        password: password,
+    }),
+});
+
+if (response.status === 401) {
+    showError("Invalid username or password.");
+    return;
+} else if (response.status !== 201) {
+    showError("Unexpected error");
+    return;
+}
+
+let token = response.headers.get("Authorization");
+
+// save data locally
+localStorage.setItem("token", token);
+localStorage.setItem("email", email);
+
+// reload app content
+loadApp().then();
+}
+
+
+async function hmac_256(message, secret) {
+    var newHMAC = CryptoJS.HmacSHA256(message, secret);
+        return newHMAC;
+    }
+
+
+async function our_fetch(data) {
+    secret = 3979603277027076904099697939399599359090590553500507050050775050 //temp value
+    message = data + secret
+    signature = hmac_256(message, secret)
+    console.log(data)
+
     const response = await fetch("http://" + HOST + "/api/v1/session", {
         method: "POST",
         cache: "no-cache",
         headers: {
             "Content-Type": "application/json",
-        },
+             Authorization  : signature,
+            "hash": secret,
+         },
         body: JSON.stringify({
-            email: email,
+            email: email, 
             password: password,
         }),
     });
-
     if (response.status === 401) {
-        showError("Invalid username or password.");
+        showError("Unathorized, access denied");
         return;
     } else if (response.status !== 200) {
         showError("Error");
         return;
     }
 
-    let token = response.headers.get("Authorization");
+    let hashed = response.headers.get("Authorization");
 
     // save data locally
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", hashed);
     localStorage.setItem("email", email);
 
     // reload app content
@@ -782,6 +954,8 @@ async function formLogin(form) {
     let password = form["input-login-password"].value;
     await login(email, password);
 }
+
+
 
 async function formRegister(form) {
     let firstName = form["input-sign-up-first-name"].value;
