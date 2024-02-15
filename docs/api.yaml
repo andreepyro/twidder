@@ -18,7 +18,7 @@ paths:
               $ref: '#/components/schemas/SignIn'
         required: true
       responses:
-        '200':
+        '201':
           description: Session successfully created
           headers:
             Authorization:
@@ -61,7 +61,7 @@ paths:
               $ref: '#/components/schemas/UserData'
         required: true
       responses:
-        '200':
+        '201':
           description: User account successfully created
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -89,6 +89,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictEmailError'
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -166,7 +168,7 @@ paths:
               $ref: '#/components/schemas/NewPost'
         required: true
       responses:
-        '200':
+        '201':
           $ref: '#/components/responses/NewPostID'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -331,10 +333,10 @@ components:
     EditPost:
       type: object
       properties:
-        content:
+        message:
           type: string
       required:
-        - content
+        - message
   securitySchemes:
     bearerAuth:
       type: http
@@ -397,6 +399,8 @@ components:
       description: This operation is forbidden
     NotFoundError:
       description: Resource not found
+    ConflictEmailError:
+      description: The email is already taken
     BadRequest:
       description: Bad request
       content:

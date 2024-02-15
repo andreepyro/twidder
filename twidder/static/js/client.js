@@ -51,7 +51,7 @@ async function loadApp() {
         } else if (event.data === "fail") {
             showError("failed to initialize connection");
         } else {
-            showError("error")
+            showError("Unexpected error")
             console.log("unexpected message from the server: " + event.data);
         }
     }
@@ -186,7 +186,7 @@ async function reloadUserData() {
     let userPostsResponse = await userPostsRequest;
 
     if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
-        showError("Error")
+        showError("Unexpected error")
         return false;
     }
 
@@ -247,10 +247,10 @@ async function searchUser(form) {
     const userPostsResponse = await userPostsRequest;
 
     if (userDataResponse.status === 404 || userDataResponse.status === 404) {
-        showInfo("User not found")
+        showInfo("User not found.")
         return;
     } else if (userDataResponse.status !== 200 || userPostsResponse.status !== 200) {
-        showError("Error")
+        showError("Unexpected error")
         return;
     }
 
@@ -327,8 +327,8 @@ async function login(email, password) {
     if (response.status === 401) {
         showError("Invalid username or password.");
         return;
-    } else if (response.status !== 200) {
-        showError("Error");
+    } else if (response.status !== 201) {
+        showError("Unexpected error");
         return;
     }
 
@@ -354,13 +354,13 @@ async function logout() {
             },
         });
 
-        if (response.status !== 200) {
-            showError("Error");
-            return false;
+        if (response.status === 200) {
+            showSuccess("You have successfully logged out.");
+        } else {
+            showError("Unexpected error");
         }
     }
 
-    showSuccess("You have successfully logged out.")
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     showWelcomeView();
@@ -408,8 +408,10 @@ async function formEditAccountDetails(form) {
         }),
     });
 
-    if (response.status !== 200) {
-        showError("Error")
+    if (response.status === 403) {
+        showError("Invalid email!"); // other 403 error shouldn't happen considering the checks above
+    } else if (response.status !== 200) {
+        showError("Unexpected error")
         return;
     }
 
@@ -464,10 +466,10 @@ async function formChangePassword(form) {
     });
 
     if (response.status === 403) {
-        showError("Invalid password.");
+        showError("Wrong old password.");
         return;
     } else if (response.status !== 200) {
-        showError("Error");
+        showError("Unexpected error");
         return;
     }
 
@@ -504,7 +506,7 @@ async function buttonDeleteUserAccount() {
     });
 
     if (response.status !== 200) {
-        showError("Error");
+        showError("Unexpected error");
         return;
     }
 
@@ -573,10 +575,10 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
     });
 
     if (response.status === 403) {
-        showError("User does not exist")
+        showError("User does not exist.")
         return false;
-    } else if (response.status !== 200) {
-        showError("Error")
+    } else if (response.status !== 201) {
+        showError("Unexpected error")
         return false;
     }
 
@@ -635,10 +637,12 @@ async function buttonDeletePost(button) {
         },
     });
     if (response.status === 404) {
-        showError("Post not found")
+        // if it doesn't exist, it might've been deleted but other user in the mean tim
+        showError("Post not found.")
+        button.parentElement.remove();
         return;
     } else if (response.status !== 200) {
-        showError("Error")
+        showError("Unexpected error")
         return;
     }
 
@@ -804,13 +808,15 @@ async function formRegister(form) {
         }),
     });
 
-    if (response.status === 200) {
+    if (response.status === 201) {
         await login(email, password);
         showSuccess("Account successfully register!");
-    } else if (response.status === 404) {
-        showError("Invalid data!"); // TODO decide on error message
+    } else if (response.status === 403) {
+        showError("Invalid email!"); // other 403 error shouldn't happen considering the checks above
+    } else if (response.status === 409) {
+        showError("This email is already taken!");
     } else {
-        showError("Error");
+        showError("Unexpected error");
     }
 }
 

@@ -17,7 +17,7 @@ def create_session(email: str, password: str):
         token = session_handler.create_session(email)
         resp = jsonify({"message": "session successfully created"})
         resp.headers["Authorization"] = token
-        return resp, http.HTTPStatus.OK
+        return resp, http.HTTPStatus.CREATED
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
 
 

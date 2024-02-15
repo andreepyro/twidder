@@ -24,13 +24,13 @@ def create_user(email: str, password: str, firstname: str, lastname: str, gender
         return jsonify({"message": "invalid email"}), http.HTTPStatus.FORBIDDEN
 
     if database_handler.get_user_by_email(email) is not None:
-        return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.CONFLICT
 
     hashed_password = util.hash_password(password)
     if not database_handler.create_user(email, hashed_password, firstname, lastname, gender, city, country, None):
         return jsonify({"message": "couldn't create user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
 
-    return jsonify({"message": "user successfully created"}), http.HTTPStatus.OK
+    return jsonify({"message": "user successfully created"}), http.HTTPStatus.CREATED
 
 
 @blueprint.route('/<string:target_user>', methods=["GET"])
@@ -65,7 +65,7 @@ def update_user(user_email: str, email: str, old_password: str, new_password: st
 
     if new_password is not None:
         if old_password is None:
-            return jsonify({"message": "`old_password` parameter is missing"}), http.HTTPStatus.FORBIDDEN
+            return jsonify({"message": "`old_password` parameter is missing"}), http.HTTPStatus.BAD_REQUEST
         if len(new_password) < current_app.config["MIN_PASSWORD_LENGTH"]:
             return jsonify({"message": f"new password must have at least '{current_app.config['MIN_PASSWORD_LENGTH']}' characters"}), http.HTTPStatus.FORBIDDEN
         if not util.check_password(old_password, user["password"]):
@@ -107,7 +107,7 @@ def update_user(user_email: str, email: str, old_password: str, new_password: st
         # if not util.is_email_valid(email):
         #     return jsonify({"message": "invalid email"}), http.HTTPStatus.FORBIDDEN
         # if database_handler.get_user(email) is not None:
-        #     return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.FORBIDDEN
+        #     return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.CONFLICT
         # user["email"] = email
 
     if database_handler.update_user_by_email(

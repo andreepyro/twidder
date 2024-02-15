@@ -21,7 +21,7 @@ def create_post(user_email: str, message: str, email: str):
     post_id = database_handler.create_post(user_email, email, message, curr_datetime, curr_datetime)
     if post_id == -1:
         return jsonify({"message": "couldn't create a new post"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    return jsonify({"message": "post successfully created", "id": post_id}), http.HTTPStatus.OK
+    return jsonify({"message": "post successfully created", "id": post_id}), http.HTTPStatus.CREATED
 
 
 @blueprint.route("", methods=["GET"])
@@ -59,7 +59,7 @@ def list_posts(user_email: str):
 def update_post(user_email: str, message: str, post_id: str):
     """Update a post."""
     if message is None:
-        return jsonify({"message": "`message` parameter is missing"}), http.HTTPStatus.FORBIDDEN
+        return jsonify({"message": "`message` parameter is missing"}), http.HTTPStatus.BAD_REQUEST
     if message == "":
         return jsonify({"message": "message must not be empty"}), http.HTTPStatus.FORBIDDEN
     post = database_handler.get_post_by_id(post_id)
