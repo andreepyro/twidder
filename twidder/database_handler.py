@@ -40,7 +40,7 @@ def initialize_database():
         get_db().commit()
 
 
-def create_user(email: str, password: str, firstname: str, lastname: str, gender: str, city: str, country: str, image: bytes) -> bool:
+def create_user(email: str, password: str, firstname: str, lastname: str, gender: str, city: str, country: str, image: bytes | None) -> bool:
     """
     Insert a new user into the database.
 
@@ -87,7 +87,7 @@ def get_user_by_email(email: str) -> None | dict:
     }
 
 
-def update_user_by_email(curr_email: str, email: str, password: str, firstname: str, lastname: str, gender: str, city: str, country: str, image: bytes) -> bool:
+def update_user_by_email(curr_email: str, email: str, password: str, firstname: str, lastname: str, gender: str, city: str, country: str, image: bytes | None) -> bool:
     """
     Update information belonging to a user with the given email address.
 
