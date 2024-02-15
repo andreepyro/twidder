@@ -130,7 +130,6 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(71, 78, 93, 0.75);
-    padding-top: 50px;
 }
 
 #form-register {
@@ -234,6 +233,29 @@
     #text-authors {
         width: 200px;
         left: calc(50% - 105px);
+    }
+}
+
+@media screen and (max-width: 500px) {
+    #form-register {
+        width: 262px;
+        top: calc(50% - 294px);
+        left: calc(50% - 139px)
+    }
+
+    #form-register div {
+        display: block;
+    }
+
+    #form-register button {
+        width: 246px;
+    }
+}
+
+@media screen and (max-height: 550px) {
+    #form-register {
+        position: unset;
+        margin: auto;
     }
 }
 
