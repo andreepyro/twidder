@@ -151,9 +151,12 @@ function showTab(tabName) {
     if (tabName === "browse") {
         if (window.location.search.startsWith("?email=")) {
             // search for user from query
+            let searchBar = document.getElementById("input-user-email");
             let userEmail = window.location.search.replace("?email=", "");
-            loadBrowseUser(userEmail).then();
-            document.getElementById("input-user-email").value = userEmail;
+            if (searchBar.value !== userEmail) {
+                loadBrowseUser(userEmail).then();
+                searchBar.value = userEmail;
+            }
         } else {
             // specify query by current value
             let userEmail = document.getElementById("input-user-email").value;
@@ -213,6 +216,7 @@ async function reloadUserData() {
     document.getElementById("home-user-gender").innerHTML = user.gender;
     document.getElementById("home-user-location").innerHTML = user.city + ", " + user.country;
     document.getElementById("home-user-email").innerHTML = user.email;
+    document.getElementById("home-user-image").src = getProfilePicturePath(user.gender);
 
     // Account tab
     document.getElementById("input-account-first-name").value = user.firstname;
@@ -221,6 +225,7 @@ async function reloadUserData() {
     document.getElementById("input-account-country").value = user.country;
     document.getElementById("input-account-gender").value = user.gender;
     document.getElementById("account-email").innerHTML = user.email;
+    document.getElementById("account-user-image").src = getProfilePicturePath(user.gender);
 
     // User's posts
     reloadWall(
@@ -287,6 +292,7 @@ async function loadBrowseUser(userEmail) {
     document.getElementById("browse-user-gender").innerHTML = userData.gender;
     document.getElementById("browse-user-location").innerHTML = userData.city + ", " + userData.country;
     document.getElementById("browse-user-email").innerHTML = userData.email;
+    document.getElementById("browse-user-image").src = getProfilePicturePath(userData.gender);
 
     // User posts
     reloadWall(
@@ -442,6 +448,10 @@ async function formEditAccountDetails(form) {
     document.getElementById("home-user-name").innerHTML = firstName + " " + lastName;
     document.getElementById("home-user-gender").innerHTML = gender;
     document.getElementById("home-user-location").innerHTML = city + ", " + country;
+    document.getElementById("home-user-image").src = getProfilePicturePath(gender);
+
+    // update picture in account tab
+    document.getElementById("account-user-image").src = getProfilePicturePath(gender);
 
     showSuccess("Account details successfully changed!");
 }
@@ -678,6 +688,12 @@ async function buttonDeletePost(button) {
     setTimeout(function () {
         button.parentElement.remove();
     }, 500);
+}
+
+function getProfilePicturePath(gender) {
+    if (gender === "Male") return "./static/src/user-male.svg";
+    else if (gender === "Female") return "./static/src/user-female.svg";
+    else return "./static/src/user-solid.svg";
 }
 
 // INTERACTIVE CSS ELEMENTS
