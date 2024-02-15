@@ -69,6 +69,7 @@ button {
 
 /* Popup message */
 #pop-message {
+    z-index: 999;
     visibility: hidden;
     left: 50%;
     bottom: 30px;
