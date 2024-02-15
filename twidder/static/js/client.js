@@ -211,7 +211,8 @@ async function reloadUserData() {
     reloadWall(
         document.getElementById("home-wall"),
         document.getElementById("home-post-template").innerHTML,
-        posts
+        posts,
+        email
     );
 }
 
@@ -222,6 +223,12 @@ async function searchUser(form) {
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
+        return;
+    }
+
+    let email = localStorage.getItem("email");
+    if (email == null) {
+        showError("Error: couldn't load user email");
         return;
     }
 
@@ -263,11 +270,12 @@ async function searchUser(form) {
     reloadWall(
         document.getElementById("browse-wall"),
         document.getElementById("browse-post-template").innerHTML,
-        posts
+        posts,
+        email
     );
 }
 
-function reloadWall(htmlWall, postTemplateHtml, posts) {
+function reloadWall(htmlWall, postTemplateHtml, posts, email) {
     // remove all old posts
     for (let i = htmlWall.children.length - 1; i >= 0; i--) {
         let element = htmlWall.children[i];
@@ -294,6 +302,8 @@ function reloadWall(htmlWall, postTemplateHtml, posts) {
             newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
             newPostHtml.children[2].appendChild(document.createElement("br"));
         }
+        newPostHtml.children[3].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
+        newPostHtml.children[4].style.display = posts[i]["author"] === email ? "block" : "none";
         htmlWall.appendChild(newPostHtml);
     }
 }
