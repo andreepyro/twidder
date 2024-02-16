@@ -25,30 +25,20 @@ def create_session(email: str, password: str):
 
 @blueprint.route("", methods=["GET"])
 @util.authorize_user
-def verify_session(data):
+@util.post_parameters(("email", str))
+def verify_session(email):
     """Verify existing session."""
-    secret = request.headers["hash"]
-    message = data + secret
+    hash = request.headers["hash"]
+    message = email + hash
     hmac_server = hmac.new(bytes(secret, 'utf-8'), 
         msg=bytes(message, 'utf-8'), 
         digestmod=hashlib.sha256).hexdigest()
-    
     hmac_client = request.headers["Authorization"]
+    
     if hmac_server==hmac_client:
         return jsonify({"message": "successful verification"}), http.HTTPStatus.OK
-    else:
-         return jsonify({"message": "Unauthorized"}), http.HTTPStatus.UNAUTHORIZED
     
-
-@blueprint.route("", methods=["DELETE"])
-@util.authorize_user
-def delete_session(user_email: str):
-    """Destroy existing session."""
-
-    session_id = request.headers["Authorization"]
-    session_handler.delete_session(session_id)
-    return jsonify({"message": "session successfully deleted"}), http.HTTPStatus.OK
-
+    return jsonify({"message": "unauthorized"}), http.HTTPStatus.UNAUTHORIZED
 
 @blueprint.route("", methods=["DELETE"])
 @util.authorize_user
