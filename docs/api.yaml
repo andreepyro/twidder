@@ -313,13 +313,21 @@ components:
         created:
           type: string
           format: date-time
+        edited:
+          type: string
+          format: date-time
         content:
           type: string
+        media:
+          type: string
+          format: binary
       required:
         - id
         - author
         - created
+        - edited
         - content
+        - media
     NewPost:
       type: object
       properties:
@@ -327,6 +335,9 @@ components:
           type: string
         content:
           type: string
+        media:
+          type: string
+          format: binary
       required:
         - user
         - content
@@ -335,8 +346,9 @@ components:
       properties:
         message:
           type: string
-      required:
-        - message
+        media:
+          type: string
+          format: binary
   securitySchemes:
     bearerAuth:
       type: http

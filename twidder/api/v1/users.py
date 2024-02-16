@@ -54,8 +54,8 @@ def get_user(user_email: str, target_user: str):
 @util.authorize_user
 @util.patch_parameters(("email", str), ("old_password", str), ("new_password", str), ("firstname", str), ("lastname", str), ("gender", str), ("city", str),
                        ("country", str))
-def update_user(user_email: str, email: str, old_password: str, new_password: str, firstname: str, lastname: str, gender: str, city: str, country: str,
-                target_user: str):
+def update_user(user_email: str, email: str | None, old_password: str | None, new_password: str | None, firstname: str | None, lastname: str | None,
+                gender: str | None, city: str | None, country: str | None, target_user: str):
     """Update user information."""
     user = database_handler.get_user_by_email(target_user)
     if user is None:
