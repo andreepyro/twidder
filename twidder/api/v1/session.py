@@ -30,7 +30,7 @@ def verify_session(email):
     """Verify existing session."""
     hash = request.headers["hash"]
     message = email + hash
-    hmac_server = hmac.new(bytes(secret, 'utf-8'), 
+    hmac_server = hmac.new(bytes(hash, 'utf-8'), 
         msg=bytes(message, 'utf-8'), 
         digestmod=hashlib.sha256).hexdigest()
     hmac_client = request.headers["Authorization"]
