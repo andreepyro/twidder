@@ -126,7 +126,7 @@ def delete_user_by_email(email: str) -> bool:
         return False
 
 
-def create_post(author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime) -> int:
+def create_post(author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime, media: str | None) -> int:
     """
     Insert a new post into the database.
 
@@ -135,12 +135,14 @@ def create_post(author: str, user: str, content: str, created: datetime.datetime
     :param content: content of the post
     :param created: datetime of the post creation
     :param edited: datetime of the post last edition
+    :param media: uploaded media
     :return: id of the created post on success, -1 on error
     """
     try:
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("insert into post (author, user, content, created, edited) values (?, ?, ?, ?, ?)", [author, user, content, created, edited])
+        cursor.execute("insert into post (author, user, content, created, edited, media) values (?, ?, ?, ?, ?, ?)",
+                       [author, user, content, created, edited, media])
         db.commit()
         return cursor.lastrowid
     except Exception:
@@ -154,18 +156,19 @@ def get_post_by_id(post_id: str) -> None | dict:
     :param post_id: id of the post
     :return: dictionary of the posts information if it exists, None otherwise
     """
-    cursor = get_db().execute("select id, author, user, content, created, edited from post where id==?", [post_id])
+    cursor = get_db().execute("select id, author, user, content, created, edited, media from post where id==?", [post_id])
     rows = cursor.fetchall()
     if len(rows) == 0:
         return None
 
     return {
-        'id': rows[0][0],
-        'author': rows[0][1],
-        'user': rows[0][2],
-        'content': rows[0][3],
-        'created': rows[0][4],
-        'edited': rows[0][5]
+        "id": rows[0][0],
+        "author": rows[0][1],
+        "user": rows[0][2],
+        "content": rows[0][3],
+        "created": rows[0][4],
+        "edited": rows[0][5],
+        "media": rows[0][6],
     }
 
 
@@ -175,15 +178,17 @@ def list_post() -> list[dict]:
 
     :return: list of dictionaries of posts information
     """
-    cursor = get_db().execute("select id, author, user, content, created, edited from post")
+    cursor = get_db().execute("select id, author, user, content, created, edited, media from post")
     rows = cursor.fetchall()
-    return [{'id': row[0],
-             'author': row[1],
-             'user': row[2],
-             'content': row[3],
-             'created': row[4],
-             'edited': row[5]
-             } for row in rows]
+    return [{
+        "id": row[0],
+        "author": row[1],
+        "user": row[2],
+        "content": row[3],
+        "created": row[4],
+        "edited": row[5],
+        "media": row[6],
+    } for row in rows]
 
 
 def list_posts_by_user(email: str) -> list[dict]:
@@ -193,15 +198,17 @@ def list_posts_by_user(email: str) -> list[dict]:
     :param email: user's email address
     :return: list of dictionaries of posts information
     """
-    cursor = get_db().execute("select id, author, user, content, created, edited from post where user==?", [email])
+    cursor = get_db().execute("select id, author, user, content, created, edited, media from post where user==?", [email])
     rows = cursor.fetchall()
-    return [{'id': row[0],
-             'author': row[1],
-             'user': row[2],
-             'content': row[3],
-             'created': row[4],
-             'edited': row[5]
-             } for row in rows]
+    return [{
+        "id": row[0],
+        "author": row[1],
+        "user": row[2],
+        "content": row[3],
+        "created": row[4],
+        "edited": row[5],
+        "media": row[6],
+    } for row in rows]
 
 
 def list_posts_by_author(email: str) -> list[dict]:
@@ -211,18 +218,20 @@ def list_posts_by_author(email: str) -> list[dict]:
     :param email: user's email address
     :return: list of dictionaries of posts information
     """
-    cursor = get_db().execute("select id, author, user, content, created, edited from post where author==?", [email])
+    cursor = get_db().execute("select id, author, user, content, created, edited, media from post where author==?", [email])
     rows = cursor.fetchall()
-    return [{'id': row[0],
-             'author': row[1],
-             'user': row[2],
-             'content': row[3],
-             'created': row[4],
-             'edited': row[5]
-             } for row in rows]
+    return [{
+        "id": row[0],
+        "author": row[1],
+        "user": row[2],
+        "content": row[3],
+        "created": row[4],
+        "edited": row[5],
+        "media": row[6],
+    } for row in rows]
 
 
-def update_post_by_id(post_id: str, author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime) -> bool:
+def update_post_by_id(post_id: str, author: str, user: str, content: str, created: datetime.datetime, edited: datetime.datetime, media: str | None) -> bool:
     """
     Update post by its id.
 
@@ -232,10 +241,12 @@ def update_post_by_id(post_id: str, author: str, user: str, content: str, create
     :param content: new post's content
     :param created: datetime of the post creation
     :param edited: datetime of the post last edition
+    :param media: uploaded media
     :return: True on success, False on error
     """
     try:
-        get_db().execute("update post set author=?, user=?, content=?, created=?, edited=? where id==?", [author, user, content, created, edited, post_id])
+        get_db().execute("update post set author=?, user=?, content=?, created=?, edited=?, media=? where id==?",
+                         [author, user, content, created, edited, post_id, media])
         get_db().commit()
         return True
     except Exception:

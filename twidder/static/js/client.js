@@ -323,16 +323,41 @@ function reloadWall(htmlWall, postTemplateHtml, posts, email) {
         const newPostHtml = document.createElement("div");
         newPostHtml.innerHTML = postTemplateHtml;
         newPostHtml.classList.add("user-post");
+
+        // general information
         newPostHtml.setAttribute("data-id", posts[i]["id"]);
-        newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
-        newPostHtml.children[1].innerHTML = posts[i]["author"];
+        newPostHtml.getElementsByClassName("time")[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
+        newPostHtml.getElementsByClassName("author")[0].innerHTML = posts[i]["author"];
+
+        // show media
+        let mediaContainer = newPostHtml.getElementsByClassName("media-content")[0];
+        let mediaData = posts[i]["media"];
+        if (mediaData != null) {
+            let mediaContent = null;
+            if (mediaData.startsWith("data:image")) {
+                mediaContent = mediaContainer.getElementsByTagName("img")[0];
+            } else if (mediaData.startsWith("data:video")) {
+                mediaContent = mediaContainer.getElementsByTagName("video")[0];
+            } else {
+                console.log("unsupported media type")
+            }
+            if (mediaContent != null) {
+                mediaContent.src = mediaData;
+                mediaContent.style.display = "block";
+            }
+        }
+
+        // show content
         let lines = posts[i]["content"].split("\n");
         for (let j = 0; j < lines.length; j++) {
-            newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
-            newPostHtml.children[2].appendChild(document.createElement("br"));
+            newPostHtml.getElementsByClassName("content")[0].appendChild(document.createTextNode(lines[j]));
+            newPostHtml.getElementsByClassName("content")[0].appendChild(document.createElement("br"));
         }
-        newPostHtml.children[3].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
-        newPostHtml.children[4].style.display = posts[i]["author"] === email ? "block" : "none";
+
+        // start animation
+        newPostHtml.getElementsByClassName("button-edit")[0].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
+        newPostHtml.getElementsByClassName("button-delete")[0].style.display = posts[i]["author"] === email ? "block" : "none";
+
         htmlWall.appendChild(newPostHtml);
     }
 }
@@ -549,38 +574,60 @@ async function buttonDeleteUserAccount() {
     showWelcomeView();
 }
 
-async function addPostHome() {
+async function addPostHome(form) {
     let email = localStorage.getItem("email");
     if (email == null) {
         showError("Error: couldn't load user email");
         return;
     }
 
-    let newPostBoxHtml = document.getElementById("input-home-new-post");
+    let messageInput = form["input-home-new-post"];
+    let fileInput = form["home-post-file-upload"];
+    let imageContent = document.getElementById("post-home-uploaded-image");
+    let videoContent = document.getElementById("post-home-uploaded-video");
+    let file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+
     if (await addPostToWall(
         document.getElementById("home-wall"),
         document.getElementById("home-post-template").innerHTML,
         email,
-        newPostBoxHtml.value,
+        messageInput.value,
+        file != null && file.type.match('image.*') ? imageContent.src : null,
+        file != null && file.type.match('video.*') ? videoContent.src : null,
     )) {
-        newPostBoxHtml.value = "";
+        messageInput.value = null;
+        fileInput.value = null;
+        document.getElementById("post-home-uploaded-image").style.display = "none";
+        document.getElementById("post-home-uploaded-video").style.display = "none";
+        document.getElementById("home-post-remove-content").style.display = "none";
     }
 }
 
-async function addPostBrowse() {
-    let newPostBoxHtml = document.getElementById("input-browse-new-post");
+async function addPostBrowse(form) {
+    let messageInput = form["input-browse-new-post"];
+    let fileInput = form["browse-post-file-upload"];
+    let imageContent = document.getElementById("post-browse-uploaded-image");
+    let videoContent = document.getElementById("post-browse-uploaded-video");
+    let file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+
     if (await addPostToWall(
         document.getElementById("browse-wall"),
         document.getElementById("browse-post-template").innerHTML,
         document.getElementById("browse-user-email").innerHTML,
-        newPostBoxHtml.value,
+        messageInput.value,
+        file != null && file.type.match('image.*') ? imageContent.src : null,
+        file != null && file.type.match('video.*') ? videoContent.src : null,
     )) {
-        newPostBoxHtml.value = "";
+        messageInput.value = null;
+        fileInput.value = null;
+        document.getElementById("post-browse-uploaded-image").style.display = "none";
+        document.getElementById("post-browse-uploaded-video").style.display = "none";
+        document.getElementById("browse-post-remove-content").style.display = "none";
     }
 }
 
-async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
-    console.log("Creating a new post: " + userEmail + ", " + content);
+async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, image, video) {
+    console.log("Creating a new post: " + userEmail + ", " + content + (", image" ? image != null : "") + (", video" ? video != null : ""));
 
     let token = localStorage.getItem("token");
     if (token == null) {
@@ -604,6 +651,7 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
         body: JSON.stringify({
             email: userEmail,
             message: content,
+            media: image != null ? image : video  // NOTE: here we assume that only image or video or none of those is provided
         }),
     });
 
@@ -623,16 +671,34 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
     newPostHtml.innerHTML = postTemplateHtml;
     newPostHtml.classList.add("user-post");
     newPostHtml.setAttribute("data-id", newPostID);
-    newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date());
-    newPostHtml.children[1].innerHTML = email;
+    newPostHtml.getElementsByClassName("time")[0].innerHTML = getDateTimeFormat(new Date());
+    newPostHtml.getElementsByClassName("author")[0].innerHTML = email;
+
+    // show media
+    let mediaContent = newPostHtml.getElementsByClassName("media-content")[0];
+    if (image != null) {
+        let imageContent = mediaContent.getElementsByTagName("img")[0];
+        imageContent.src = image;
+        imageContent.style.display = "block";
+    }
+    if (video != null) {
+        let videoContent = mediaContent.getElementsByTagName("video")[0];
+        videoContent.src = video;
+        videoContent.style.display = "block";
+    }
+
+    // show content
     let lines = content.split("\n");
     for (let j = 0; j < lines.length; j++) {
-        newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
-        newPostHtml.children[2].appendChild(document.createElement("br"));
+        newPostHtml.getElementsByClassName("content")[0].appendChild(document.createTextNode(lines[j]));
+        newPostHtml.getElementsByClassName("content")[0].appendChild(document.createElement("br"));
     }
+
+    // animation
     newPostHtml.style.animation = "post-appear 0.75s";
-    newPostHtml.children[3].style.animation = "post-appear-inner 1.0s";
-    newPostHtml.children[4].style.animation = "post-appear-inner 1.0s";
+    newPostHtml.getElementsByClassName("button-edit")[0].style.animation = "post-appear-inner 1.0s";
+    newPostHtml.getElementsByClassName("button-delete")[0].style.animation = "post-appear-inner 1.0s";
+
     htmlWall.insertBefore(newPostHtml, htmlWall.childNodes[2]);
 
     // clear animation eventually
@@ -648,7 +714,7 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content) {
 async function buttonEditPost(button) {
     let postID = button.parentElement.getAttribute("data-id");
     console.log("Edit post, post id: " + postID);
-    alert("EDIT POST: " + postID); // TODO IMPLEMENT ME
+    showError("THIS FEATURE IS NOT IMPLEMENTED YET");
 }
 
 async function buttonDeletePost(button) {
@@ -694,6 +760,47 @@ function getProfilePicturePath(gender) {
     if (gender === "Male") return "./static/src/user-male.svg";
     else if (gender === "Female") return "./static/src/user-female.svg";
     else return "./static/src/user-solid.svg";
+}
+
+function postFileUpload(input, imageElementID, videoElementID, removeElementID) {
+    let file = input.files[0];
+    let imageContent = document.getElementById(imageElementID);
+    let videoContent = document.getElementById(videoElementID);
+    let removeButton = document.getElementById(removeElementID);
+
+    if (!file.type.match('image.*') && !file.type.match('video.*')) {
+        showError("Only image or video can be uploaded!");
+        input.value = null;
+        return;
+    }
+
+    let reader = new FileReader();
+    reader.onloadend = function () {
+        removeButton.style.display = "block";
+
+        if (file.type.match('image.*')) {
+            imageContent.src = reader.result;
+            imageContent.style.display = "block";
+            videoContent.src = "";
+            videoContent.style.display = "none";
+        }
+
+        if (file.type.match('video.*')) {
+            imageContent.src = "";
+            imageContent.style.display = "none";
+            videoContent.src = reader.result;
+            videoContent.style.display = "block";
+        }
+
+        removeButton.onclick = ev => {
+            removeButton.style.display = "none";
+            imageContent.style.display = "none";
+            videoContent.style.display = "none";
+            imageContent.src = "";
+            videoContent.src = "";
+        };
+    }
+    reader.readAsDataURL(file);
 }
 
 // INTERACTIVE CSS ELEMENTS

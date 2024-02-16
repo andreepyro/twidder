@@ -15,6 +15,7 @@ sock = Sock(app)
 app.config["MIN_PASSWORD_LENGTH"] = 8
 app.config["DATABASE_FILE"] = "./database.db"
 app.config["DATABASE_SCHEMA"] = "./twidder/schema.sql"
+app.config["POST_MEDIA_TYPES"] = ["image", "video"]
 
 app.register_blueprint(api_v1_session, url_prefix="/api/v1/session")
 app.register_blueprint(api_v1_users, url_prefix="/api/v1/users")
