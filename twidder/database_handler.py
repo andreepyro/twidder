@@ -40,6 +40,17 @@ def initialize_database():
         get_db().commit()
 
 
+def clear_database():
+    """
+    Clear the database schema and tables.
+
+    :return: None
+    """
+    get_db().execute("DROP TABLE IF EXISTS user")
+    get_db().execute("DROP TABLE IF EXISTS post")
+    get_db().commit()
+
+
 def create_user(email: str, password: str, firstname: str, lastname: str, gender: str, city: str, country: str, image: bytes | None) -> bool:
     """
     Insert a new user into the database.

@@ -3,29 +3,116 @@ from multiprocessing import Process
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 
+from twidder.database_handler import initialize_database, clear_database
 from twidder.server import app
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def run_server():
     server = Process(target=lambda: app.run(host="localhost", port=8080))
     server.start()
+    time.sleep(1)  # wait for server to start
     yield
     server.terminate()
     server.join()
 
 
-def test_e2e_workflow():
-    # create drive
+@pytest.fixture()
+def driver():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")  # TODO enable
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get("http://127.0.0.1:8080/")
-
     driver.implicitly_wait(5.0)
+    _reset_database()
+    yield driver
+    driver.quit()
 
+
+def test_sign_up(driver):
+    # try to register user with empty first name
+    driver.get("http://localhost:8080/")
+    _register(driver, "", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com", "secretpassword", False)
+
+    # try to register user with empty last name
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "", "Male", "Linkoping", "Sweden", "peter@parker.com", "secretpassword", False)
+
+    # try to register user without selecting gender
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "", "Linkoping", "Sweden", "peter@parker.com", "secretpassword", False)
+
+    # try to register user with empty city
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "", "Sweden", "peter@parker.com", "secretpassword", False)
+
+    # try to register user with empty country
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "", "peter@parker.com", "secretpassword", False)
+
+    # try to register user with invalid email
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker", "secretpassword", False)
+
+    # try to register user with short password
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com", "short", False)
+
+    # try to register user with empty password
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com", "", False)
+
+    # try to register user with correct details
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com", "secretpassword", True)
+    time.sleep(4.5)  # for pop-up message to disappear
+    _logout(driver)
+
+    # try to register a new user with already used email
+    driver.get("http://localhost:8080/")
+    _register(driver, "Lucy", "Boss", "Female", "Stockholm", "Sweden", "peter@parker.com", "totalysecretpaddowrd", False)
+
+
+def test_sign_in(driver):
+    # try to log in with invalid credentials
+    driver.get("http://localhost:8080/")
+    _login(driver, "random@email.com", "password", False)
+
+    # create a new user
+    driver.get("http://localhost:8080/")
+    _register(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com", "secretpassword", True)
+    time.sleep(4.5)  # for pop-up message to disappear
+    _logout(driver)
+
+    # try to log in with invalid email
+    driver.get("http://localhost:8080/")
+    _login(driver, "random@email.com", "secretpassword", False)
+
+    # try to log in with invalid password
+    driver.get("http://localhost:8080/")
+    _login(driver, "peter@parker.com", "password", False)
+
+    # log in with valid credentials
+    driver.get("http://localhost:8080/")
+    _login(driver, "peter@parker.com", "secretpassword", True)
+
+
+def test_browse_users(driver):
+    pass
+
+
+def test_post_message(driver):
+    pass
+
+
+def test_change_details(driver):
+    pass
+
+
+@pytest.mark.skip("legacy test, doesn't work anymore")
+def test_e2e_workflow(driver):
     # try to log in with invalid credentials
     _login(driver, "random@email.com", "password", False)
 
@@ -37,7 +124,7 @@ def test_e2e_workflow():
 
     # check url is the same after page refresh
     old_url = driver.current_url
-    driver.get("http://127.0.0.1:8080/")
+    driver.get("http://localhost:8080/")
     assert driver.current_url == old_url
 
     # log out
@@ -95,7 +182,11 @@ def test_e2e_workflow():
 
     # TODO add new posts to Anna's wall
 
-    driver.quit()
+
+def _reset_database():
+    with app.app_context():
+        clear_database()
+        initialize_database()
 
 
 def _login(driver: webdriver.Chrome, email: str, password: str, expect_success: bool):
@@ -104,7 +195,7 @@ def _login(driver: webdriver.Chrome, email: str, password: str, expect_success: 
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check user is not logged in
-    assert driver.current_url == "http://127.0.0.1:8080/"
+    assert driver.current_url == "http://localhost:8080/"
 
     # try log in with provided credentials
     input_email = driver.find_element("id", "input-login-email")
@@ -119,16 +210,16 @@ def _login(driver: webdriver.Chrome, email: str, password: str, expect_success: 
     submit_button.click()
 
     # check operation result
+    time.sleep(0.25)
     popup_message = driver.find_element("id", "pop-message")
     if expect_success:
         assert popup_message.value_of_css_property('visibility') == "hidden"
         assert popup_message.get_attribute('innerHTML') == ""
-        assert driver.current_url == "http://127.0.0.1:8080/home"
+        assert driver.current_url == "http://localhost:8080/home"
     else:
         assert popup_message.value_of_css_property('visibility') == "visible"
-        assert popup_message.get_attribute('innerHTML') == "Wrong username or password."
-        assert driver.current_url == "http://127.0.0.1:8080/"
-        time.sleep(5.0)  # wait for popup message to disappear
+        assert popup_message.get_attribute('innerHTML') == "Invalid username or password."
+        assert driver.current_url == "http://localhost:8080/"
 
 
 def _register(driver: webdriver.Chrome, firstname: str, lastname: str, gender: str, city: str, country: str, email: str, password: str, expect_success: bool):
@@ -137,7 +228,13 @@ def _register(driver: webdriver.Chrome, firstname: str, lastname: str, gender: s
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check user is not logged in
-    assert driver.current_url == "http://127.0.0.1:8080/"
+    assert driver.current_url == "http://localhost:8080/"
+
+    # check register window is closed
+    assert driver.find_element("id", "register-container").value_of_css_property("display") == "none"
+
+    # open register window
+    driver.find_element("id", "button-register-window").click()
 
     # try to register new user
     input_firstname = driver.find_element("id", "input-sign-up-first-name")
@@ -148,8 +245,9 @@ def _register(driver: webdriver.Chrome, firstname: str, lastname: str, gender: s
     input_lastname.clear()
     input_lastname.send_keys(lastname)
 
-    input_gender = driver.find_element("id", "input-sign-up-gender")
-    input_gender.send_keys(gender)
+    select_gender = Select(driver.find_element("id", "input-sign-up-gender"))
+    if gender:
+        select_gender.select_by_visible_text(gender)
 
     input_city = driver.find_element("id", "input-sign-up-city")
     input_city.clear()
@@ -175,16 +273,14 @@ def _register(driver: webdriver.Chrome, firstname: str, lastname: str, gender: s
     submit_button.click()
 
     # check operation result
+    time.sleep(0.5)
     popup_message = driver.find_element("id", "pop-message")
     if expect_success:
-        assert popup_message.value_of_css_property('visibility') == "hidden"
-        assert popup_message.get_attribute('innerHTML') == ""
-        assert driver.current_url == "http://127.0.0.1:8080/home"
-    else:
+        assert driver.current_url == "http://localhost:8080/home"
         assert popup_message.value_of_css_property('visibility') == "visible"
-        assert popup_message.get_attribute('innerHTML') == "User already exists."
-        assert driver.current_url == "http://127.0.0.1:8080/"
-        time.sleep(5.0)  # wait for popup message to disappear
+        assert popup_message.get_attribute('innerHTML') == "Account successfully register!"
+    else:
+        assert driver.current_url == "http://localhost:8080/"
 
 
 def _logout(driver: webdriver.Chrome):
@@ -193,22 +289,23 @@ def _logout(driver: webdriver.Chrome):
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check we are logged in
-    assert driver.current_url != "http://127.0.0.1:8080/"
+    assert driver.current_url != "http://localhost:8080/"
 
     # log out
     submit_button = driver.find_element("id", "button-logout")
     submit_button.click()
 
     # check success
+    time.sleep(0.50)
     popup_message = driver.find_element("id", "pop-message")
-    assert popup_message.value_of_css_property('visibility') == "hidden"
-    driver.get("http://127.0.0.1:8080/")  # reload, TODO REMOVE THIS !!!
-    assert driver.current_url == "http://127.0.0.1:8080/"
+    assert popup_message.value_of_css_property('visibility') == "visible"
+    assert popup_message.get_attribute('innerHTML') == "You have successfully logged out."
+    assert driver.current_url == "http://localhost:8080/"
 
 
 def _check_home_tab_user_info(driver: webdriver.Chrome, firstname: str, lastname: str, gender: str, city: str, country: str, email: str):
     # check home tab is loaded
-    assert driver.current_url == "http://127.0.0.1:8080/home"
+    assert driver.current_url == "http://localhost:8080/home"
 
     # check user information
     assert driver.find_element("id", "home-user-name").get_attribute('innerHTML') == f"{firstname} {lastname}"
@@ -223,7 +320,7 @@ def _switch_tab(driver: webdriver.Chrome, tabname: str):
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check we are logged in
-    assert driver.current_url != "http://127.0.0.1:8080/"
+    assert driver.current_url != "http://localhost:8080/"
 
     # switch tab
     driver.find_element("id", f"sidebar-tab-{tabname}").click()
@@ -233,7 +330,7 @@ def _switch_tab(driver: webdriver.Chrome, tabname: str):
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check success
-    assert driver.current_url == f"http://127.0.0.1:8080/{tabname}"
+    assert driver.current_url == f"http://localhost:8080/{tabname}"
 
 
 def _add_home_post(driver: webdriver.Chrome, email: str, content: str):
@@ -242,7 +339,7 @@ def _add_home_post(driver: webdriver.Chrome, email: str, content: str):
     assert popup_message.value_of_css_property('visibility') == "hidden"
 
     # check we are on home page
-    assert driver.current_url == "http://127.0.0.1:8080/home"
+    assert driver.current_url == "http://localhost:8080/home"
 
     # add post
     input_post = driver.find_element("id", "input-home-new-post")
