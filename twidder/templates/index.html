@@ -51,7 +51,7 @@
                     <input id="input-sign-up-password" required minlength="8" type="password" size="10"
                            onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');" placeholder="Password">
                     <input id="input-sign-up-password-repeat" required minlength="8" type="password" size="10"
-                           onKeyUp="checkSamePasswords('input-sign-up-password', 'input-sign-up-password-repeat');" placeholder="Repeat password">
+                           onKeyUp="checkSamePasswords('input-sign-up-password-repeat', 'input-sign-up-password');" placeholder="Repeat password">
                 </div>
                 <button id="button-register" type="submit" name="save" value="Save">Register</button>
             </form>
@@ -238,7 +238,7 @@
                                    onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');"
                                    placeholder="New password">
                             <input id="input-change-password-new-repeat" type="password" required size="10" minlength="8"
-                                   onKeyUp="checkSamePasswords('input-change-password-new', 'input-change-password-new-repeat');"
+                                   onKeyUp="checkSamePasswords('input-change-password-new-repeat', 'input-change-password-new');"
                                    placeholder="Repeat new password">
                             <button type="submit" name="save" value="Save">Change password</button>
                         </form>

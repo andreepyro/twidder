@@ -881,12 +881,10 @@ function postFileUpload(input, imageElementID, videoElementID, removeElementID) 
 function checkSamePasswords(htmlPassword, htmlPassword2) {
     let password1 = document.getElementById(htmlPassword);
     let password2 = document.getElementById(htmlPassword2);
+    password1.setCustomValidity(password1.value === "" || password1.value === password2.value || password2.value === "" ? "" : "Passwords doesn't match!")
     if (password1.value === password2.value) {
         password1.setCustomValidity("");
         password2.setCustomValidity("");
-    } else {
-        password1.setCustomValidity("Passwords doesn't match!");
-        password2.setCustomValidity("Passwords doesn't match!");
     }
 }
 
