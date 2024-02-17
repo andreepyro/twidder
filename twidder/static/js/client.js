@@ -205,38 +205,6 @@ async function reloadUserData() {
     }
 }
 
-function reloadWall(htmlWall, postTemplateHtml, posts, email) {
-// remove all old posts
-for (let i = htmlWall.children.length - 1; i >= 0; i--) {
-    let element = htmlWall.children[i];
-    if (element.classList.contains("user-post")) {
-        element.remove();
-    }
-}
-
-// sort posts by date
-posts.sort(function(a, b){
-  return new Date(b.created) - new Date(a.created);
-});
-
-// add new posts from template
-for (let i = 0; i < posts.length; i++) {
-    const newPostHtml = document.createElement("div");
-    newPostHtml.innerHTML = postTemplateHtml;
-    newPostHtml.classList.add("user-post");
-    newPostHtml.setAttribute("data-id", posts[i]["id"]);
-    newPostHtml.children[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
-    newPostHtml.children[1].innerHTML = posts[i]["author"];
-    let lines = posts[i]["content"].split("\n");
-    for (let j = 0; j < lines.length; j++) {
-        newPostHtml.children[2].appendChild(document.createTextNode(lines[j]));
-        newPostHtml.children[2].appendChild(document.createElement("br"));
-    }
-    newPostHtml.children[3].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
-    newPostHtml.children[4].style.display = posts[i]["author"] === email ? "block" : "none";
-    htmlWall.appendChild(newPostHtml);
-}
-}
 
 async function loadBrowseUser(userEmail) {
     console.log("Querying user data: " + userEmail);
