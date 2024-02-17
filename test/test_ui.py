@@ -16,7 +16,6 @@ def run_server():
     server.join()
 
 
-@pytest.mark.skip("to be fixed")
 def test_e2e_workflow():
     # create drive
     op = webdriver.ChromeOptions()

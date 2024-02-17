@@ -7,5 +7,4 @@ before_script:
 run tests:
     stage: test
     script:
-#        - python -m pytest
-        - echo "all ok"
+        - python -m pytest
