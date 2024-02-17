@@ -210,7 +210,7 @@ def _login(driver: webdriver.Chrome, email: str, password: str, expect_success: 
     submit_button.click()
 
     # check operation result
-    time.sleep(0.25)
+    time.sleep(1)
     popup_message = driver.find_element("id", "pop-message")
     if expect_success:
         assert popup_message.value_of_css_property('visibility') == "hidden"
@@ -273,7 +273,7 @@ def _register(driver: webdriver.Chrome, firstname: str, lastname: str, gender: s
     submit_button.click()
 
     # check operation result
-    time.sleep(0.5)
+    time.sleep(1)
     popup_message = driver.find_element("id", "pop-message")
     if expect_success:
         assert driver.current_url == "http://localhost:8080/home"
@@ -296,7 +296,7 @@ def _logout(driver: webdriver.Chrome):
     submit_button.click()
 
     # check success
-    time.sleep(0.50)
+    time.sleep(1)
     popup_message = driver.find_element("id", "pop-message")
     assert popup_message.value_of_css_property('visibility') == "visible"
     assert popup_message.get_attribute('innerHTML') == "You have successfully logged out."
