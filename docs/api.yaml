@@ -301,6 +301,9 @@ components:
         password:
           type: string
           format: password
+        image:
+          type: string
+          format: binary
     UserPost:
       type: object
       properties:
@@ -374,6 +377,9 @@ components:
               email:
                 type: string
                 format: email
+              image:
+                type: string
+                format: binary
             required:
               - firstname
               - lastna
@@ -381,6 +387,7 @@ components:
               - city
               - country
               - email
+              - image
     UserPosts:
       description: List of user posts
       content:
