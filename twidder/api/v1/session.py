@@ -25,15 +25,14 @@ def create_session(email: str, password: str):
 
 @blueprint.route("", methods=["GET"])
 @util.authorize_user
-@util.post_parameters(("email", str))
-def verify_session(email):
+def verify_session(user_email: str):
     """Verify existing session."""
-    hash = request.headers["hash"]
-    message = email + hash
-    hmac_server = hmac.new(bytes(hash, 'utf-8'), 
+    token = request.headers["Authorization"]
+    message = user_email + token
+    hmac_server = hmac.new(bytes(token, 'utf-8'), 
         msg=bytes(message, 'utf-8'), 
         digestmod=hashlib.sha256).hexdigest()
-    hmac_client = request.headers["Authorization"]
+    hmac_client = request.headers["Signature"]
     
     if hmac_server==hmac_client:
         return jsonify({"message": "successful verification"}), http.HTTPStatus.OK

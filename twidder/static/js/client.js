@@ -371,19 +371,20 @@ async function hmac_256(message, secret) {
     }
 
 
-async function our_fetch(data) {
-    secret = 3979603277027076904099697939399599359090590553500507050050775050 //temp value
-    message = data + secret
-    signature = hmac_256(message, secret)
-    console.log(data)
+async function our_fetch() {
+    let token = localStorage.getItem("token");
+    let user_email = localStorage.getItem("email");
+    message = user_email + token
+    signature = hmac_256(message, token)
+    console.log(signature)
 
     const response = await fetch("http://" + HOST + "/api/v1/session", {
         method: "POST",
         cache: "no-cache",
         headers: {
             "Content-Type": "application/json",
-            "Authorization"  : signature,
-            "hash": secret,
+            "Authorization"  : token,
+            "Signature": signature,
          },
         body: JSON.stringify({
             email: email, 
