@@ -1,6 +1,6 @@
 import http
 
-from flask import jsonify, Blueprint, current_app, request
+from flask import jsonify, Blueprint, current_app
 
 from twidder import database_handler, session_handler, util
 
@@ -143,8 +143,7 @@ def delete_user(user_email: str, target_user: str):
         return jsonify({"message": "couldn't delete user posts"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
     if not database_handler.delete_user_by_email(target_user):
         return jsonify({"message": "couldn't delete user"}), http.HTTPStatus.INTERNAL_SERVER_ERROR
-    session_id = request.headers["Authorization"]
-    session_handler.delete_session(session_id)
+    session_handler.delete_session(user_email)
     return jsonify({"message": "user successfully deleted"}), http.HTTPStatus.OK
 
 

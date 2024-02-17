@@ -1,6 +1,6 @@
 import http
 
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint
 
 from twidder import database_handler, session_handler, util
 
@@ -14,9 +14,9 @@ def create_session(email: str, password: str):
     user = database_handler.get_user_by_email(email)
 
     if user is not None and util.check_password(password, user["password"]):
-        token = session_handler.create_session(email)
+        session_id = session_handler.create_session(email)
         resp = jsonify({"message": "session successfully created"})
-        resp.headers["Authorization"] = token
+        resp.headers["Authorization"] = session_id
         return resp, http.HTTPStatus.CREATED
     return jsonify({"message": "invalid username or password"}), http.HTTPStatus.UNAUTHORIZED
 
@@ -25,8 +25,7 @@ def create_session(email: str, password: str):
 @util.authorize_user
 def delete_session(user_email: str):
     """Destroy existing session."""
-    session_id = request.headers["Authorization"]
-    session_handler.delete_session(session_id)
+    session_handler.delete_session(user_email)
     return jsonify({"message": "session successfully deleted"}), http.HTTPStatus.OK
 
 

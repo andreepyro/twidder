@@ -1,3 +1,5 @@
+import base64
+import json
 import time
 
 from flask import Flask
@@ -31,23 +33,27 @@ def get_page():
 
 @sock.route('/session')
 def session(ws):
-    session_id = ws.receive(timeout=10)
-    app.logger.info(f"new session request, {session_id=}")
-    if session_id is None:
+    # receive data
+    payload = ws.receive(timeout=10)
+    if payload is None:
         return
 
-    user_email = session_handler.get_email_from_session(session_id)
-    if user_email is None:
-        ws.send("faiL")
-        app.logger.info("no email found for this session id")
+    # decode the payload
+    data = json.loads(base64.b64decode(payload))
+    user_email, session_id = data["email"], data["session_id"]
+    app.logger.info(f"new session request, {user_email=}, {session_id=}")
+
+    if session_handler.get_session(user_email) != session_id:
+        ws.send("fail")
+        app.logger.info("session id doesn't match")
         return
 
-    app.logger.info(f"session id verified, {user_email=}")
+    app.logger.info(f"session id verified for {user_email=}")
     ws.send("ok")
-       
+
     while True:
         time.sleep(0.5)
-        if not session_handler.check_session(user_email, session_id):
+        if session_id != session_handler.get_session(user_email):
             app.logger.info(f"session {session_id=} expired, closing the socket")
             ws.close(message="session expired")
             time.sleep(10.0)  # NOTE: it takes some time for the socket to be closed successfully

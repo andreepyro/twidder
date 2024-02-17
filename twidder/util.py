@@ -1,8 +1,10 @@
+import base64
 import http
+import json
 
 import bcrypt
 from email_validator import validate_email, EmailNotValidError
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 
 from twidder import session_handler
 
@@ -11,11 +13,24 @@ def authorize_user(fun):
     """Decorator for user authorization. Makes sure only authorized users are let through. Adds user email to function parameters."""
 
     def wrapper(*args, **kwargs):
+        # check if Authorization header is present
         if "Authorization" not in request.headers:
             return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
-        session_id = request.headers["Authorization"]
-        user_email = session_handler.get_email_from_session(session_id)
-        if user_email is None:
+
+        # decode the payload
+        payload = request.headers["Authorization"]
+        data = json.loads(base64.b64decode(payload))
+        user_email, user_hash = data["email"], data["hash"]
+        current_app.logger.debug(f"authorizing request: {user_email=}, {user_hash=}")
+
+        # get user session
+        session_id = session_handler.get_session(user_email)
+        if session_id is None:
+            return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
+
+        # verify the hash
+        server_hash = user_hash  # TODO use HMAC !!!
+        if user_hash != server_hash:
             return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
         return fun(user_email, *args, **kwargs)
 

@@ -39,8 +39,12 @@ async function loadApp() {
 
     socket.onopen = (event) => {
         console.log("Socket is open");
-        // send the session id (token) to the server
-        socket.send(token);
+
+        let payload = btoa(JSON.stringify({
+            email: email, session_id: token,
+        }));
+
+        socket.send(payload);
     }
 
     socket.onmessage = (event) => {
@@ -188,16 +192,14 @@ async function reloadUserData() {
         method: "GET",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
     let userPostsRequest = fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: email}).toString(), {
         method: "GET",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
     let userDataResponse = await userDataRequest;
@@ -261,12 +263,12 @@ async function loadBrowseUser(userEmail) {
 
     let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
         method: "GET", cache: "no-cache", headers: {
-            "Content-Type": "application/json", "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
     let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
         method: "GET", cache: "no-cache", headers: {
-            "Content-Type": "application/json", "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
 
@@ -401,10 +403,11 @@ async function logout() {
     console.log("Log out request");
 
     let token = localStorage.getItem("token");
-    if (token != null) {
+    let email = localStorage.getItem("email");
+    if (token != null && email != null) {
         const response = await fetch("http://" + HOST + "/api/v1/session", {
             method: "DELETE", cache: "no-cache", headers: {
-                "Content-Type": "application/json", "Authorization": token,
+                "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
             },
         });
 
@@ -446,20 +449,20 @@ async function formEditAccountDetails(form) {
         return;
     }
 
+    let body = {
+        firstname: firstName,
+        lastname: lastName,
+        gender: gender,
+        city: city,
+        country: country,
+    };
     const response = await fetch("http://" + HOST + "/api/v1/users/" + email, {
         method: "PATCH",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
         },
-        body: JSON.stringify({
-            firstname: firstName,
-            lastname: lastName,
-            gender: gender,
-            city: city,
-            country: country,
-        }),
+        body: JSON.stringify(body),
     });
 
     if (response.status === 403) {
@@ -560,8 +563,7 @@ async function buttonDeleteUserAccount() {
         method: "DELETE",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
 
@@ -643,18 +645,18 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, ima
         return false;
     }
 
+    let body = {
+        email: userEmail,
+        message: content,
+        media: image != null ? image : video  // NOTE: here we assume that only image or video or none of those is provided
+    };
     const response = await fetch("http://" + HOST + "/api/v1/posts", {
         method: "POST",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
         },
-        body: JSON.stringify({
-            email: userEmail,
-            message: content,
-            media: image != null ? image : video  // NOTE: here we assume that only image or video or none of those is provided
-        }),
+        body: JSON.stringify(body),
     });
 
     if (response.status === 403) {
@@ -726,6 +728,12 @@ async function buttonDeletePost(button) {
         return;
     }
 
+    let email = localStorage.getItem("email");
+    if (email == null) {
+        showError("Error: couldn't load user email");
+        return;
+    }
+
     let postID = button.parentElement.getAttribute("data-id");
     console.log("Delete post, post id: " + postID);
 
@@ -733,8 +741,7 @@ async function buttonDeletePost(button) {
         method: "DELETE",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
+            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
         },
     });
     if (response.status === 404) {
@@ -798,16 +805,17 @@ function userImageUpload(input) {
 
     let reader = new FileReader();
     reader.onloadend = function () {
+        let body = {
+            image: reader.result,
+        };
+
         fetch("http://" + HOST + "/api/v1/users/" + email, {
             method: "PATCH",
             cache: "no-cache",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": token,
+                "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
             },
-            body: JSON.stringify({
-                image: reader.result,
-            }),
+            body: JSON.stringify(body),
         }).then(function (response) {
             if (response.status !== 200) {
                 showError("Unexpected error");
@@ -1030,4 +1038,13 @@ async function formRegister(form) {
 
 function getDateTimeFormat(date) {
     return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + (date.getHours() < 10 ? " 0" : " ") + date.getHours() + (date.getMinutes() < 10 ? ":0" : ":") + date.getMinutes();
+}
+
+// authorization
+
+function getAuthorizationHeader(userEmail, sessionID, payload) {
+    let hash = "abcdef"; // TODO use HMAC to create the hash
+    return btoa(JSON.stringify({
+        email: userEmail, hash: hash,
+    }))
 }
