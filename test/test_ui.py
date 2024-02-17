@@ -16,12 +16,12 @@ def run_server():
     server.join()
 
 
-@pytest.mark.skip("to be fixed")
 def test_e2e_workflow():
     # create drive
-    op = webdriver.ChromeOptions()
-    op.add_argument('headless')
-    driver = webdriver.Chrome(options=op)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get("http://127.0.0.1:8080/")
 
     driver.implicitly_wait(5.0)
