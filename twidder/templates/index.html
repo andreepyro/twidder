@@ -38,7 +38,9 @@
                 </div>
                 <div>
                     <input id="input-sign-up-city" required type="text" size="10" placeholder="City">
-                    <input id="input-sign-up-country" required type="text" size="10" placeholder="Country">
+                    <input id="input-sign-up-country" required type="text" class="autocomplete-input" size="10" placeholder="Search for country">
+                    <ul class="autocomplete-list" id="country-list">
+                      <ul/>
                 </div>
                 <div>
                     <select id="input-sign-up-gender" onpageshow="checkValidGender(this);" onChange="checkValidGender(this);">

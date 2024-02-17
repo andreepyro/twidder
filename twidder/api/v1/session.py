@@ -27,12 +27,11 @@ def create_session(email: str, password: str):
 @util.authorize_user
 def verify_session(user_email: str):
     """Verify existing session."""
-    token = request.headers["Authorization"]
-    message = user_email + token
+    token = request.headers["Authorization"] #session id
     hmac_server = hmac.new(bytes(token, 'utf-8'), 
-        msg=bytes(message, 'utf-8'), 
+        msg=bytes(user_email, 'utf-8'), 
         digestmod=hashlib.sha256).hexdigest()
-    hmac_client = request.headers["Signature"]
+    hmac_client = request.headers["Authorization"]
     
     if hmac_server==hmac_client:
         return jsonify({"message": "successful verification"}), http.HTTPStatus.OK

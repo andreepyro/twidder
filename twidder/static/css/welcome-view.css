@@ -189,6 +189,30 @@
     font-size: 13px;
 }
 
+
+.autocomplete-list {
+    display: inline-block;
+    overflow-y: auto;
+    align-items: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: aqua;
+    width: calc(100%-5px);
+    max-height: 200px;
+    
+}
+
+.autocomplete-list li{
+    display: inline-block;
+    color: black;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+    padding: 15px;
+    width: calc(100%-30px);
+    font-weight:bolder;
+    cursor: pointer;
+}
 #form-register button {
     width: 464px;
     height: 36px;
