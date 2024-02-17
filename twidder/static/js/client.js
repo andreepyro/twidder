@@ -102,6 +102,9 @@ function showWelcomeView() {
 async function showUserView() {
     console.log("Loading user view");
 
+    // load user content
+    await reloadUserData();
+
     // load view
     document.getElementById("welcome-view").style.display = "none";
     document.getElementById("user-view").style.display = "block";
@@ -112,9 +115,6 @@ async function showUserView() {
     else if (window.location.pathname === "/account") showTab("account");
     else showTab("home");
     // TODO if path doesn't exists, show # 404 PAGE NOT FOUND ERROR ???
-
-    // show user content
-    await reloadUserData();
 }
 
 function showTab(tabName) {
