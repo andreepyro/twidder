@@ -107,6 +107,7 @@ async function showUserView() {
     if (window.location.pathname === "/browse") showTab("browse");
     else if (window.location.pathname === "/account") showTab("account");
     else showTab("home");
+    // TODO if path doesn't exists, show # 404 PAGE NOT FOUND ERROR ???
 
     // show user content
     await reloadUserData();

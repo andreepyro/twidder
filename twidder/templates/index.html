@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link href="./static/css/shared.css" type="text/css" rel="stylesheet">
-    <link href="./static/css/welcome-view.css" type="text/css" rel="stylesheet">
-    <link href="./static/css/user-view.css" type="text/css" rel="stylesheet">
-    <script src="./static/js/client.js"></script>
+    <link href="/static/css/shared.css" type="text/css" rel="stylesheet">
+    <link href="/static/css/welcome-view.css" type="text/css" rel="stylesheet">
+    <link href="/static/css/user-view.css" type="text/css" rel="stylesheet">
+    <script src="/static/js/client.js"></script>
     <title>Twidder</title>
-    <link rel="icon" type="image/x-icon" href="./static/src/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/static/src/favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
     <script id="welcome-view" type=”text/view”>
-        <img id="image-twidder-logo" src="./static/src/logo.png" alt="twidder logo" width="170" height="170">
+        <img id="image-twidder-logo" src="/static/src/logo.png" alt="twidder logo" width="170" height="170">
         <div id="login-container">
             <form id="form-login" action="#" onsubmit="formLogin(this);return false;">
                 <input id="input-login-email" type="email" size="10" required placeholder="e-mail">
@@ -58,7 +58,7 @@
     </script>
     <script id="user-view" type=”text/view”>
     <div id="sidebar">
-        <img src="./static/src/logo.png" alt="twidder logo" width="64" height="64">
+        <img src="/static/src/logo.png" alt="twidder logo" width="64" height="64">
         <a id="sidebar-tab-home" class="active" href="#" onclick="showTab('home'); return false;">Home</a>
         <a id="sidebar-tab-browse" href="#" onclick="showTab('browse'); return false;">Browse</a>
         <a id="sidebar-tab-account" href="#" onclick="showTab('account'); return false;">Account</a>
@@ -77,7 +77,7 @@
         </svg>
         <div id="home-user-page">
           <div id="home-user-page-user-info">
-            <img id="home-user-image" alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
+            <img id="home-user-image" alt="user profile picture" src="/static/src/user-solid.svg" width="128" height="128">
             <div id="home-user-name">Name</div>
             <div id="home-user-gender">Gender</div>
             <div id="home-user-email">Email</div>
@@ -139,7 +139,7 @@
         <div id="browse-user-background"></div>
         <div id="container-user-page">
           <div id="browse-container-user-info">
-            <img id="browse-user-image" alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
+            <img id="browse-user-image" alt="user profile picture" src="/static/src/user-solid.svg" width="128" height="128">
             <div id="browse-user-name">Name</div>
             <div id="browse-user-gender">Gender</div>
             <div id="browse-user-email">Email</div>
@@ -196,7 +196,7 @@
             <div id="account-container">
                 <div id="account-info">
                     <label for="account-user-image-upload">
-                        <img id="account-user-image" alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
+                        <img id="account-user-image" alt="user profile picture" src="/static/src/user-solid.svg" width="128" height="128">
                     </label>
                     <input id="account-user-image-upload" accept="image/*,image/heif,image/heic" type="file" onchange="userImageUpload(this);"/>
                 </div>
@@ -239,7 +239,7 @@
     </div>
     </script>
     <div id="content">
-        <img id="loading-logo" src="./static/src/logo.png" alt="twidder logo" width="170" height="170">
+        <img id="loading-logo" src="/static/src/logo.png" alt="twidder logo" width="170" height="170">
         <p id="loading-text-title">Twidder</p>
         <p id="loading-text-description">The page is loading...</p>
     </div>

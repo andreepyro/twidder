@@ -1,34 +1,22 @@
 import base64
+import http
 import json
 import time
 
-from flask import Flask
-from flask import render_template, send_file
+from flask import Flask, send_file
 from flask_sock import Sock
 
 from twidder import session_handler
-from twidder.api.v1.posts import blueprint as api_v1_posts
-from twidder.api.v1.session import blueprint as api_v1_session
-from twidder.api.v1.users import blueprint as api_v1_users
+from twidder.api.api import blueprint as api
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
+app.register_blueprint(api, url_prefix="/api")
+
 sock = Sock(app)
 
 app.config["MIN_PASSWORD_LENGTH"] = 8
 app.config["DATABASE_FILE"] = "./database.db"
 app.config["DATABASE_SCHEMA"] = "./twidder/schema.sql"
-
-app.register_blueprint(api_v1_session, url_prefix="/api/v1/session")
-app.register_blueprint(api_v1_users, url_prefix="/api/v1/users")
-app.register_blueprint(api_v1_posts, url_prefix="/api/v1/posts")
-
-
-@app.route('/')
-@app.route('/home')
-@app.route('/browse')
-@app.route('/account')
-def get_page():
-    return send_file("templates/index.html")
 
 
 @sock.route('/session')
@@ -60,11 +48,12 @@ def session(ws):
             return
 
 
-@app.errorhandler(404)
-def not_found(e):
-    return render_template("404.html")  # TODO IMPLEMENT ME
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def get_page(path: str):
+    return send_file("templates/index.html")
 
 
-@app.errorhandler(500)
+@app.errorhandler(http.HTTPStatus.INTERNAL_SERVER_ERROR)
 def not_found(e):
-    return render_template("500.html")  # TODO IMPLEMENT ME
+    return send_file("templates/500.html")
