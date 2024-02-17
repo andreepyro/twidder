@@ -85,7 +85,9 @@ function showWelcomeView() {
     console.log("Loading welcome view");
 
     // load view
-    document.getElementById("content").innerHTML = document.getElementById("welcome-view").innerHTML;
+    document.getElementById("welcome-view").style.display = "block";
+    document.getElementById("user-view").style.display = "none";
+    document.getElementById("loading-view").style.display = "none";
 
     // history API
     history.pushState("welcome", "", "/");
@@ -101,7 +103,9 @@ async function showUserView() {
     console.log("Loading user view");
 
     // load view
-    document.getElementById("content").innerHTML = document.getElementById("user-view").innerHTML;
+    document.getElementById("welcome-view").style.display = "none";
+    document.getElementById("user-view").style.display = "block";
+    document.getElementById("loading-view").style.display = "none";
 
     // history API
     if (window.location.pathname === "/browse") showTab("browse");

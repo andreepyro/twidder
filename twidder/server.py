@@ -42,7 +42,7 @@ def session(ws):
     while True:
         time.sleep(0.5)
         if session_id != session_handler.get_session(user_email):
-            app.logger.info(f"session {session_id=} expired, closing the socket")
+            app.logger.debug(f"session expired: {user_email=}, {session_id=}, closing the socket")
             ws.close(message="session expired")
             time.sleep(10.0)  # NOTE: it takes some time for the socket to be closed successfully
             return
