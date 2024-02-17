@@ -216,7 +216,7 @@ async function reloadUserData() {
     document.getElementById("home-user-gender").innerHTML = user.gender;
     document.getElementById("home-user-location").innerHTML = user.city + ", " + user.country;
     document.getElementById("home-user-email").innerHTML = user.email;
-    document.getElementById("home-user-image").src = getProfilePicturePath(user.gender);
+    setProfilePicture("home-user-image", user.image, user.gender);
 
     // Account tab
     document.getElementById("input-account-first-name").value = user.firstname;
@@ -225,7 +225,7 @@ async function reloadUserData() {
     document.getElementById("input-account-country").value = user.country;
     document.getElementById("input-account-gender").value = user.gender;
     document.getElementById("account-email").innerHTML = user.email;
-    document.getElementById("account-user-image").src = getProfilePicturePath(user.gender);
+    setProfilePicture("account-user-image", user.image, user.gender);
 
     // User's posts
     reloadWall(
@@ -292,7 +292,7 @@ async function loadBrowseUser(userEmail) {
     document.getElementById("browse-user-gender").innerHTML = userData.gender;
     document.getElementById("browse-user-location").innerHTML = userData.city + ", " + userData.country;
     document.getElementById("browse-user-email").innerHTML = userData.email;
-    document.getElementById("browse-user-image").src = getProfilePicturePath(userData.gender);
+    setProfilePicture("browse-user-image", userData.image, userData.gender);
 
     // User posts
     reloadWall(
@@ -473,10 +473,12 @@ async function formEditAccountDetails(form) {
     document.getElementById("home-user-name").innerHTML = firstName + " " + lastName;
     document.getElementById("home-user-gender").innerHTML = gender;
     document.getElementById("home-user-location").innerHTML = city + ", " + country;
-    document.getElementById("home-user-image").src = getProfilePicturePath(gender);
 
-    // update picture in account tab
-    document.getElementById("account-user-image").src = getProfilePicturePath(gender);
+    // update profile picture (only if it is not set yet)
+    if (!document.getElementById("account-user-image").src.startsWith("data:image")) {
+        setProfilePicture("home-user-image", null, gender);
+        setProfilePicture("account-user-image", null, gender);
+    }
 
     showSuccess("Account details successfully changed!");
 }
@@ -756,10 +758,68 @@ async function buttonDeletePost(button) {
     }, 500);
 }
 
-function getProfilePicturePath(gender) {
-    if (gender === "Male") return "./static/src/user-male.svg";
-    else if (gender === "Female") return "./static/src/user-female.svg";
-    else return "./static/src/user-solid.svg";
+function setProfilePicture(elementID, imageData, gender) {
+    let imageElement = document.getElementById(elementID);
+    if (imageData != null) {
+        imageElement.src = imageData;
+    } else {
+        switch (gender) {
+            case 'Male':
+                imageElement.src = "./static/src/user-male.svg";
+                break;
+            case 'Female':
+                imageElement.src = "./static/src/user-female.svg";
+                break;
+            default:
+                imageElement.src = "./static/src/user-solid.svg";
+        }
+    }
+}
+
+function userImageUpload(input) {
+    let token = localStorage.getItem("token");
+    if (token == null) {
+        showError("Error: couldn't load token");
+        return;
+    }
+
+    let email = localStorage.getItem("email");
+    if (email == null) {
+        showError("Error: couldn't load user email");
+        return;
+    }
+
+    let file = input.files[0];
+    if (!file.type.match('image.*')) {
+        showError("Only image file can be uploaded!");
+        input.value = null;
+        return;
+    }
+
+    let reader = new FileReader();
+    reader.onloadend = function () {
+        fetch("http://" + HOST + "/api/v1/users/" + email, {
+            method: "PATCH",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token,
+            },
+            body: JSON.stringify({
+                image: reader.result,
+            }),
+        }).then(function (response) {
+            if (response.status !== 200) {
+                showError("Unexpected error");
+                return;
+            }
+
+            // update UI
+            document.getElementById("account-user-image").src = reader.result;
+            document.getElementById("home-user-image").src = reader.result;
+        });
+    }
+    reader.readAsDataURL(file);
 }
 
 function postFileUpload(input, imageElementID, videoElementID, removeElementID) {

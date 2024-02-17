@@ -195,7 +195,10 @@
         <div id="account-window">
             <div id="account-container">
                 <div id="account-info">
-                    <img id="account-user-image" alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
+                    <label for="account-user-image-upload">
+                        <img id="account-user-image" alt="user profile picture" src="./static/src/user-solid.svg" width="128" height="128">
+                    </label>
+                    <input id="account-user-image-upload" accept="image/*,image/heif,image/heic" type="file" onchange="userImageUpload(this);"/>
                 </div>
                 <form id="form-account-details" action="#" onsubmit="formEditAccountDetails(this);return false;">
                     <p id="title-account-details">Account details</p>

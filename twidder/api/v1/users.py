@@ -47,15 +47,16 @@ def get_user(user_email: str, target_user: str):
         "city": user["city"],
         "country": user["country"],
         "email": user["email"],
+        "image": user["image"],
     }), http.HTTPStatus.OK
 
 
 @blueprint.route('/<string:target_user>', methods=["PATCH"])
 @util.authorize_user
 @util.patch_parameters(("email", str), ("old_password", str), ("new_password", str), ("firstname", str), ("lastname", str), ("gender", str), ("city", str),
-                       ("country", str))
+                       ("country", str), ("image", str))
 def update_user(user_email: str, email: str | None, old_password: str | None, new_password: str | None, firstname: str | None, lastname: str | None,
-                gender: str | None, city: str | None, country: str | None, target_user: str):
+                gender: str | None, city: str | None, country: str | None, image: bytes | None, target_user: str):
     """Update user information."""
     user = database_handler.get_user_by_email(target_user)
     if user is None:
@@ -109,6 +110,9 @@ def update_user(user_email: str, email: str | None, old_password: str | None, ne
         # if database_handler.get_user(email) is not None:
         #     return jsonify({"message": "user with the same email already exists"}), http.HTTPStatus.CONFLICT
         # user["email"] = email
+
+    if image is not None:
+        user["image"] = image
 
     if database_handler.update_user_by_email(
             user_email,
