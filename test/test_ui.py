@@ -18,9 +18,9 @@ def run_server():
 
 def test_e2e_workflow():
     # create drive
-    op = webdriver.ChromeOptions()
+    op = webdriver.FirefoxOptions()
     op.add_argument('headless')
-    driver = webdriver.Chrome(options=op)
+    driver = webdriver.Firefox(options=op)
     driver.get("http://127.0.0.1:8080/")
 
     driver.implicitly_wait(5.0)
