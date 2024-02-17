@@ -16,6 +16,7 @@ create table if not exists post (
   	content text NOT NULL,
   	created datetime NOT NULL,
   	edited datetime,
+    media blob,
   	foreign key(author) references user(email),
   	foreign key(user) references user(email)
 );
