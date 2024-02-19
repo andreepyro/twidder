@@ -361,7 +361,8 @@ function reloadWall(htmlWall, postTemplateHtml, posts, email) {
         }
 
         // start animation
-        newPostHtml.getElementsByClassName("button-edit")[0].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
+        newPostHtml.getElementsByClassName("button-edit")[0].style.display = "none"; // NOTE: hiding edit button until the feature is implemented
+        // newPostHtml.getElementsByClassName("button-edit")[0].style.display = posts[i]["author"] === email || posts[i]["user"] === email ? "block" : "none";
         newPostHtml.getElementsByClassName("button-delete")[0].style.display = posts[i]["author"] === email ? "block" : "none";
 
         htmlWall.appendChild(newPostHtml);
@@ -699,6 +700,9 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, ima
         newPostHtml.getElementsByClassName("content")[0].appendChild(document.createTextNode(lines[j]));
         newPostHtml.getElementsByClassName("content")[0].appendChild(document.createElement("br"));
     }
+
+    // NOTE: hiding edit button until the feature is implemented
+    newPostHtml.getElementsByClassName("button-edit")[0].style.display = "none"
 
     // animation
     newPostHtml.style.animation = "post-appear 0.75s";
