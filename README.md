@@ -1,25 +1,25 @@
 # Twidder
 
-Twidder project consists of a client-side single-page web application and a backend.
+This project was developed as a part of the Web Programming (TDDD97) course at [Linköping University](https://liu.se/).
 
-The project was created as a part of the Web Programming (TDDD97) course at [Linköping University](https://liu.se/)
+The project presents an HTML5 Single-page application with Python backend and SQLite database.
 
-## Requirements
+## Prerequisites
 
-- Python packages specified in `requirements.py`
+- Linux OS
+- Python 3.10
+- Python packages listed in `requirements.txt`
+    - Install with: ```pip install -r requirements.txt```
+- Gunicorn
+    - See [Installation instructions](https://docs.gunicorn.org/en/stable/install.html)
 
-- `gunicorn`
+## Run tests
 
-## Run
+- Run tests by running ```pytest``` in the root folder of this repository
 
-### Debug
+## Run project
 
-```bash
-python3 ./appserver.py
-```
-
-### Gunicorn
-
-```bash
-./run.sh
-```
+- Run the server using one of the following commands:
+    - ```python3 ./appserver.py``` for development
+    - ```./run.sh``` for production
+- Access the application on http://localhost:8080/
