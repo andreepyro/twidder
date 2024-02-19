@@ -761,9 +761,10 @@ async function buttonDeletePost(button) {
     }
 
     // show animation
-    button.parentElement.style.animation = "post-disappear 0.25s 0.25s";
-    button.parentElement.children[3].style.animation = "post-disappear-inner 0.50s";
-    button.parentElement.children[4].style.animation = "post-disappear-inner 0.50s";
+    button.parentElement.style.animation = "post-disappear 0.50s";
+    button.parentElement.getElementsByClassName("content")[0].style.animation = "post-disappear-content 0.50";
+    button.parentElement.getElementsByClassName("button-edit")[0].style.animation = "post-disappear-inner 0.50s";
+    button.parentElement.getElementsByClassName("button-delete")[0].style.animation = "post-disappear-inner 0.00s";
 
     // remove element eventually
     setTimeout(function () {
