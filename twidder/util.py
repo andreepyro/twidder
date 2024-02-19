@@ -89,6 +89,12 @@ def patch_parameters(*params):
 
 
 def hash_password(password: str) -> str:
+    """
+    Hash password using bcrypt library.
+
+    :param password: plain text password
+    :return: hashed password
+    """
     password_b = bytes(password, "utf-8")
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password_b, salt)
@@ -96,12 +102,25 @@ def hash_password(password: str) -> str:
 
 
 def check_password(password: str, hashed_password: str) -> bool:
+    """
+    Check if a given plain text password matches given password hash.
+
+    :param password: plain text password
+    :param hashed_password: hashed password
+    :return: True if password matches the hash, False otherwise
+    """
     password_b = bytes(password, "utf-8")
     hashed_password_b = bytes(hashed_password, "utf-8")
     return bcrypt.checkpw(password_b, hashed_password_b)
 
 
 def is_email_valid(email: str) -> bool:
+    """
+    Check if a given string is a valid email address.
+
+    :param email: email address
+    :return: True if email is valid, False otherwise
+    """
     try:
         validate_email(email, check_deliverability=False)
         return True
