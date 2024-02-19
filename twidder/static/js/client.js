@@ -114,7 +114,6 @@ async function showUserView() {
     if (window.location.pathname === "/browse") showTab("browse");
     else if (window.location.pathname === "/account") showTab("account");
     else showTab("home");
-    // TODO if path doesn't exists, show # 404 PAGE NOT FOUND ERROR ???
 }
 
 function showTab(tabName) {
@@ -333,7 +332,7 @@ function reloadWall(htmlWall, postTemplateHtml, posts, email) {
 
         // general information
         newPostHtml.setAttribute("data-id", posts[i]["id"]);
-        newPostHtml.getElementsByClassName("time")[0].innerHTML = getDateTimeFormat(new Date(posts[i]["edited"])); // TODO show icon for edited posts
+        newPostHtml.getElementsByClassName("time")[0].innerHTML = getDateTimeFormat(new Date(posts[i]["created"]));
         newPostHtml.getElementsByClassName("author")[0].innerHTML = posts[i]["author"];
 
         // show media
@@ -549,8 +548,6 @@ async function formChangePassword(form) {
 
 async function buttonDeleteUserAccount() {
     console.log("Delete account request");
-
-    // TODO ask user if they are sure
 
     let token = localStorage.getItem("token");
     if (token == null) {

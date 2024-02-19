@@ -101,7 +101,6 @@ def update_user(user_email: str, email: str | None, old_password: str | None, ne
         user["country"] = country
 
     if email is not None:
-        # TODO implement
         # NOTE: currently, email is used as primary key in our database, so it cannot be updated
         # also, it's used as primary key in our API
         return jsonify({"message": "email can not be updated"}), http.HTTPStatus.FORBIDDEN
