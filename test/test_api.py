@@ -1,8 +1,8 @@
 import http
+import time
 from multiprocessing import Process
 
 import pytest
-import time
 import requests
 
 from twidder.database_handler import initialize_database, clear_database
@@ -23,16 +23,14 @@ def run_server():
     server.join()
 
 
-@pytest.mark.skip("Not implemented yet")
 def test_invalid_api_route():
+    # make sure that non-existent /api requests fail with BAD_REQUEST response
     response = requests.get("http://localhost:8080/api/v1/nonexisting/route")
-    assert response.status_code == http.HTTPStatus.NOT_FOUND
-    # make sure generic NOT FOUND page is shown (not the custom page for frontend)
-    assert response.text == "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
+    assert response.status_code == http.HTTPStatus.BAD_REQUEST
+    assert response.json() == {"message": "bad request"}
 
 
 def test_invalid_general_route():
+    # make sure that non-existent page succeeds with OK response
     response = requests.get("http://localhost:8080/nonexisting/route")
     assert response.status_code == http.HTTPStatus.OK
-    # make sure custom NOT FOUND page is shown
-    assert response.text != "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n"
