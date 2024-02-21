@@ -3,8 +3,9 @@ const HOST = "localhost:8080";
 const POPUP_MESSAGE_TIME = 4500
 
 // App state management
+
 window.onload = function() {
-    loadApp().then();
+    loadApp().then(); 
 };
 
 window.onpopstate = function (e) {
@@ -196,14 +197,14 @@ async function reloadUserData() {
         method: "GET",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
     let userPostsRequest = fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: email}).toString(), {
         method: "GET",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
     let userDataResponse = await userDataRequest;
@@ -267,12 +268,12 @@ async function loadBrowseUser(userEmail) {
 
     let userDataRequest = fetch("http://" + HOST + "/api/v1/users/" + userEmail, {
         method: "GET", cache: "no-cache", headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
     let userPostsRequest = await fetch("http://" + HOST + "/api/v1/posts?" + new URLSearchParams({user_email: userEmail}).toString(), {
         method: "GET", cache: "no-cache", headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
 
@@ -412,7 +413,7 @@ async function logout() {
     if (token != null && email != null) {
         const response = await fetch("http://" + HOST + "/api/v1/session", {
             method: "DELETE", cache: "no-cache", headers: {
-                "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+                "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
             },
         });
 
@@ -465,7 +466,7 @@ async function formEditAccountDetails(form) {
         method: "PATCH",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, body),
         },
         body: JSON.stringify(body),
     });
@@ -566,7 +567,7 @@ async function buttonDeleteUserAccount() {
         method: "DELETE",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
 
@@ -657,7 +658,7 @@ async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, ima
         method: "POST",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, body),
         },
         body: JSON.stringify(body),
     });
@@ -747,7 +748,7 @@ async function buttonDeletePost(button) {
         method: "DELETE",
         cache: "no-cache",
         headers: {
-            "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, null),
+            "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, null),
         },
     });
     if (response.status === 404) {
@@ -811,7 +812,7 @@ function userImageUpload(input) {
     }
 
     let reader = new FileReader();
-    reader.onloadend = function () {
+    reader.onloadend = async function () {
         let body = {
             image: reader.result,
         };
@@ -820,7 +821,7 @@ function userImageUpload(input) {
             method: "PATCH",
             cache: "no-cache",
             headers: {
-                "Content-Type": "application/json", "Authorization": getAuthorizationHeader(email, token, body),
+                "Content-Type": "application/json", "Authorization": await getAuthorizationHeader(email, token, body),
             },
             body: JSON.stringify(body),
         }).then(function (response) {
@@ -1046,10 +1047,38 @@ function getDateTimeFormat(date) {
 }
 
 // authorization
+async function getAuthorizationHeader(userEmail, sessionID, payload) {
+    let message = payload != null ? JSON.stringify(payload) : "";
 
-function getAuthorizationHeader(userEmail, sessionID, payload) {
-    let hash = "abcdef"; // TODO use HMAC to create the hash
+    // implementation from https://stackoverflow.com/a/76117805
+    const encoder = new TextEncoder();
+    const payload_encode = encoder.encode(message);
+    const sessionID_encode = encoder.encode(sessionID);
+
+    // Import the secretKey as a CryptoKey
+    const cryptoKey = await window.crypto.subtle.importKey(
+        "raw",
+        sessionID_encode,
+        {name: "HMAC", hash: "SHA-256"},
+        false,
+        ["sign"]
+    );
+
+    // Sign the payload with hmac and cryptokey
+    const signature = await window.crypto.subtle.sign(
+        "HMAC",
+        cryptoKey,
+        payload_encode
+    );
+
+    // Convert the signature ArrayBuffer to a hex string
+    const hash = Array.from(new Uint8Array(signature));
+    const hashHex = hash
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
     return btoa(JSON.stringify({
-        email: userEmail, hash: hash,
-    }))
+        email: userEmail, hash: hashHex,
+    }));
 }
+    
