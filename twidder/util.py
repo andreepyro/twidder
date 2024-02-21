@@ -1,8 +1,8 @@
 import base64
+import hashlib
+import hmac
 import http
 import json
-import hmac
-import hashlib
 
 import bcrypt
 from email_validator import validate_email, EmailNotValidError
@@ -32,12 +32,12 @@ def authorize_user(fun):
         if session_id is None:
             return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
 
-        #create server hmac
+        # create server hmac
         server_hash = hmac.new(
-            session_id.encode('utf-8'), 
+            session_id.encode("utf-8"),
             body, 
             hashlib.sha256
-            ).hexdigest()
+        ).hexdigest()
         
         # verify the hash
         if user_hash != server_hash:

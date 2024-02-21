@@ -2,7 +2,6 @@
 const HOST = "localhost:8080";
 const POPUP_MESSAGE_TIME = 4500
 
-
 // App state management
 
 window.onload = function() {
@@ -1048,40 +1047,38 @@ function getDateTimeFormat(date) {
 }
 
 // authorization
-//Code in function below taken from Stackoverflow in order to create an HMAC with TextEncoder https://stackoverflow.com/a/76117805 
 async function getAuthorizationHeader(userEmail, sessionID, payload) {
-        let message = payload!= null ? 
-        JSON.stringify(payload): "";
+    let message = payload != null ? JSON.stringify(payload) : "";
 
-        const encoder = new TextEncoder();
-        const payload_encode = encoder.encode(message);
-        const sessionID_encode = encoder.encode(sessionID);
-        
-        // create a cryptokey from session id
-        const cryptoKey = await window.crypto.subtle.importKey(
-            "raw",
-            sessionID_encode,
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["sign"]
-        );
-    
-        // Sign the payload with hmac and cryptokey
-        const signature = await window.crypto.subtle.sign(
-            "HMAC",
-            cryptoKey,
-            payload_encode
-        );
-    
-        // Convert the signature ArrayBuffer to a hex string
-        const hash = Array.from(new Uint8Array(signature));
-        const hashHex = hash
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-            
-        return btoa(JSON.stringify({
-                email: userEmail, hash: hashHex,
-            }))  
-   
+    // implementation from https://stackoverflow.com/a/76117805
+    const encoder = new TextEncoder();
+    const payload_encode = encoder.encode(message);
+    const sessionID_encode = encoder.encode(sessionID);
+
+    // Import the secretKey as a CryptoKey
+    const cryptoKey = await window.crypto.subtle.importKey(
+        "raw",
+        sessionID_encode,
+        {name: "HMAC", hash: "SHA-256"},
+        false,
+        ["sign"]
+    );
+
+    // Sign the payload with hmac and cryptokey
+    const signature = await window.crypto.subtle.sign(
+        "HMAC",
+        cryptoKey,
+        payload_encode
+    );
+
+    // Convert the signature ArrayBuffer to a hex string
+    const hash = Array.from(new Uint8Array(signature));
+    const hashHex = hash
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+    return btoa(JSON.stringify({
+        email: userEmail, hash: hashHex,
+    }));
 }
     
