@@ -15,33 +15,36 @@ def authorize_user(fun):
     """Decorator for user authorization. Makes sure only authorized users are let through. Adds user email to function parameters."""
 
     def wrapper(*args, **kwargs):
-        # check if Authorization header is present
-        if "Authorization" not in request.headers:
-            return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
+        try:
+            # check if Authorization header is present
+            if "Authorization" not in request.headers:
+                return jsonify({"message": "Authorization header is missing"}), http.HTTPStatus.UNAUTHORIZED
 
-        # decode the payload
-        payload = request.headers["Authorization"]
-        data = json.loads(base64.b64decode(payload))
-        body = request.get_data()
+            # decode the payload
+            payload = request.headers["Authorization"]
+            data = json.loads(base64.b64decode(payload))
+            body = request.get_data()
 
-        user_email, user_hash = data["email"], data["hash"]
-        current_app.logger.debug(f"authorizing request: {user_email=}, {user_hash=}")
-      
-        # get user session
-        session_id = session_handler.get_session(user_email)
-        if session_id is None:
-            return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
-
-        # create server hmac
-        server_hash = hmac.new(
-            session_id.encode("utf-8"),
-            body, 
-            hashlib.sha256
-        ).hexdigest()
+            user_email, user_hash = data["email"], data["hash"]
+            current_app.logger.debug(f"authorizing request: {user_email=}, {user_hash=}")
         
-        # verify the hash
-        if user_hash != server_hash:
-            return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
+            # get user session
+            session_id = session_handler.get_session(user_email)
+            if session_id is None:
+                return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
+
+            # create server hmac
+            server_hash = hmac.new(
+                session_id.encode("utf-8"),
+                body, 
+                hashlib.sha256
+            ).hexdigest()
+            
+            # verify the hash
+            if user_hash != server_hash:
+                return jsonify({"message": "invalid token"}), http.HTTPStatus.UNAUTHORIZED
+        except Exception as e:
+            return jsonify({"message": "failed to parse authorization token"}), http.HTTPStatus.UNAUTHORIZED
         return fun(user_email, *args, **kwargs)
 
     # renaming wrapper to function name, so flask doesn't throw exception

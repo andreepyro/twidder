@@ -26,7 +26,6 @@ def disconnect_db():
     if db is not None:
         db.close()
         g.db = None
-    return db
 
 
 def initialize_database():
@@ -257,7 +256,7 @@ def update_post_by_id(post_id: str, author: str, user: str, content: str, create
     """
     try:
         get_db().execute("update post set author=?, user=?, content=?, created=?, edited=?, media=? where id==?",
-                         [author, user, content, created, edited, post_id, media])
+                         [author, user, content, created, edited, media, post_id])
         get_db().commit()
         return True
     except Exception:

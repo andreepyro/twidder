@@ -1,5 +1,5 @@
 // Constants
-const HOST = "localhost:8080";
+const HOST = getCurrentHost();
 const POPUP_MESSAGE_TIME = 4500
 
 // App state management
@@ -637,6 +637,11 @@ async function addPostBrowse(form) {
 async function addPostToWall(htmlWall, postTemplateHtml, userEmail, content, image, video) {
     console.log("Creating a new post: " + userEmail + ", " + content + (", image" ? image != null : "") + (", video" ? video != null : ""));
 
+    if (content != null && content.length > 280) {
+        showError("Only 280 characters are allowed for a post!");
+        return;
+    }
+
     let token = localStorage.getItem("token");
     if (token == null) {
         showError("Error: couldn't load token");
@@ -850,6 +855,11 @@ function postFileUpload(input, imageElementID, videoElementID, removeElementID) 
         return;
     }
 
+    if (file.size / (1024 * 1024) > 50) {
+        showError("The maximum allowed file size is 50MB!");
+        return;
+    }
+
     let reader = new FileReader();
     reader.onloadend = function () {
         removeButton.style.display = "block";
@@ -877,6 +887,23 @@ function postFileUpload(input, imageElementID, videoElementID, removeElementID) 
         };
     }
     reader.readAsDataURL(file);
+}
+
+function getCurrentHost() {
+    var currentURL = window.location.href;
+    
+    // Create a URL object from the current URL
+    var urlObject = new URL(currentURL);
+    
+    // Construct the URL without the protocol
+    var hostWithoutProtocol = urlObject.host;
+    
+    // Remove trailing slash if it exists (and is not the root '/')
+    if (hostWithoutProtocol.endsWith('/') && hostWithoutProtocol !== '/') {
+        hostWithoutProtocol = hostWithoutProtocol.slice(0, -1);
+    }
+    
+    return hostWithoutProtocol;
 }
 
 // INTERACTIVE CSS ELEMENTS

@@ -1,36 +1,13 @@
 import time
-from multiprocessing import Process
-
 import pytest
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-from twidder.database_handler import initialize_database, clear_database
-from twidder.server import app
+from test.e2e.utils import run_server, driver
 
 
-@pytest.fixture(scope="module", autouse=True)
-def run_server():
-    server = Process(target=lambda: app.run(host="localhost", port=8080))
-    server.start()
-    time.sleep(1)  # wait for server to start
-    yield
-    server.terminate()
-    server.join()
-
-
-@pytest.fixture()
-def driver():
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.implicitly_wait(5.0)
-    _reset_database()
-    yield driver
-    driver.quit()
-
-
+@pytest.mark.timeout(60)
 def test_sign_up(driver):
     # try to register user with empty first name
     driver.get("http://localhost:8080/")
@@ -75,6 +52,7 @@ def test_sign_up(driver):
     _register(driver, "Lucy", "Boss", "Female", "Stockholm", "Sweden", "peter@parker.com", "totalysecretpaddowrd", False)
 
 
+@pytest.mark.timeout(60)
 def test_sign_in(driver):
     # try to log in with invalid credentials
     driver.get("http://localhost:8080/")
@@ -98,6 +76,7 @@ def test_sign_in(driver):
     driver.get("http://localhost:8080/")
 
 
+@pytest.mark.timeout(60)
 def test_browse_users(driver):
     # create first user and logout
     driver.get("http://localhost:8080/")
@@ -120,6 +99,7 @@ def test_browse_users(driver):
     _check_browse_tab_user_info(driver, "Peter", "Parker", "Male", "Linkoping", "Sweden", "peter@parker.com")
 
 
+@pytest.mark.timeout(60)
 def test_post_message(driver):
     # create a new user
     driver.get("http://localhost:8080/")
@@ -138,6 +118,7 @@ def test_post_message(driver):
         _check_post_exists(driver, "peter@parker.com", post)
 
 
+@pytest.mark.timeout(60)
 def test_change_account_details(driver):
     # create a new user
     driver.get("http://localhost:8080/")
@@ -162,12 +143,6 @@ def test_change_account_details(driver):
     driver.get("http://localhost:8080/")
     time.sleep(1.0)  # wait until the app is loaded
     _check_home_tab_user_info(driver, "Martin", "Boss", "Female", "Stockholm", "Sweden", "peter@parker.com")
-
-
-def _reset_database():
-    with app.app_context():
-        clear_database()
-        initialize_database()
 
 
 def _login(driver: webdriver.Chrome, email: str, password: str, expect_success: bool):

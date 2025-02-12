@@ -15,6 +15,8 @@ app.register_blueprint(api, url_prefix="/api")
 sock = Sock(app)
 
 app.config["MIN_PASSWORD_LENGTH"] = 8
+app.config["MAX_POST_LENGTH"] = 280  # characters
+app.config["MAX_FILE_SIZE"] = 50 * 1024 * 1024  # 50 MB
 app.config["DATABASE_FILE"] = "./database.db"
 app.config["DATABASE_SCHEMA"] = "./twidder/schema.sql"
 

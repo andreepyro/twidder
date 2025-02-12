@@ -15,10 +15,20 @@ blueprint = Blueprint('posts', __name__)
 def create_post(user_email: str, message: str, email: str):
     """Create a new post."""
 
+    # Check message length
+    if len(message) > current_app.config["MAX_POST_LENGTH"]:
+        return jsonify({"message": f"message length exceeds {current_app.config['MAX_POST_LENGTH']} characters"}), http.HTTPStatus.BAD_REQUEST
+
     # parse optional parameter 'media'
     media = None
     if "media" in (body := request.get_json()):
         media = body["media"]
+
+        # Check media size (base64 encoded size)
+        if media is not None:
+            media_size_bytes = (len(media) * 3) / 4  # Base64 encoding increases size by ~33%
+            if media_size_bytes > current_app.config["MAX_FILE_SIZE"]:
+                return jsonify({"message": f"Media size exceeds {current_app.config['MAX_FILE_SIZE'] / (1024 * 1024):.2f} MB."}), http.HTTPStatus.BAD_REQUEST
 
     if database_handler.get_user_by_email(email) is None:
         return jsonify({"message": "user doesn't exist"}), http.HTTPStatus.FORBIDDEN
@@ -82,11 +92,21 @@ def update_post(user_email: str, post_id: str):
         message = body["message"]
         if message == "":
             return jsonify({"message": "message must not be empty"}), http.HTTPStatus.FORBIDDEN
+        if len(message) > current_app.config["MAX_POST_LENGTH"]:
+            return jsonify({"message": f"message length exceeds {current_app.config['MAX_POST_LENGTH']} characters"}), http.HTTPStatus.BAD_REQUEST
         post["content"] = message
 
     # update media
     if "media" in body:
-        post["media"] = body["media"]
+        media = body["media"]
+
+        # Check media size (base64 encoded size)
+        if media is not None:
+            media_size_bytes = (len(media) * 3) / 4  # Base64 encoding increases size by ~33%
+            if media_size_bytes > current_app.config["MAX_FILE_SIZE"]:
+                return jsonify({"message": f"Media size exceeds {current_app.config['MAX_FILE_SIZE'] / (1024 * 1024):.2f} MB."}), http.HTTPStatus.BAD_REQUEST
+
+        post["media"] = media
 
     # update edited time
     post["edited"] = datetime.datetime.now(datetime.timezone.utc)
