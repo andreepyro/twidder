@@ -319,7 +319,7 @@ components:
         edited:
           type: string
           format: date-time
-        content:
+        message:
           type: string
         media:
           type: string
@@ -329,21 +329,21 @@ components:
         - author
         - created
         - edited
-        - content
+        - message
         - media
     NewPost:
       type: object
       properties:
-        user:
+        email:
           type: string
-        content:
+        message:
           type: string
         media:
           type: string
           format: binary
       required:
-        - user
-        - content
+        - email
+        - message
     EditPost:
       type: object
       properties:
